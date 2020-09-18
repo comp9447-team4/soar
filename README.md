@@ -95,7 +95,7 @@ aws_secret_access_key = <SECRET>
 [qa]
 source_profile = qa-user
 region = ap-southeast-2
-role_arn = arn:aws:iam::306967644367:role/qa-RestrictedAdmin
+role_arn = arn:aws:iam::306967644367:role/qa-project-member
 mfa_serial = arn:aws:iam::306967644367:mfa/<YOUR_USERNAME>
 ```
 
