@@ -30,7 +30,7 @@ Parameters:
     Type: String
     Description: 'The CloudFormation export name prefix used with the resource name for the resources created, eg Baseline-PrivilegedAdminRole'
     Default: 'Baseline'
-    MinLength: '3'
+    MinLength: '2'
     MaxLength: '32'
   # BaselineS3TemplateBucket:
   #   Type: String

@@ -1,11 +1,18 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   Users for COMP9447 Team 4
-
+Parameters:
+  BaselineExportName:
+    Type: String
+    Description: 'The CloudFormation export name prefix used with the resource name for the resources created, eg Baseline-PrivilegedAdminRole'
+    Default: 'Baseline'
+    MinLength: '2'
+    MaxLength: '32'
 Resources:
   Justin:
     Type: 'AWS::IAM::User'
     Properties:
       UserName: "justin"
       Groups:
-        - !ImportValue RestrictedAdminGroup
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"

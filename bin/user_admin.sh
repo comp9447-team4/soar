@@ -9,14 +9,16 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 export USER_ROLES_STACK_NAME="user-roles"
 export USERS_STACK_NAME="users"
 
-source "${REPO_ROOT}"/_utils.sh
+source "${REPO_ROOT}"/bin/_utils.sh
 
 create_user_role_stack() {
     echo "Creating role stack..."
     local parameters
-    parameters=$("${REPO_ROOT}"/users/users-parameters.json |
-                sed "s/{{ AWS_PROFILE}}/${AWS_PROFILE}/g" |
+    parameters=$(cat "${REPO_ROOT}"/infra/users/users-parameters.json |
+                sed "s/{{ AWS_PROFILE }}/${AWS_PROFILE}/g" |
                 jq)
+
+    echo "${parameters}"
 
     aws cloudformation create-stack --stack-name "${USER_ROLES_STACK_NAME}" \
         --template-body file://"${REPO_ROOT}"/infra/users/roles.yml \
@@ -28,6 +30,14 @@ create_users_stack() {
     echo "Creating users stack..."
     aws cloudformation create-stack --stack-name "${USERS_STACK_NAME}" \
         --template-body file://"${REPO_ROOT}"/infra/users/users.yml \
+        --parameters ParameterKey=BaselineExportName,ParameterValue="${AWS_PROFILE}" \
+        --capabilities CAPABILITY_NAMED_IAM
+}
+
+update_users_stack() {
+    aws cloudformation update-stack --stack-name "${USERS_STACK_NAME}" \
+        --template-body file://"${REPO_ROOT}"/infra/users/users.yml \
+        --parameters ParameterKey=BaselineExportName,ParameterValue="${AWS_PROFILE}" \
         --capabilities CAPABILITY_NAMED_IAM
 }
 
@@ -51,6 +61,8 @@ main() {
         create_user_role_stack
     elif [ "${args}" == "create-users-stack" ]; then
         create_users_stack
+    elif [ "${args}" == "update-users-stack" ]; then
+        update_users_stack
     elif [ "${args}" == "delete-users-stack" ]; then
         delete_users_stack
     fi
