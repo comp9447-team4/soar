@@ -1,4 +1,6 @@
-# COMP9447 Team 4 - 2020T3
+# COMP9447 Team 4 - 2020T3 - SOAR
+
+The main repo for the SOAR project (COMP9447 Team4)
 
 ```
 Team 4 (Drupal)
@@ -108,4 +110,8 @@ These contain infrastructure-as-code for comp9447-team4.
 **THIS WILL ONLY BE NEEDED TO BE DONE ONCE** (Already provisioned for you).
 
 
-# More to come
+# Branching (TODO)
+
+* Checkout new branches from `dev` and submit new PRs onto `dev`.
+* When we are satisfied with the `dev` branch, submit a PR to `master`
+* Checkout a release branch off `master` (todo)
