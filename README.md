@@ -12,15 +12,31 @@ Your username has been provisioned for you but you would still need to generate 
 
 Steps:
 * Go to AWS Console https://comp9447-team4-qa.signin.aws.amazon.com/console (I'll provide a password via Discord)
-* Generate a new password on login and keep it safe
-* Go to AWS IAM -> Users -> Find your user
-* Generate Access Keys and save it in your `~/.aws/credentials`
+
+![](doc/img/login.png)
+
+* On your first login, it will ask for you to generate a new password on login and keep it safe
+* Go to AWS IAM -> Users -> Find your user -> Security Credentials
+* Generate Access Keys and save it in your `~/.aws/credentials`. (See screenshot)
 * Download Google Authenticator on your phone.
-* Enabled MFA and copy the ARN to `~/.aws/credentials` as `mfa_serial`. (See example below)
+* Enabled MFA, save it on  your Google authenticator and copy the ARN to `~/.aws/credentials` as `mfa_serial`. (See screenshot below)
 
 ![](doc/img/user-setup.png)
 
 Note you will **not** be able to call commands if you do not have MFA enabled. This is part of a well architected framework.
+
+## Test if your setup works
+
+Test if you can call this command, if it works, you should see some json output:
+
+```
+AWS_PROFILE=qa aws sts get-caller-identity
+{
+    UserId: "...",
+    Account: "..."
+    Arn: "..."
+}
+```
 
 ## AWS CLI
 
