@@ -1,10 +1,53 @@
 # COMP9447 Team 4 - 2020T3
 
-TODO
-Members:
+```
+Team 4 (Drupal)
+Mentor: Paul Hawkins
+Tutor: Chong Yew Chang
 
+Members:
+Nathan Driscoll
+Justin Ty
+Sarah Ailin Liu
+Yunsar Jilliani
+Keung Lee
+Elton Wong
+Evangeline Endacott
+William Yin
+Dallas Yan
+```
 
 # Setup
+
+These are written in `bash` which glues together AWS commands. This works best under Linux / MacOS.
+
+If you are on Windows, Cygwin / WSL may work but it may not be as smooth.
+
+* https://docs.microsoft.com/en-us/windows/wsl/install-win10
+* https://www.cygwin.com/
+
+
+# Setup prerequisites
+
+This varies by OS but these instructions are for a Debian / Ubuntu based system.
+You can also use `brew` for MacOS or Chocolatey for `Windows`.
+
+## Jq
+json parsing for API calls
+
+```
+sudo apt install direnv jq
+```
+
+## Direnv
+Setup direnv for environment variables. This is used for substituing environment variables to params.
+It's optional, you can just set your environment variables as in `.envrc-demo`.
+```
+cp .envrc-demo .envrc
+direnv allow
+
+echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
+```
 
 ## AWS IAM User
 
