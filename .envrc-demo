@@ -1,0 +1,4 @@
+# Use this for saving environment variables
+# DO NOT COMMIT the .envrc file!
+export REPO_ROOT=$(git rev-parse --show-toplevel)
+export AWS_ENVIRONMENT="qa"
