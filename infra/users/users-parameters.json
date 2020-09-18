@@ -5,10 +5,10 @@
     },
     {
         "ParameterKey": "BaselineExportName",
-        "ParameterValue": "UserMgt"
+        "ParameterValue": "{{ AWS_PROFILE }}"
     },
     {
         "ParameterKey": "BaselineNamePrefix",
-        "ParameterValue": "UserMgt"
+        "ParameterValue": "{{ AWS_PROFILE }}"
     }
 ]
