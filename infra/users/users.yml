@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Users for COMP9447 Team 4
+Parameters:
+  BaselineExportName:
+    Type: String
+    Description: 'The CloudFormation export name prefix used with the resource name for the resources created, eg Baseline-PrivilegedAdminRole'
+    Default: 'Baseline'
+    MinLength: '2'
+    MaxLength: '32'
+Resources:
+  Nathan:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: "nathan"
+      Groups:
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"
+  Justin:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: "justin"
+      Groups:
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-PrivilegedAdminGroup"
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"
+  Evangeline:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: "evangeline"
+      Groups:
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"
+  Sarah:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: "sarah"
+      Groups:
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"
+  Yunsar:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: "yunsar"
+      Groups:
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"
+  Keung:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: "keung"
+      Groups:
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"
+  Elton:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: "elton"
+      Groups:
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"
+  William:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: "william"
+      Groups:
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"
+  Dallas:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: "dallas"
+      Groups:
+        - Fn::ImportValue:
+            !Sub "${BaselineExportName}-RestrictedAdminGroup"
