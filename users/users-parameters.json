@@ -5,10 +5,10 @@
     },
     {
         "ParameterKey": "BaselineExportName",
-        "ParameterValue": "{{ AWS_ENVIRONMENT }}"
+        "ParameterValue": "users-"
     },
     {
         "ParameterKey": "BaselineNamePrefix",
-        "ParameterValue": "{{ AWS_ENVIRONMENT }}"
+        "ParameterValue": "users-"
     }
 ]
