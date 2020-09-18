@@ -15,4 +15,6 @@ Resources:
       UserName: "justin"
       Groups:
         - Fn::ImportValue:
+            !Sub "${BaselineExportName}-PrivilegedAdminGroup"
+        - Fn::ImportValue:
             !Sub "${BaselineExportName}-RestrictedAdminGroup"
