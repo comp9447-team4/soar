@@ -516,6 +516,11 @@ Outputs:
     Value: !Ref RestrictedAdminGroup
     Export:
       Name: !Sub '${BaselineExportName}-RestrictedAdminGroup'
+  PrivilegedAdminGroup:
+    Description: Privileged Admin Group
+    Value: !Ref PrivilegedAdminGroup
+    Export:
+      Name: !Sub '${BaselineExportName}-PrivilegedAdminGroup'
   RestrictedAdminRole:
     Description: Restricted Admin Role
     Value: !GetAtt RestrictedAdminRole.Arn

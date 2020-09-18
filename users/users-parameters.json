@@ -5,10 +5,10 @@
     },
     {
         "ParameterKey": "BaselineExportName",
-        "ParameterValue": "users-"
+        "ParameterValue": "UserMgt"
     },
     {
         "ParameterKey": "BaselineNamePrefix",
-        "ParameterValue": "users-"
+        "ParameterValue": "UserMgt"
     }
 ]
