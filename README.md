@@ -20,6 +20,8 @@ Steps:
 
 ![](doc/img/user-setup.png)
 
+Note you will **not** be able to call commands if you do not have MFA enabled. This is part of a well architected framework.
+
 ## AWS CLI
 
 Copy this template to your `~/.aws/cli`
