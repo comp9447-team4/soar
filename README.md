@@ -19,17 +19,46 @@ William Yin
 Dallas Yan
 ```
 
-# Setup
+# User Setup
 
-These are written in `bash` which glues together AWS commands. This works best under Linux / MacOS.
+## AWS CLI
 
-If you are on Windows, Cygwin / WSL may work but it may not be as smooth.
+Install AWS CLI 2. Version 2 is required for AWS SSO.
 
-* https://docs.microsoft.com/en-us/windows/wsl/install-win10
-* https://www.cygwin.com/
+https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
 
+## AWS SSO
+
+I'll send an email via AWS SSO. Follow the email instructions and add an MFA device.
+
+Our portal is in:
+https://comp9447-team4.awsapps.com/start
+
+You would need an MFA device to login. Register with Google Authenticator on your phone and scan the QR code.
+
+To use the CLI with SSO, see:
+https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html
+
+Once logged in via SSO, configure your AWS CLI in a terminal:
+
+```
+aws configure sso
+SSO Start URL: https://comp9447-team4.awsapps.com/start
+SSO Region: ap-southeast-2
+CLI default client Region: ap-southeast-2
+CLI default output format: json
+CLI profile name: qa (or) prod --> THIS IS IMPORTANT! Otherwise you might have to type in a very long profile name...
+```
+
+To test this, run this command in `qa`:
+
+```
+aws sts get-caller-identity --profile qa
+```
 
 # Setup prerequisites
+
+These are written in `bash` which glues together AWS commands. This works best under Linux / MacOS.
 
 This varies by OS but these instructions are for a Debian / Ubuntu based system.
 You can also use `brew` for MacOS or Chocolatey for `Windows`.
@@ -50,29 +79,7 @@ direnv allow
 
 echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
 ```
-## AWS SSO
 
-I'll send an email via AWS SSO.
-
-## AWS CLI
-
-Copy this template to your `~/.aws/cli`
-
-```
-[qa-user]
-aws_access_key_id = <SECRET>
-aws_secret_access_key = <SECRET>
-
-[qa]
-source_profile = qa-user
-region = ap-southeast-2
-<<<<<<< HEAD
-role_arn = arn:aws:iam::306967644367:role/qa-RestrictedAdmin
-=======
-role_arn = arn:aws:iam::306967644367:role/qa-project-member
->>>>>>> 14502ca4328dcf2378f202ed288e405f0120aa65
-mfa_serial = arn:aws:iam::306967644367:mfa/<YOUR_USERNAME>
-```
 
 # infra/ 
 
@@ -84,12 +91,3 @@ These contain infrastructure-as-code for comp9447-team4.
 
 **THIS WILL ONLY BE NEEDED TO BE DONE ONCE** (Already provisioned for you).
 
-
-<<<<<<< HEAD
-# More to come
-=======
-# Branching (TODO)
-
-* Checkout new branches from `dev` and submit new PRs onto `dev`.
-* When we are satisfied with the `dev` branch, submit a PR to `master`
-* Checkout a release branch off `master` (todo)
