@@ -27,24 +27,23 @@ Resources:
         - Sid: AllowEC2
           Effect: Allow
           Action: ec2:*
-          Resource: "arn:aws:ec2:ap-southeast-2:*"
+          Resource: "*"
         - Sid: AllowCFN
           Effect: Allow
           Action: cloudformation:*
-          Resource: "arn:aws:cloudformation:ap-southeast-2:*"
+          Resource: "*"
         - Sid: AllowCloudwatch
           Effect: Allow
           Action: cloudwatch:*
-          Resource: "arn:aws:cloudwatch:ap-southeast-2:*"
+          Resource: "*"
         - Sid: AllowLambda
           Effect: Allow
           Action: lambda:*
-          Resource: "arn:aws:lambda:ap-southeast-2:*"
+          Resource: "*"
         - Sid: AllowGuardDuty
           Effect: Allow
           Action: guardduty:*
-          Resource: "arn:aws:guardduty:ap-southeast-2:*"
-
+          Resource: "*"
 Outputs:
   DeveloperRole:
     Description: Developer role in Sydney
