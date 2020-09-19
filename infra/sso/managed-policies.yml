@@ -13,7 +13,6 @@ Resources:
         - Sid: DenyAdmin
           Effect: Deny
           Action:
-          - iam:*
           - organizations:*
           - account:*
           Resource: "*"
@@ -21,22 +20,30 @@ Resources:
           Effect: Allow
           Action: s3:*
           Resource: "*"
+        - Sid: AllowIam
+          Effect: Allow
+          Action: iam:*
+          Resource: "*"
         - Sid: AllowEC2
           Effect: Allow
           Action: ec2:*
-          Resource: arn:aws:ec2:ap-southeast-2:*:*
+          Resource: "arn:aws:ec2:ap-southeast-2:*"
         - Sid: AllowCFN
           Effect: Allow
           Action: cloudformation:*
-          Resource: arn:aws:ec2:ap-southeast-2:*:*
+          Resource: "arn:aws:cloudformation:ap-southeast-2:*"
         - Sid: AllowCloudwatch
           Effect: Allow
           Action: cloudwatch:*
-          Resource: arn:aws:ec2:ap-southeast-2:*:*
+          Resource: "arn:aws:cloudwatch:ap-southeast-2:*"
         - Sid: AllowLambda
           Effect: Allow
           Action: lambda:*
-          Resource: arn:aws:ec2:ap-southeast-2:*:*
+          Resource: "arn:aws:lambda:ap-southeast-2:*"
+        - Sid: AllowGuardDuty
+          Effect: Allow
+          Action: guardduty:*
+          Resource: "arn:aws:guardduty:ap-southeast-2:*"
 
 Outputs:
   DeveloperRole:
