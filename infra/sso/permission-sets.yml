@@ -11,29 +11,5 @@ Resources:
       Name: PowerUserAccessPermissionSet
       Description: PowerUser
       InstanceArn: arn:aws:sso:::instance ??? what is this ??
-      InlinePolicy: |
-        {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "NotAction": [
-                    "iam:*",
-                    "organizations:*",
-                    "account:*"
-                ],
-                "Resource": "*"
-            },
-            {
-                "Effect": "Allow",
-                "Action": [
-                    "iam:CreateServiceLinkedRole",
-                    "iam:DeleteServiceLinkedRole",
-                    "iam:ListRoles",
-                    "organizations:DescribeOrganization",
-                    "account:ListRegions"
-                ],
-                "Resource": "arn:aws:*:ap-southeast-2:*"
-            }
-        ]
-        }
+      ManagedPolicies:
+        - !ImportValue DeveloperManagedPolicy

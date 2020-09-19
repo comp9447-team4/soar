@@ -5,7 +5,7 @@
 set -eu
 
 export REPO_ROOT=$(git rev-parse --show-toplevel)
-export MANAGED_POLICIES_STACK_NAME="sso-roles"
+export MANAGED_POLICIES_STACK_NAME="sso-managed-policies"
 
 source "${REPO_ROOT}"/bin/_utils.sh
 

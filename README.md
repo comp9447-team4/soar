@@ -21,23 +21,32 @@ Dallas Yan
 
 # User Setup
 
+## AWS SSO
+
+I'll send an email via AWS SSO. Follow the email instructions and add an MFA device.
+
+Our portal can be found in:
+https://comp9447-team4.awsapps.com/start
+
+You would need an MFA device to login. Register with Google Authenticator on your phone and scan the QR code.
+
+If you've set it up properly, you would be able to login to the console and see this:
+
+![](doc/img/single-signon.png)
+
+Use the `developer` role for normal use and `billing` to keep track of $.
+
 ## AWS CLI
 
 Install AWS CLI 2. Version 2 is required for AWS SSO.
 
 https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
 
-## AWS SSO
-
-I'll send an email via AWS SSO. Follow the email instructions and add an MFA device.
-
-Our portal is in:
-https://comp9447-team4.awsapps.com/start
-
-You would need an MFA device to login. Register with Google Authenticator on your phone and scan the QR code.
+## AWS SSO CLI setup
 
 To use the CLI with SSO, see:
 https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html
+
 
 Once logged in via SSO, configure your AWS CLI in a terminal:
 
@@ -53,7 +62,7 @@ CLI profile name: qa (or) prod --> THIS IS IMPORTANT! Otherwise you might have t
 To test this, run this command in `qa`:
 
 ```
-aws sts get-caller-identity --profile qa
+aws s3 ls --profile qa
 ```
 
 # Setup prerequisites
@@ -90,4 +99,8 @@ These contain infrastructure-as-code for comp9447-team4.
 `infra/users/` contains the setup for AWS users that follows the well architected labs.
 
 **THIS WILL ONLY BE NEEDED TO BE DONE ONCE** (Already provisioned for you).
+
+# Drupal
+
+TODO...
 
