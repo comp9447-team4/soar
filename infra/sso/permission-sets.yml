@@ -1,17 +1,16 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  This defines the permission set for AWS SSO.
-  All users will have PowerUserAccess only at the Sydney region.
-  To be run in the master account.
+  This defines the permission set for AWS SSO to be run in the master account.
+  Should all users will have PowerUserAccess to Sydney region?
   This has not been run using CFN because what is instance sso arn?.
-  Manually created
+  Manually created for now.
 Resources:
   PowerUserAccessSydney:
     Type: AWS::SSO::PermissionSet
     Properties:
       Name: PowerUserAccessPermissionSet
       Description: PowerUser
-      InstanceArn: arn:aws:sso:::instance ??? WHAT IS THIS???
+      InstanceArn: arn:aws:sso:::instance ??? what is this ??
       InlinePolicy: |
         {
         "Version": "2012-10-17",

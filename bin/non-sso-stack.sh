@@ -1,6 +1,7 @@
 #!/bin/bash
 # Deploys IAM user roles
 # This only needs to be done once per environment!
+# This is legacy (non sso) to be deprecated once we have AWS SSO
 
 set -eu
 

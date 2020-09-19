@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  The power user role in Sydney
+Resources:
+  DeveloperManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: A managed policy only for developers
+      ManagedPolicyName: DeveloperManagedPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          NotAction:
+          - iam:*
+          - organizations:*
+          - account:*
+          Resource: "*"
+        - Sid: S3
+          Effect: Allow
+          Action: s3:*
+          Resource: "*"
+        - Sid: EC2
+          Effect: Allow
+          Action: ec2:*
+          Resource: arn:aws:ec2:ap-southeast-2:*:*
