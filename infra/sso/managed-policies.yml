@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Developer role in Sydney
+Resources:
+  DeveloperManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: A managed policy only for developers
+      ManagedPolicyName: DeveloperManagedPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: DenyAdmin
+          Effect: Deny
+          Action:
+          - organizations:*
+          - account:*
+          Resource: "*"
+        - Sid: AllowS3
+          Effect: Allow
+          Action: s3:*
+          Resource: "*"
+        - Sid: AllowIam
+          Effect: Allow
+          Action: iam:*
+          Resource: "*"
+        - Sid: AllowEC2
+          Effect: Allow
+          Action: ec2:*
+          Resource: "*"
+        - Sid: AllowCFN
+          Effect: Allow
+          Action: cloudformation:*
+          Resource: "*"
+        - Sid: AllowCloudwatch
+          Effect: Allow
+          Action: cloudwatch:*
+          Resource: "*"
+        - Sid: AllowLambda
+          Effect: Allow
+          Action: lambda:*
+          Resource: "*"
+        - Sid: AllowGuardDuty
+          Effect: Allow
+          Action: guardduty:*
+          Resource: "*"
+Outputs:
+  DeveloperRole:
+    Description: Developer role in Sydney
+    Value: !Ref DeveloperManagedPolicy
+    Export:
+      Name: DeveloperManagedPolicy
