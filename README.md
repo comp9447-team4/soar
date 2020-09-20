@@ -50,13 +50,15 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html
 
 Once logged in via SSO, configure your AWS CLI in a terminal:
 
-```
+```sh
 aws configure sso
 SSO Start URL: https://comp9447-team4.awsapps.com/start
 SSO Region: ap-southeast-2
+<It will ask you to select qa or prod. Select qa to start with>
+
 CLI default client Region: ap-southeast-2
 CLI default output format: json
-CLI profile name: qa (or) prod --> THIS IS IMPORTANT! Otherwise you might have to type in a very long profile name...
+CLI profile name [CLI profile name [DeveloperAccess-306967644367]]: qa --> THIS IS IMPORTANT! Otherwise you might have to type in a very long profile name...
 ```
 
 To test this, run this command in `qa`:
@@ -65,7 +67,21 @@ To test this, run this command in `qa`:
 aws s3 ls --profile qa
 ```
 
-# Setup prerequisites
+## Having issues with SSO?
+
+Remove the cache and retry.
+
+```
+mv ~/.aws/sso ~/.aws/sso.bak
+mv ~/.aws/config ~/.aws/config.bak
+
+aws configure sso
+# Clean up if successful
+# rm -rf ~/.aws/sso.bak
+# rm -f ~/.aws/config.bak
+```
+
+# Repo prerequisites
 
 These are written in `bash` which glues together AWS commands. This works best under Linux / MacOS.
 
@@ -87,6 +103,8 @@ cp .envrc-demo .envrc
 direnv allow
 
 echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
+
+# DO NOT COMMIT YOUR .envrc
 ```
 
 
@@ -102,5 +120,32 @@ These contain infrastructure-as-code for comp9447-team4.
 
 # Drupal
 
-TODO...
+This will only need to be done **once**. Do not destroy the existing stack.
 
+https://aws.amazon.com/quickstart/architecture/drupal/
+
+Create a key pair with:
+
+```
+export AWS_PROFILE=qa
+./bin/key-pair.sh create
+./bin/key-pair.sh describe
+```
+
+Make sure you save it.
+
+
+Deploy the stack with:
+
+```
+export AWS_PROFILE=qa
+./bin/stack.sh create
+```
+
+## Clean up
+
+```
+export AWS_PROFILE=qa
+./bin/key-pair.sh delete
+./bin/stach.sh delete
+```

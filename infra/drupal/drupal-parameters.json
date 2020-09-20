@@ -1,0 +1,34 @@
+[
+    {
+        "ParameterKey": "AutoScalingNotificationEmail",
+        "ParameterValue": "{{ DEVELOPER_EMAIL }}"
+    },
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "{{ AVAILABILITY_ZONES }}"
+    },
+    {
+        "ParameterKey": "DBMasterUserPassword",
+        "ParameterValue": "{{ PASSWORD }}"
+    },
+    {
+        "ParameterKey": "DrupalDbPassword",
+        "ParameterValue": "{{ PASSWORD }}"
+    },
+    {
+        "ParameterKey": "DrupalSiteAdminEmail",
+        "ParameterValue": "{{ DEVELOPER_EMAIL }}"
+    },
+    {
+        "ParameterKey": "DrupalSiteAdminPassword",
+        "ParameterValue": "{{ PASSWORD }}"
+    },
+    {
+        "ParameterKey": "RemoteAccessCIDR",
+        "ParameterValue": "{{ REMOTE_ACCESS_CIDER }}"
+    },
+    {
+        "ParameterKey": "KeyPair",
+        "ParameterValue": "{{ KEY_PAIR }}"
+    }
+]

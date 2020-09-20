@@ -2,7 +2,8 @@
 # Deploys IAM user roles for AWS SSO stack
 # This only needs to be done once
 
-set -eu
+set -e
+set -u
 
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 export MANAGED_POLICIES_STACK_NAME="sso-managed-policies"
