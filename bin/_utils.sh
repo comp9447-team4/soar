@@ -13,6 +13,8 @@ check_environment() {
     elif [ "${AWS_PROFILE}" == "master-admin" ]; then
         echo "In environment: master-admin"
     else
-        echo "Unknown AWS_PROFILE. Did you setup your aws cli properly?"
+        echo "Unknown AWS_PROFILE. Must be 'qa' or 'prod'. Did you setup your aws cli properly? See README."
+        echo "Exiting..."
+        exit 1
     fi
 }
