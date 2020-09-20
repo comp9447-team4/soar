@@ -2,11 +2,11 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   Developer role in Sydney
 Resources:
-  DeveloperManagedPolicy:
+  DeveloperAccessManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
       Description: A managed policy only for developers
-      ManagedPolicyName: Developer
+      ManagedPolicyName: DeveloperAccess
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -20,36 +20,24 @@ Resources:
           Effect: Allow
           Action: s3:*
           Resource: "*"
-          Condition:
-            BoolIfExists:
-              aws:MultiFactorAuthPresent: 'true'
         - Sid: AllowIam
           Effect: Allow
           Action: iam:*
           Resource: "*"
-          Condition:
-            BoolIfExists:
-              aws:MultiFactorAuthPresent: 'true'
-            StringEquals:
-              aws:RequestedRegion: ap-southeast-2
         - Sid: AllowEC2
           Effect: Allow
           Action: ec2:*
           Resource: "*"
           Condition:
-            BoolIfExists:
-              aws:MultiFactorAuthPresent: 'true'
-            StringEquals:
-              ec2:Region: ap-southeast-2
             StringEquals:
               aws:RequestedRegion: ap-southeast-2
+            StringEquals:
+              ec2:Region: ap-southeast-2
         - Sid: AllowCFN
           Effect: Allow
           Action: cloudformation:*
           Resource: "*"
           Condition:
-            BoolIfExists:
-              aws:MultiFactorAuthPresent: 'true'
             StringEquals:
               aws:RequestedRegion: ap-southeast-2
         - Sid: AllowCloudwatch
@@ -57,8 +45,6 @@ Resources:
           Action: cloudwatch:*
           Resource: "*"
           Condition:
-            BoolIfExists:
-              aws:MultiFactorAuthPresent: 'true'
             StringEquals:
               aws:RequestedRegion: ap-southeast-2
         - Sid: AllowLambda
@@ -66,8 +52,6 @@ Resources:
           Action: lambda:*
           Resource: "*"
           Condition:
-            BoolIfExists:
-              aws:MultiFactorAuthPresent: 'true'
             StringEquals:
               aws:RequestedRegion: ap-southeast-2
         - Sid: AllowGuardDuty
@@ -75,11 +59,9 @@ Resources:
           Action: guardduty:*
           Resource: "*"
           Condition:
-            BoolIfExists:
-              aws:MultiFactorAuthPresent: 'true'
             StringEquals:
               aws:RequestedRegion: ap-southeast-2
-  BillingViewManagedPolicy:
+  BillingViewAccessManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
       Description: View billing information
@@ -95,18 +77,15 @@ Resources:
           - aws-portal:ViewBilling
           - aws-portal:ViewUsage
           Resource: "*"
-          Condition:
-            BoolIfExists:
-              aws:MultiFactorAuthPresent: 'true'
 
 Outputs:
-  DeveloperManagedPolicy:
-    Description: DeveloperManagedPolicy
-    Value: !Ref DeveloperManagedPolicy
+  DeveloperAccessManagedPolicy:
+    Description: DeveloperAccessManagedPolicy
+    Value: !Ref DeveloperAccessManagedPolicy
     Export:
-      Name: DeveloperManagedPolicy
-  BillingViewManagedPolicy:
-    Description: BillingViewManagedPolicy
-    Value: !Ref BillingViewManagedPolicy
+      Name: DeveloperAccessManagedPolicy
+  BillingViewAccessManagedPolicy:
+    Description: BillingViewAccessManagedPolicy
+    Value: !Ref BillingViewAccessManagedPolicy
     Export:
-      Name: BillingViewManagedPolicy
+      Name: BillingViewAccessManagedPolicy
