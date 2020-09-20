@@ -3,4 +3,4 @@
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 export AWS_ENVIRONMENT="qa"
 export MY_IP=$(curl https://api.myip.com | jq -r .'ip')
-export EMAIL="your@email.com"
+export DEVELOPER_EMAIL="your@email.com"

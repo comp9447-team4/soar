@@ -96,7 +96,7 @@ sudo apt install direnv jq
 ```
 
 ## Direnv
-Setup direnv for environment variable. This is used for substituing environment variables to params.
+Setup direnv for environment variables. This is used for substituing environment variables to params.
 It's optional, you can just set your environment variables as in `.envrc-demo`.
 ```
 cp .envrc-demo .envrc
