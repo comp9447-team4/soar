@@ -25,12 +25,26 @@ delete_managed_policies() {
     aws cloudformation delete-stack --stack-name "${MANAGED_POLICIES_STACK_NAME}"
 }
 
+usage() {
+    cat <<EOF
+Manages the SSO stack on the MASTER ACCOUNT.
+Only the admin can change this.
+
+Usage: ./bin/sso-stack.sh <arg>
+Where arg is:
+create-managed-policies
+delete-managed-policies
+update-managed-policies
+EOF
+}
+
 main() {
     args="$@"
     check_environment
 
     if [[ "${AWS_PROFILE}" != "master-admin" ]]; then
-        echo "This must be run in the master account!"
+        echo "Got AWS_PROFILE: ${AWS_PROFILE}"
+        echo "This must be run in the master account! (master-admin)"
         echo "Exiting."
         exit 1
     fi
@@ -43,6 +57,7 @@ main() {
         update_managed_policies
     else
         echo "No command run :("
+        usage
     fi
 
 }
