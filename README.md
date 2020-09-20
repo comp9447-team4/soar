@@ -120,6 +120,8 @@ These contain infrastructure-as-code for comp9447-team4.
 
 # Drupal
 
+This will only need to be done **once**. Do not destroy the existing stack.
+
 https://aws.amazon.com/quickstart/architecture/drupal/
 
 Create a key pair with:
