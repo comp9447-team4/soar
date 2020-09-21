@@ -138,7 +138,7 @@ Resources:
         }
 
   # Read-only for Billing
-  BillingAccessPermissionSet:
+  BillingViewAccessPermissionSet:
     Type: AWS::SSO::PermissionSet
     Properties:
       Name: BillingViewAccess
@@ -177,7 +177,7 @@ Resources:
     Type: AWS::SSO::Assignment
     Properties:
       InstanceArn: !Ref SSOInstanceArn
-      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PermissionSetArn: !GetAtt BillingViewAccessPermissionSet.PermissionSetArn
       PrincipalId: !Ref SSODevelopersGroupId
       PrincipalType: GROUP
       TargetId: !Ref MasterAccountId
@@ -186,7 +186,7 @@ Resources:
     Type: AWS::SSO::Assignment
     Properties:
       InstanceArn: !Ref SSOInstanceArn
-      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PermissionSetArn: !GetAtt AdministratorAccessPermissionSet.PermissionSetArn
       PrincipalId: !Ref SSOAdministratorsGroupId
       PrincipalType: GROUP
       TargetId: !Ref QaAccountId
@@ -204,7 +204,7 @@ Resources:
     Type: AWS::SSO::Assignment
     Properties:
       InstanceArn: !Ref SSOInstanceArn
-      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PermissionSetArn: !GetAtt AdministratorAccessPermissionSet.PermissionSetArn
       PrincipalId: !Ref SSOAdministratorsGroupId
       PrincipalType: GROUP
       TargetId: !Ref ProdAccountId
