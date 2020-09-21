@@ -1,0 +1,22 @@
+[
+    {
+        "ParameterKey": "QaAccountId",
+        "ParameterValue": "{{ QA_ACCOUNT_ID }}"
+    },
+    {
+        "ParameterKey": "ProdAccountId",
+        "ParameterValue": "{{ PROD_ACCOUNT_ID }}"
+    },
+    {
+        "ParameterKey": "SSOAdministratorsGroupId",
+        "ParameterValue": "{{ SSO_ADMINISTRATORS_GROUP_ID }}"
+    },
+    {
+        "ParameterKey": "SSODevelopersGroupId",
+        "ParameterValue": "{{ SSO_DEVELOPERS_GROUP_ID }}"
+    },
+    {
+        "ParameterKey": "SSOInstanceArn",
+        "ParameterValue": "{{ SSO_INSTANCE_ARN }}"
+    }
+]

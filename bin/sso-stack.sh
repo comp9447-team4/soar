@@ -11,16 +11,34 @@ export SSO_STACK_NAME="sso"
 
 source "${REPO_ROOT}"/bin/_utils.sh
 
+get_parameters() {
+    parameters=$(cat "${REPO_ROOT}"/infra/sso/sso-parameters.json |
+                     sed "s/{{ QA_ACCOUNT_ID }}/${QA_ACCOUNT_ID}/g" |
+                     sed "s/{{ PROD_ACCOUNT_ID }}/${PROD_ACCOUNT_ID}/g" |
+                     sed "s/{{ SSO_ADMINISTRATORS_GROUP_ID }}/${SSO_ADMINISTRATORS_GROUP_ID}/g" |
+                     sed "s/{{ SSO_DEVELOPERS_GROUP_ID }}/${SSO_DEVELOPERS_GROUP_ID}/g" |
+                     sed "s/{{ SSO_INSTANCE_ARN }}/${SSO_INSTANCE_ARN}/g" |
+                     jq)
+    echo "${parameters}"
+}
+
 create() {
+    local parameters
+    parameters=$(get_parameters)
+    echo "${parameters}"
     aws cloudformation create-stack --stack-name "${SSO_STACK_NAME}" \
-        --template-body file://"${REPO_ROOT}"/infra/sso/managed-policies.yml \
-        --capabilities CAPABILITY_NAMED_IAM
+        --template-body file://"${REPO_ROOT}"/infra/sso/sso-stack.yml \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters "${parameters}"
 }
 
 update() {
+    local parameters
+    parameters=$(get_parameters)
     aws cloudformation update-stack --stack-name "${SSO_STACK_NAME}" \
-        --template-body file://"${REPO_ROOT}"/infra/sso/managed-policies.yml \
-        --capabilities CAPABILITY_NAMED_IAM
+        --template-body file://"${REPO_ROOT}"/infra/sso/sso-stack.yml \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters "${parameters}"
 }
 
 delete() {

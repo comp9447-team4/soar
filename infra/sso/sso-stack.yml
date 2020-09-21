@@ -4,23 +4,18 @@ Description: >-
 Parameters:
   SSOInstanceArn:
     Type: String
-    Default: arn:aws:sso:::instance/ssoins-8259a65681d80bfc
     Description: The instance arn of SSO. See aws sso-admin help to get the instance arn.
-  AdministratorsGroupId:
+  SSOAdministratorsGroupId:
     Type: String
-    Default: 97671e4d05-7d0a4a6e-b156-4969-baa0-cf4d771b9624
-    Description: The group id of administrators in SSO
-  DevelopersGroupId:
+    Description: The SSO group id of administrators in SSO
+  SSODevelopersGroupId:
     Type: String
-    Default: 97671e4d05-8bebfdd3-42cf-459e-a9a2-3d462c48706c
-    Description: The group id of developers
+    Description: The SSO group id of developers
   QaAccountId:
     Type: String
-    Default: 306967644367
     Description: Qa account id
   ProdAccountId:
     Type: String
-    Default: 389413969684
     Description: Prod account id
 
 Resources:
@@ -149,7 +144,7 @@ Resources:
     Properties:
       InstanceArn: !Ref SSOInstanceArn
       PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
-      PrincipalId: !Ref DevelopersGroupId
+      PrincipalId: !Ref SSODevelopersGroupId
       PrincipalType: GROUP
       TargetId: !Ref QaAccountId
       TargetType: AWS_ACCOUNT
