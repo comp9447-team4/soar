@@ -80,64 +80,9 @@ Resources:
               }
             },
             {
-              "Sid": "AllowCloudwatch",
+              "Sid": "AllowSydney",
               "Effect": "Allow",
-              "Action": "cloudwatch:*",
-              "Resource": "*",
-              "Condition": {
-                "StringEquals": {
-                  "aws:RequestedRegion": "ap-southeast-2"
-                }
-              }
-            },
-            {
-              "Sid": "AllowLambda",
-              "Effect": "Allow",
-              "Action": "lambda:*",
-              "Resource": "*",
-              "Condition": {
-                "StringEquals": {
-                  "aws:RequestedRegion": "ap-southeast-2"
-                }
-              }
-            },
-            {
-              "Sid": "AllowGuardDuty",
-              "Effect": "Allow",
-              "Action": "guardduty:*",
-              "Resource": "*",
-              "Condition": {
-                "StringEquals": {
-                  "aws:RequestedRegion": "ap-southeast-2"
-                }
-              }
-            },
-            {
-              "Sid": "AllowRds",
-              "Effect": "Allow",
-              "Action": "rds:*",
-              "Resource": "*",
-              "Condition": {
-                "StringEquals": {
-                  "aws:RequestedRegion": "ap-southeast-2"
-                }
-              }
-            },
-            {
-              "Sid": "AllowElasticache",
-              "Effect": "Allow",
-              "Action": "elasticache:*",
-              "Resource": "*",
-              "Condition": {
-                "StringEquals": {
-                  "aws:RequestedRegion": "ap-southeast-2"
-                }
-              }
-            },
-            {
-              "Sid": "AllowSecretsManager",
-              "Effect": "Allow",
-              "Action": "secretsmanager:*",
+              "Action": "*",
               "Resource": "*",
               "Condition": {
                 "StringEquals": {
@@ -193,6 +138,15 @@ Resources:
       PrincipalType: GROUP
       TargetId: !Ref MasterAccountId
       TargetType: AWS_ACCOUNT
+  AdminstratorsMasterAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt AdministratorAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSOAdministratorsGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref MasterAccountId
+      TargetType: AWS_ACCOUNT
   AdminstratorsQaAssignment:
     Type: AWS::SSO::Assignment
     Properties:
@@ -230,4 +184,5 @@ Resources:
   #     PrincipalType: GROUP
   #     TargetId: !Ref ProdAccountId
   #     TargetType: AWS_ACCOUNT
+
 

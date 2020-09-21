@@ -60,14 +60,16 @@ EOF
 
 main() {
     args="$@"
-    check_environment
 
+    export AWS_PROFILE="master-admin"
     if [[ "${AWS_PROFILE}" != "master-admin" ]]; then
         echo "Got AWS_PROFILE: ${AWS_PROFILE}"
         echo "This must be run in the master account! (master-admin)"
         echo "Exiting."
         exit 1
     fi
+
+    check_environment
 
     if [[ "${args}" == "create" ]]; then
         create
