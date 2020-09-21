@@ -1,0 +1,156 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  This defines the permission set for AWS SSO to be run in the master account.
+Parameters:
+  SSOInstanceArn:
+    Type: String
+    Default: arn:aws:sso:::instance/ssoins-8259a65681d80bfc
+    Description: The instance arn of SSO. See aws sso-admin help to get the instance arn.
+  AdministratorsGroupId:
+    Type: String
+    Default: 97671e4d05-7d0a4a6e-b156-4969-baa0-cf4d771b9624
+    Description: The group id of administrators in SSO
+  DevelopersGroupId:
+    Type: String
+    Default: 97671e4d05-8bebfdd3-42cf-459e-a9a2-3d462c48706c
+    Description: The group id of developers
+  QaAccountId:
+    Type: String
+    Default: 306967644367
+    Description: Qa account id
+  ProdAccountId:
+    Type: String
+    Default: 389413969684
+    Description: Prod account id
+
+Resources:
+  # For Developers
+  DeveloperAccessManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: A managed policy only for developers
+      ManagedPolicyName: DeveloperAccess
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: DenyAdmin
+          Effect: Deny
+          Action:
+          - organizations:*
+          - account:*
+          Resource: "*"
+        - Sid: AllowS3
+          Effect: Allow
+          Action: s3:*
+          Resource: "*"
+        - Sid: AllowIam
+          Effect: Allow
+          Action: iam:*
+          Resource: "*"
+        - Sid: AllowEC2
+          Effect: Allow
+          Action: ec2:*
+          Resource: "*"
+          Condition:
+            StringEquals:
+              aws:RequestedRegion: ap-southeast-2
+            StringEquals:
+              ec2:Region: ap-southeast-2
+        - Sid: AllowCFN
+          Effect: Allow
+          Action: cloudformation:*
+          Resource: "*"
+          Condition:
+            StringEquals:
+              aws:RequestedRegion: ap-southeast-2
+        - Sid: AllowCloudwatch
+          Effect: Allow
+          Action: cloudwatch:*
+          Resource: "*"
+          Condition:
+            StringEquals:
+              aws:RequestedRegion: ap-southeast-2
+        - Sid: AllowLambda
+          Effect: Allow
+          Action: lambda:*
+          Resource: "*"
+          Condition:
+            StringEquals:
+              aws:RequestedRegion: ap-southeast-2
+        - Sid: AllowGuardDuty
+          Effect: Allow
+          Action: guardduty:*
+          Resource: "*"
+          Condition:
+            StringEquals:
+              aws:RequestedRegion: ap-southeast-2
+        - Sid: AllowRds
+          Effect: Allow
+          Action: rds:*
+          Resource: "*"
+          Condition:
+            StringEquals:
+              aws:RequestedRegion: ap-southeast-2
+        - Sid: AllowElasticache
+          Effect: Allow
+          Action: elasticache:*
+          Resource: "*"
+          Condition:
+            StringEquals:
+              aws:RequestedRegion: ap-southeast-2
+  DeveloperAccessPermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Name: DeveloperAccess
+      Description: DeveloperAccess
+      InstanceArn: !Ref SSOInstanceArn
+      ManagedPolicies:
+        - !Ref DeveloperAccessManagedPolicy
+
+  # Read-only for Billing
+  BillingViewAccessManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: View billing information
+      ManagedPolicyName: BillingViewAccess
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: ViewBilling
+          Effect: Allow
+          Action:
+          - aws-portal:ViewPaymentMethods
+          - aws-portal:ViewAccount
+          - aws-portal:ViewBilling
+          - aws-portal:ViewUsage
+          Resource: "*"
+  BillingAccessPermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Name: BillingViewAccess
+      Description: BillingViweAccess
+      InstanceArn: !Ref SSOInstanceArn
+      ManagedPolicies:
+        - !Ref BillingViewAccessManagedPolicy
+
+  # For Admins
+  AdministratorAccessPermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Name: AdministratorAccess
+      Description: Administrator
+      InstanceArn: !Ref SSOInstanceArn
+      ManagedPolicies:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  # Assignments
+  AdminQaAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref DevelopersGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref QaAccountId
+      TargetType: AWS_ACCOUNT
+
