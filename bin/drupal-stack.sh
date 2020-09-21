@@ -42,6 +42,13 @@ create() {
         --template-body file://"${REPO_ROOT}"/infra/drupal/drupal-stack.yml \
         --parameters "${parameters}" \
         --capabilities CAPABILITY_IAM # Assumes you have a role that can do this
+
+    # Ideally it should be part of the stack
+    # but it requires keypairs to exists
+    # and the drupal stack is quite convoluted...
+    aws secretsmanager create-secret \
+        --name "drupal-parameters" \
+        --secret-string "${parameters}"
 }
 
 update() {
@@ -77,6 +84,10 @@ delete() {
     aws cloudformation delete-stack \
         --stack-name "${STACK_NAME}"
     echo "Deleting stack..."
+
+    aws secretsmanager delete-secret \
+        --secret-id "drupal-parameters" \
+        --force-delete-without-recovery
 }
 
 describe_stacks() {

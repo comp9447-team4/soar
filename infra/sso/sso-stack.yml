@@ -91,6 +91,17 @@ Resources:
               }
             },
             {
+              "Sid": "AllowLogs",
+              "Effect": "Allow",
+              "Action": "logs:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestedRegion": "ap-southeast-2"
+                }
+              }
+            },
+            {
               "Sid": "AllowLambda",
               "Effect": "Allow",
               "Action": "lambda:*",

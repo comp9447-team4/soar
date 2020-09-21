@@ -12,12 +12,22 @@ create() {
     echo "${key}" > ~/.ssh/drupal.pem
     chmod 400 ~/.ssh/drupal.pem
     echo "Keypair saved in ~/.ssh/drupal.pem"
+
+    echo "Saving in Secrets Manager.."
+    aws secretsmanager create-secret \
+        --name "drupal-keypair" \
+        --secret-string "${key}"
 }
 
 delete() {
     aws ec2 delete-key-pair --key-name drupal
     rm -f ~/.ssh/drupal.pem
+
+    echo "Deleting in Secrets Manager.."
     echo "Keypair deleted in ~/.ssh/drupal.pem"
+    aws secretsmanager delete-secret \
+        --secret-id "drupal-keypair" \
+        --force-delete-without-recovery
 }
 
 describe() {
@@ -26,7 +36,8 @@ describe() {
 
 usage() {
     cat <<EOF
-Manages a keypair for drupal-quick-start
+Manages a keypair for drupal-quick-start. This only needs to be done once.
+Do not modify the existing stack!
 
 Usage: ./bin/key-pair.sh <arg>
 Where arg is:
