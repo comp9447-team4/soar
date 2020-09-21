@@ -118,11 +118,11 @@ echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
 
 These contain infrastructure-as-code for comp9447-team4.
 
-## infra/users/ folder
+## infra/sso/ folder
 
-`infra/users/` contains the setup for AWS users that follows the well architected labs.
+This folder contains the setup for AWS users that follows the well architected labs. This uses AWS SSO.
 
-**THIS WILL ONLY BE NEEDED TO BE DONE ONCE** (Already provisioned for you).
+**THIS WILL ONLY BE NEEDED TO BE DONE ONCE** on the master root account. (Already provisioned for you).
 
 # Drupal
 
