@@ -14,9 +14,5 @@
     {
         "ParameterKey": "SSODevelopersGroupId",
         "ParameterValue": "{{ SSO_DEVELOPERS_GROUP_ID }}"
-    },
-    {
-        "ParameterKey": "SSOInstanceArn",
-        "ParameterValue": "{{ SSO_INSTANCE_ARN }}"
     }
 ]

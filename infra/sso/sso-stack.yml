@@ -17,6 +17,9 @@ Parameters:
   ProdAccountId:
     Type: String
     Description: Prod account id
+  SSOInstanceArn:
+    Type: String
+    Default: arn:aws:sso:::instance/ssoins-8259a65681d80bfc
 
 Resources:
   # For Developers

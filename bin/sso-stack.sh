@@ -17,7 +17,6 @@ get_parameters() {
                      sed "s/{{ PROD_ACCOUNT_ID }}/${PROD_ACCOUNT_ID}/g" |
                      sed "s/{{ SSO_ADMINISTRATORS_GROUP_ID }}/${SSO_ADMINISTRATORS_GROUP_ID}/g" |
                      sed "s/{{ SSO_DEVELOPERS_GROUP_ID }}/${SSO_DEVELOPERS_GROUP_ID}/g" |
-                     sed "s/{{ SSO_INSTANCE_ARN }}/${SSO_INSTANCE_ARN}/g" |
                      jq)
     echo "${parameters}"
 }
