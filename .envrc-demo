@@ -8,6 +8,7 @@ export DEVELOPER_EMAIL="your@email.com"
 # AWS Accounts
 export QA_ACCOUNT_ID=""
 export PROD_ACCOUNT_ID=""
+export MASTER_ACCOUNT_ID=""
 export SSO_ADMINISTRATORS_GROUP_ID=""
 export SSO_DEVELOPERS_GROUP_ID=""
 export SSO_INSTANCE_ARN=""

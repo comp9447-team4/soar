@@ -11,6 +11,9 @@ Parameters:
   SSODevelopersGroupId:
     Type: String
     Description: The SSO group id of developers
+  MasterAccountId:
+    Type: String
+    Description: Master account id (root of org)
   QaAccountId:
     Type: String
     Description: Qa account id
@@ -170,7 +173,25 @@ Resources:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
   # Assignments
-  AdminQaAssignment:
+  DevelopersMasterBilling:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSODevelopersGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref MasterAccountId
+      TargetType: AWS_ACCOUNT
+  AdminstratorsQaAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSOAdministratorsGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref QaAccountId
+      TargetType: AWS_ACCOUNT
+  DevelopersQaAssignment:
     Type: AWS::SSO::Assignment
     Properties:
       InstanceArn: !Ref SSOInstanceArn
@@ -178,5 +199,23 @@ Resources:
       PrincipalId: !Ref SSODevelopersGroupId
       PrincipalType: GROUP
       TargetId: !Ref QaAccountId
+      TargetType: AWS_ACCOUNT
+  AdminstratorsProdAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSOAdministratorsGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref ProdAccountId
+      TargetType: AWS_ACCOUNT
+  DevelopersProdAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSODevelopersGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref ProdAccountId
       TargetType: AWS_ACCOUNT
 

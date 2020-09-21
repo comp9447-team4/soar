@@ -13,6 +13,7 @@ source "${REPO_ROOT}"/bin/_utils.sh
 
 get_parameters() {
     parameters=$(cat "${REPO_ROOT}"/infra/sso/sso-parameters.json |
+                     sed "s/{{ MASTER_ACCOUNT_ID }}/${MASTER_ACCOUNT_ID}/g" |
                      sed "s/{{ QA_ACCOUNT_ID }}/${QA_ACCOUNT_ID}/g" |
                      sed "s/{{ PROD_ACCOUNT_ID }}/${PROD_ACCOUNT_ID}/g" |
                      sed "s/{{ SSO_ADMINISTRATORS_GROUP_ID }}/${SSO_ADMINISTRATORS_GROUP_ID}/g" |

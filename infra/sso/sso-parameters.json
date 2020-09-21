@@ -1,5 +1,9 @@
 [
     {
+        "ParameterKey": "MasterAccountId",
+        "ParameterValue": "{{ MASTER_ACCOUNT_ID }}"
+    },
+    {
         "ParameterKey": "QaAccountId",
         "ParameterValue": "{{ QA_ACCOUNT_ID }}"
     },
