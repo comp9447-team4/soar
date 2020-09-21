@@ -1,29 +1,48 @@
 #!/bin/bash
-# Deploys IAM user roles for AWS SSO stack
-# This only needs to be done once
+# Deploys IAM user roles for AWS SSO stack.
+# This only needs to be done once by master admin.
+# Developers would not need to run this.
 
 set -e
 set -u
 
 export REPO_ROOT=$(git rev-parse --show-toplevel)
-export MANAGED_POLICIES_STACK_NAME="sso-managed-policies"
+export SSO_STACK_NAME="sso"
 
 source "${REPO_ROOT}"/bin/_utils.sh
 
-create_managed_policies() {
-    aws cloudformation create-stack --stack-name "${MANAGED_POLICIES_STACK_NAME}" \
-        --template-body file://"${REPO_ROOT}"/infra/sso/managed-policies.yml \
-        --capabilities CAPABILITY_NAMED_IAM
+get_parameters() {
+    parameters=$(cat "${REPO_ROOT}"/infra/sso/sso-parameters.json |
+                     sed "s/{{ MASTER_ACCOUNT_ID }}/${MASTER_ACCOUNT_ID}/g" |
+                     sed "s/{{ QA_ACCOUNT_ID }}/${QA_ACCOUNT_ID}/g" |
+                     sed "s/{{ PROD_ACCOUNT_ID }}/${PROD_ACCOUNT_ID}/g" |
+                     sed "s/{{ SSO_ADMINISTRATORS_GROUP_ID }}/${SSO_ADMINISTRATORS_GROUP_ID}/g" |
+                     sed "s/{{ SSO_DEVELOPERS_GROUP_ID }}/${SSO_DEVELOPERS_GROUP_ID}/g" |
+                     jq)
+    echo "${parameters}"
 }
 
-update_managed_policies() {
-    aws cloudformation update-stack --stack-name "${MANAGED_POLICIES_STACK_NAME}" \
-        --template-body file://"${REPO_ROOT}"/infra/sso/managed-policies.yml \
-        --capabilities CAPABILITY_NAMED_IAM
+create() {
+    local parameters
+    parameters=$(get_parameters)
+    echo "${parameters}"
+    aws cloudformation create-stack --stack-name "${SSO_STACK_NAME}" \
+        --template-body file://"${REPO_ROOT}"/infra/sso/sso-stack.yml \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters "${parameters}"
 }
 
-delete_managed_policies() {
-    aws cloudformation delete-stack --stack-name "${MANAGED_POLICIES_STACK_NAME}"
+update() {
+    local parameters
+    parameters=$(get_parameters)
+    aws cloudformation update-stack --stack-name "${SSO_STACK_NAME}" \
+        --template-body file://"${REPO_ROOT}"/infra/sso/sso-stack.yml \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters "${parameters}"
+}
+
+delete() {
+    aws cloudformation delete-stack --stack-name "${SSO_STACK_NAME}"
 }
 
 usage() {
@@ -33,9 +52,9 @@ Only the admin can change this.
 
 Usage: ./bin/sso-stack.sh <arg>
 Where arg is:
-create-managed-policies
-delete-managed-policies
-update-managed-policies
+create
+delete
+update
 EOF
 }
 
@@ -50,12 +69,12 @@ main() {
         exit 1
     fi
 
-    if [[ "${args}" == "create-managed-policies" ]]; then
-        create_managed_policies
-    elif [[ "${args}" == "delete-managed-policies" ]]; then
-        delete_managed_policies
-    elif [[ "${args}" == "update-managed-policies" ]]; then
-        update_managed_policies
+    if [[ "${args}" == "create" ]]; then
+        create
+    elif [[ "${args}" == "delete" ]]; then
+        delete
+    elif [[ "${args}" == "update" ]]; then
+        update
     else
         echo "No command run :("
         usage

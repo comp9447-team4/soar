@@ -1,0 +1,233 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  This defines the permission set for AWS SSO to be run in the master account.
+Parameters:
+  SSOInstanceArn:
+    Type: String
+    Description: The instance arn of SSO. See aws sso-admin help to get the instance arn.
+  SSOAdministratorsGroupId:
+    Type: String
+    Description: The SSO group id of administrators in SSO
+  SSODevelopersGroupId:
+    Type: String
+    Description: The SSO group id of developers
+  MasterAccountId:
+    Type: String
+    Description: Master account id (root of org)
+  QaAccountId:
+    Type: String
+    Description: Qa account id
+  ProdAccountId:
+    Type: String
+    Description: Prod account id
+  SSOInstanceArn:
+    Type: String
+    Default: arn:aws:sso:::instance/ssoins-8259a65681d80bfc
+
+Resources:
+  # For Developers
+  DeveloperAccessPermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Name: DeveloperAccess
+      Description: DeveloperAccess
+      InstanceArn: !Ref SSOInstanceArn
+      InlinePolicy: |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyAdmin",
+              "Effect": "Deny",
+              "Action": [
+                "organizations:*",
+                "account:*"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "AllowS3",
+              "Effect": "Allow",
+              "Action": "s3:*",
+              "Resource": "*"
+            },
+            {
+              "Sid": "AllowIam",
+              "Effect": "Allow",
+              "Action": "iam:*",
+              "Resource": "*"
+            },
+            {
+              "Sid": "AllowEC2",
+              "Effect": "Allow",
+              "Action": "ec2:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "ec2:Region": "ap-southeast-2"
+                }
+              }
+            },
+            {
+              "Sid": "AllowCFN",
+              "Effect": "Allow",
+              "Action": "cloudformation:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestedRegion": "ap-southeast-2"
+                }
+              }
+            },
+            {
+              "Sid": "AllowCloudwatch",
+              "Effect": "Allow",
+              "Action": "cloudwatch:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestedRegion": "ap-southeast-2"
+                }
+              }
+            },
+            {
+              "Sid": "AllowLambda",
+              "Effect": "Allow",
+              "Action": "lambda:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestedRegion": "ap-southeast-2"
+                }
+              }
+            },
+            {
+              "Sid": "AllowGuardDuty",
+              "Effect": "Allow",
+              "Action": "guardduty:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestedRegion": "ap-southeast-2"
+                }
+              }
+            },
+            {
+              "Sid": "AllowRds",
+              "Effect": "Allow",
+              "Action": "rds:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestedRegion": "ap-southeast-2"
+                }
+              }
+            },
+            {
+              "Sid": "AllowElasticache",
+              "Effect": "Allow",
+              "Action": "elasticache:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestedRegion": "ap-southeast-2"
+                }
+              }
+            },
+            {
+              "Sid": "AllowSecretsManager",
+              "Effect": "Allow",
+              "Action": "secretsmanager:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestedRegion": "ap-southeast-2"
+                }
+              }
+            }
+          ]
+        }
+
+  # Read-only for Billing
+  BillingViewAccessPermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Name: BillingViewAccess
+      Description: BillingViweAccess
+      InstanceArn: !Ref SSOInstanceArn
+      InlinePolicy: |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "ViewBilling",
+              "Effect": "Allow",
+              "Action": [
+                "aws-portal:ViewPaymentMethods",
+                "aws-portal:ViewAccount",
+                "aws-portal:ViewBilling",
+                "aws-portal:ViewUsage"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+
+  # For Admins
+  AdministratorAccessPermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Name: AdministratorAccess
+      Description: Administrator
+      InstanceArn: !Ref SSOInstanceArn
+      ManagedPolicies:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  # Assignments
+  DevelopersMasterBilling:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt BillingViewAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSODevelopersGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref MasterAccountId
+      TargetType: AWS_ACCOUNT
+  AdminstratorsQaAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt AdministratorAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSOAdministratorsGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref QaAccountId
+      TargetType: AWS_ACCOUNT
+  DevelopersQaAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSODevelopersGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref QaAccountId
+      TargetType: AWS_ACCOUNT
+  AdminstratorsProdAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt AdministratorAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSOAdministratorsGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref ProdAccountId
+      TargetType: AWS_ACCOUNT
+  # Disabled for now
+  # DevelopersProdAssignment:
+  #   Type: AWS::SSO::Assignment
+  #   Properties:
+  #     InstanceArn: !Ref SSOInstanceArn
+  #     PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+  #     PrincipalId: !Ref SSODevelopersGroupId
+  #     PrincipalType: GROUP
+  #     TargetId: !Ref ProdAccountId
+  #     TargetType: AWS_ACCOUNT
+
