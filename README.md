@@ -54,12 +54,16 @@ Once logged in via SSO, configure your AWS CLI in a terminal:
 aws configure sso
 SSO Start URL: https://comp9447-team4.awsapps.com/start
 SSO Region: ap-southeast-2
-<It will ask you to select qa or prod. Select qa to start with>
+
+<This will take you to a browser to login via SSO>
+<Once logged in, it will then ask you to select qa or prod. Select qa to start with>
 
 CLI default client Region: ap-southeast-2
 CLI default output format: json
 CLI profile name [CLI profile name [DeveloperAccess-306967644367]]: qa --> THIS IS IMPORTANT! Otherwise you might have to type in a very long profile name...
 ```
+![](doc/img/sso-cli-1.png)
+![](doc/img/sso-cli-2.png)
 
 To test this, run this command in `qa`:
 
@@ -76,9 +80,11 @@ mv ~/.aws/sso ~/.aws/sso.bak
 mv ~/.aws/config ~/.aws/config.bak
 
 aws configure sso
+# Repeat steps above
+
 # Clean up if successful
-# rm -rf ~/.aws/sso.bak
-# rm -f ~/.aws/config.bak
+rm -rf ~/.aws/sso.bak
+rm -f ~/.aws/config.bak
 ```
 
 # Repo prerequisites
