@@ -30,12 +30,6 @@ create() {
         --template-body file://"${REPO_ROOT}"/infra/sso/sso-stack.yml \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters "${parameters}"
-
-    # Ideally it should be in a stack but this requires saving the keypair.
-    # The Drupal CFN stack is quite convuluted as well.
-    aws secretsmanager create-secret \
-        --name drupal-parameters \
-        --secret-string "${parameters}"
 }
 
 update() {
@@ -49,7 +43,6 @@ update() {
 
 delete() {
     aws cloudformation delete-stack --stack-name "${SSO_STACK_NAME}"
-    aws secretsmanager delete-secret --secret-id drupal --force-delete-without-recovery
 }
 
 usage() {

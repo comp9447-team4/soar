@@ -78,6 +78,8 @@ Remove the cache and retry.
 ```
 mv ~/.aws/sso ~/.aws/sso.bak
 mv ~/.aws/config ~/.aws/config.bak
+rm -rf ~/.aws/cli/cache
+rm -rf ~/.aws/sso/cache
 
 aws configure sso
 # Repeat steps above
@@ -133,9 +135,8 @@ https://aws.amazon.com/quickstart/architecture/drupal/
 Create a key pair with:
 
 ```
-export AWS_PROFILE=qa
-./bin/key-pair.sh create
-./bin/key-pair.sh describe
+AWS_PROFILE=qa ./bin/key-pair.sh create
+AWS_PROFILE=qa ./bin/key-pair.sh describe
 ```
 
 Make sure you save it.
@@ -144,14 +145,14 @@ Make sure you save it.
 Deploy the stack with:
 
 ```
-export AWS_PROFILE=qa
-./bin/stack.sh create
+AWS_PROFILE=qa ./bin/drupal-stack.sh create
 ```
 
-## Clean up
+## Clean up Drupal stack
+DO NOT DESTROY AN EXISTING STACK! (Maybe we should have termination protection on...)
 
 ```
-export AWS_PROFILE=qa
-./bin/key-pair.sh delete
-./bin/stach.sh delete
+AWS_PROFILE=qa ./bin/key-pair.sh delete
+AWS_PROFILE=qa ./bin/drupal-stack.sh delete
 ```
+
