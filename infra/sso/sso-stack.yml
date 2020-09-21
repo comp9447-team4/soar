@@ -133,6 +133,17 @@ Resources:
                   "aws:RequestedRegion": "ap-southeast-2"
                 }
               }
+            },
+            {
+              "Sid": "AllowSecretsManager",
+              "Effect": "Allow",
+              "Action": "secretsmanager:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:RequestedRegion": "ap-southeast-2"
+                }
+              }
             }
           ]
         }
