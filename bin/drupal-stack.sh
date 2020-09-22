@@ -41,7 +41,8 @@ create() {
         --stack-name "${STACK_NAME}" \
         --template-body file://"${REPO_ROOT}"/infra/drupal/drupal-stack.yml \
         --parameters "${parameters}" \
-        --capabilities CAPABILITY_IAM # Assumes you have a role that can do this
+        --capabilities CAPABILITY_IAM \
+        --enable-termination-protection
 
     # Ideally it should be part of the stack
     # but it requires keypairs to exists
@@ -52,7 +53,6 @@ create() {
 }
 
 update() {
-
     local parameters
     local password
     password=$(generate_password)
@@ -90,11 +90,8 @@ delete() {
         --force-delete-without-recovery
 }
 
-describe_stacks() {
+describe() {
     aws cloudformation describe-stacks
-}
-
-describe_stack_events() {
     aws cloudformation describe-stack-events \
         --stack-name "${STACK_NAME}"
 }
@@ -107,8 +104,7 @@ Usage: ./bin/stack <arg>
 Where arg is:
 create                - creates the stack
 delete                - deletes the stack
-describe-stacks       - describes stacks
-describe-stack-events - describes stack events
+describe              - describes the stack and its events
 EOF
 }
 
@@ -122,10 +118,8 @@ main() {
         delete
     elif [ "${args}" == "update" ]; then
         update
-    elif [ "${args}" == "describe-stacks" ]; then
-        describe_stacks
-    elif [ "${args}" == "describe-stack-events" ]; then
-        describe_stack_events
+    elif [ "${args}" == "describe" ]; then
+        describe
     else
         usage
     fi

@@ -46,16 +46,24 @@ Resources:
               "Resource": "*"
             },
             {
-              "Sid": "AllowS3",
-              "Effect": "Allow",
-              "Action": "s3:*",
-              "Resource": "*"
+              "Sid": "DenyChangesToSSO",
+              "Effect": "Deny",
+              "Action": [
+                "iam:*"
+              ],
+              "Resource": [
+                "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_*"
+              ]
             },
             {
-              "Sid": "AllowIam",
-              "Effect": "Allow",
-              "Action": "iam:*",
-              "Resource": "*"
+              "Sid": "DenyChangesToSSOServiceRole",
+              "Effect": "Deny",
+              "Action": [
+                "iam:*"
+              ],
+              "Resource": [
+                "arn:aws:iam::*:role/aws-service-role/sso.amazonaws.com/AWSServiceRoleForSSO"
+              ]
             },
             {
               "Sid": "AllowEC2",
@@ -80,15 +88,10 @@ Resources:
               }
             },
             {
-              "Sid": "AllowSydney",
+              "Sid": "AllowRest",
               "Effect": "Allow",
               "Action": "*",
-              "Resource": "*",
-              "Condition": {
-                "StringEquals": {
-                  "aws:RequestedRegion": "ap-southeast-2"
-                }
-              }
+              "Resource": "*"
             }
           ]
         }
