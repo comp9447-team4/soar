@@ -29,7 +29,8 @@ create() {
     aws cloudformation create-stack --stack-name "${SSO_STACK_NAME}" \
         --template-body file://"${REPO_ROOT}"/infra/sso/sso-stack.yml \
         --capabilities CAPABILITY_NAMED_IAM \
-        --parameters "${parameters}"
+        --parameters "${parameters}" \
+        --enable-termination-protection
 }
 
 update() {
@@ -45,6 +46,12 @@ delete() {
     aws cloudformation delete-stack --stack-name "${SSO_STACK_NAME}"
 }
 
+describe_stack() {
+    aws cloudformation describe-stacks
+    aws cloudformation describe-stack-events \
+        --stack-name "${SSO_STACK_NAME}"
+}
+
 usage() {
     cat <<EOF
 Manages the SSO stack on the MASTER ACCOUNT.
@@ -55,6 +62,7 @@ Where arg is:
 create
 delete
 update
+describe
 EOF
 }
 
@@ -77,6 +85,8 @@ main() {
         delete
     elif [[ "${args}" == "update" ]]; then
         update
+    elif [[ "${args}" == "describe" ]]; then
+        describe_stack
     else
         echo "No command run :("
         usage
