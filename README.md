@@ -149,7 +149,7 @@ AWS_PROFILE=qa ./bin/drupal-stack.sh create
 ```
 
 ## Clean up Drupal stack
-DO NOT DESTROY AN EXISTING STACK! (Maybe we should have termination protection on...)
+DO NOT DESTROY AN EXISTING STACK UNLESS ABSOLUTELY NECESSARY! It has termination protection on.
 
 ```
 AWS_PROFILE=qa ./bin/key-pair.sh delete

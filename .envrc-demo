@@ -1,7 +1,14 @@
-# Use this for saving environment variables
+# Copy this demo file to .envrc and install direnv
+# See: https://direnv.net/
+#
+# Use this for saving environment variables.
+# Ofcourse it is optional, you can just set environment variables yourself,
+# but this unclutters it for you.
+#
 # DO NOT COMMIT the .envrc file!
+
+# Global variables
 export REPO_ROOT=$(git rev-parse --show-toplevel)
-export AWS_ENVIRONMENT="qa"
 export MY_IP=$(curl https://api.myip.com | jq -r .'ip')
 export DEVELOPER_EMAIL="your@email.com"
 
@@ -11,4 +18,4 @@ export PROD_ACCOUNT_ID=""
 export MASTER_ACCOUNT_ID=""
 export SSO_ADMINISTRATORS_GROUP_ID=""
 export SSO_DEVELOPERS_GROUP_ID=""
-export SSO_INSTANCE_ARN=""
+
