@@ -19,3 +19,5 @@ export MASTER_ACCOUNT_ID=""
 export SSO_ADMINISTRATORS_GROUP_ID=""
 export SSO_DEVELOPERS_GROUP_ID=""
 
+# All development must be in us-east-1
+export AWS_REGION="us-east-1"

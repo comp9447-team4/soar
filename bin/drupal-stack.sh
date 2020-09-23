@@ -6,8 +6,11 @@ set -u
 
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 export STACK_NAME="drupal-quick-start"
-export AZS="ap-southeast-2a,ap-southeast-2b"
+export AZS="us-east-1a,us-east-1b"
 export KEY_PAIR="drupal"
+
+# Drupal keypair is in US
+export AWS_REGION="us-east-1"
 
 source "${REPO_ROOT}"/bin/_utils.sh
 
@@ -80,15 +83,16 @@ update() {
         --capabilities CAPABILITY_IAM # Assumes you have a role that can do this
 }
 
-delete() {
-    aws cloudformation delete-stack \
-        --stack-name "${STACK_NAME}"
-    echo "Deleting stack..."
-
-    aws secretsmanager delete-secret \
-        --secret-id "drupal-parameters" \
-        --force-delete-without-recovery
-}
+# Uncomment if you are sure
+# delete() {
+#     aws cloudformation delete-stack \
+#         --stack-name "${STACK_NAME}"
+#     echo "Deleting stack..."
+#
+#     aws secretsmanager delete-secret \
+#         --secret-id "drupal-parameters" \
+#         --force-delete-without-recovery
+# }
 
 describe() {
     aws cloudformation describe-stacks

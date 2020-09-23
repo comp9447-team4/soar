@@ -8,8 +8,10 @@ set -u
 
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 export SSO_STACK_NAME="sso"
-
 source "${REPO_ROOT}"/bin/_utils.sh
+
+# SSO region is in Sydney
+export AWS_REGION="ap-southeast-2"
 
 get_parameters() {
     parameters=$(cat "${REPO_ROOT}"/infra/sso/sso-parameters.json |
