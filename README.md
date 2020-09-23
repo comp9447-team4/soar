@@ -73,6 +73,18 @@ To test this, run this command in `qa`:
 aws s3 ls --profile qa
 ```
 
+Verify that this is what is in your `~/.aws/config` file.
+
+```
+[profile qa]
+sso_start_url = https://comp9447-team4.awsapps.com/start
+sso_region = ap-southeast-2
+sso_account_id = 306967644367
+sso_role_name = DeveloperAccess
+region = us-east-1
+output = json
+```
+
 ## Having issues with SSO?
 
 Remove the cache and retry.

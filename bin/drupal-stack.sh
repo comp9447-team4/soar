@@ -15,7 +15,7 @@ export AWS_REGION="us-east-1"
 source "${REPO_ROOT}"/bin/_utils.sh
 
 generate_password() {
-    openssl rand -base64 16 | sed 's/=//g' | sed 's/+//g'
+    openssl rand -base64 26 | sed 's/=//g' | sed 's/+//g'
 }
 
 create() {
