@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: My Panther deployment
+
+Resources:
+  Panther:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://panther-community-${AWS::Region}.s3.amazonaws.com/v1.7.1/panther.yml
+      Parameters:
+        CompanyDisplayName: comp9447-team4
+        FirstUserEmail: jtdv01@gmail.com
+        FirstUserGivenName: j
+        FirstUserFamilyName: t
