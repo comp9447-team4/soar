@@ -71,8 +71,11 @@ Resources:
               "Action": "ec2:*",
               "Resource": "*",
               "Condition": {
-                "StringEquals": {
-                  "ec2:Region": "ap-southeast-2"
+                "ForAnyValue:StringEquals": {
+                  "ec2:Region": [
+                    "ap-southeast-2",
+                    "us-east-1"
+                  ]
                 }
               }
             },
@@ -82,8 +85,11 @@ Resources:
               "Action": "cloudformation:*",
               "Resource": "*",
               "Condition": {
-                "StringEquals": {
-                  "aws:RequestedRegion": "ap-southeast-2"
+                "ForAnyValue:StringEquals": {
+                  "aws:RequestedRegion": [
+                    "ap-southeast-2",
+                    "us-east-1"
+                  ]
                 }
               }
             },
