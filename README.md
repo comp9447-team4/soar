@@ -156,3 +156,17 @@ AWS_PROFILE=qa ./bin/key-pair.sh delete
 AWS_PROFILE=qa ./bin/drupal-stack.sh delete
 ```
 
+# Panther
+
+I'm experimenting with Panther to do threat hunting on top of guard duty. 
+
+There is an open source version with Cloudformation templates to deploy.
+
+See:
+* https://runpanther.io/
+* https://docs.runpanther.io/
+
+Note: The quick start templates are in `us-east-1`. There are two options we can take:
+
+1. Move everything to `us-east-1` -> I reckon it's easier
+2. Deploy Panthers from source.
