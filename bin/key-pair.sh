@@ -6,6 +6,9 @@ set -eu
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 source "${REPO_ROOT}"/bin/_utils.sh
 
+# Drupal keypair is in US
+export AWS_REGION="us-east-1"
+
 create() {
     local key
     key=$(aws ec2 create-key-pair --key-name drupal | jq -r ".KeyMaterial")
@@ -19,16 +22,17 @@ create() {
         --secret-string "${key}"
 }
 
-delete() {
-    aws ec2 delete-key-pair --key-name drupal
-    rm -f ~/.ssh/drupal.pem
-
-    echo "Deleting in Secrets Manager.."
-    echo "Keypair deleted in ~/.ssh/drupal.pem"
-    aws secretsmanager delete-secret \
-        --secret-id "drupal-keypair" \
-        --force-delete-without-recovery
-}
+# Uncomment if you are sure
+# delete() {
+#     aws ec2 delete-key-pair --key-name drupal
+#     rm -f ~/.ssh/drupal.pem
+#
+#     echo "Deleting in Secrets Manager.."
+#     echo "Keypair deleted in ~/.ssh/drupal.pem"
+#     aws secretsmanager delete-secret \
+#         --secret-id "drupal-keypair" \
+#         --force-delete-without-recovery
+# }
 
 describe() {
     aws ec2 describe-key-pairs

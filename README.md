@@ -58,9 +58,11 @@ SSO Region: ap-southeast-2
 <This will take you to a browser to login via SSO>
 <Once logged in, it will then ask you to select qa or prod. Select qa to start with>
 
-CLI default client Region: ap-southeast-2
+CLI default client Region: us-east-1 
+  --> THIS IS IMPORTANT! All our development work must be in us-east-1 to get the latest resource features
 CLI default output format: json
-CLI profile name [CLI profile name [DeveloperAccess-306967644367]]: qa --> THIS IS IMPORTANT! Otherwise you might have to type in a very long profile name...
+CLI profile name [CLI profile name [DeveloperAccess-306967644367]]: qa
+  --> THIS IS IMPORTANT! Otherwise you might have to type in a very long profile name...
 ```
 ![](doc/img/sso-cli-1.png)
 ![](doc/img/sso-cli-2.png)
@@ -69,6 +71,18 @@ To test this, run this command in `qa`:
 
 ```
 aws s3 ls --profile qa
+```
+
+Verify that this is what is in your `~/.aws/config` file.
+
+```
+[profile qa]
+sso_start_url = https://comp9447-team4.awsapps.com/start
+sso_region = ap-southeast-2
+sso_account_id = 306967644367
+sso_role_name = DeveloperAccess
+region = us-east-1
+output = json
 ```
 
 ## Having issues with SSO?
@@ -166,7 +180,8 @@ See:
 * https://runpanther.io/
 * https://docs.runpanther.io/
 
-Note: The quick start templates are in `us-east-1`. There are two options we can take:
+Note: The quick start templates are in `us-east-1`.
 
-1. Move everything to `us-east-1` -> I reckon it's easier
-2. Deploy Panthers from source.
+# AWS Region choice
+
+`us-east-1` was chosen as the main AWS REGION to make it easier to deploy resources. This region is expected to get the latest features.

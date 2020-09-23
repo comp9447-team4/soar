@@ -73,7 +73,6 @@ Resources:
               "Condition": {
                 "ForAnyValue:StringEquals": {
                   "ec2:Region": [
-                    "ap-southeast-2",
                     "us-east-1"
                   ]
                 }
@@ -87,7 +86,6 @@ Resources:
               "Condition": {
                 "ForAnyValue:StringEquals": {
                   "aws:RequestedRegion": [
-                    "ap-southeast-2",
                     "us-east-1"
                   ]
                 }

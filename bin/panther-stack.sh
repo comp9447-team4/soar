@@ -5,6 +5,9 @@
 
 source "${REPO_ROOT}"/bin/_utils.sh
 
+# Panthers is in US
+export AWS_REGION="us-east-1"
+
 create() {
     AWS_REGION=us-east-1 aws cloudformation deploy \
         --template-file "${REPO_ROOT}"/infra/panther/panther.yml \
