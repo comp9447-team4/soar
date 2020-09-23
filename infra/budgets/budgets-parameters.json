@@ -1,0 +1,6 @@
+[
+    {
+        "ParameterKey": "NotificationEmail1",
+        "ParameterValue": "{{ NOTIFICATION_EMAIL_1 }}"
+    }
+]
