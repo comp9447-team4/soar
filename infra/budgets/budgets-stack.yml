@@ -8,13 +8,83 @@ Parameters:
     ConstraintDescription: Must be a valid email address.
     Description: Email address to notify budgets
 Resources:
-  Budget:
+  BudgetWithCredits:
     Type: "AWS::Budgets::Budget"
     Properties:
       Budget:
-        BudgetName: "$100 Budget"
+        BudgetName: "$100 Budget with Credits"
         BudgetLimit:
           Amount: 100
+          Unit: USD
+        TimeUnit: MONTHLY
+        BudgetType: COST
+        CostTypes:
+          IncludeCredit: false
+      NotificationsWithSubscribers:
+        # 50% actual and forecasted
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 50
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 50
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        # 80% actual and forecasted
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 80
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 80
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        # 100% actual and forecasted
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 100
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 100
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+  BudgetActualMoney:
+    Type: "AWS::Budgets::Budget"
+    Properties:
+      Budget:
+        BudgetName: "Sh*t! Actual money being spent!"
+        BudgetLimit:
+          Amount: 1
           Unit: USD
         TimeUnit: MONTHLY
         BudgetType: COST

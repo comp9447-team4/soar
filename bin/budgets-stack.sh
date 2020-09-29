@@ -27,6 +27,23 @@ create() {
         --enable-termination-protection
 }
 
+update() {
+    local parameters
+    parameters=$(get_parameters)
+    echo "${parameters}"
+    aws cloudformation update-stack --stack-name "${BUDGETS_STACK_NAME}" \
+        --template-body file://"${REPO_ROOT}"/infra/budgets/budgets-stack.yml \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters "${parameters}"
+}
+
+delete() {
+    local parameters
+    parameters=$(get_parameters)
+    echo "${parameters}"
+    aws cloudformation delete-stack --stack-name "${BUDGETS_STACK_NAME}"
+}
+
 usage() {
     cat <<EOF
 Applies budget stack.
@@ -35,6 +52,7 @@ Usage: ./bin/budget-stack.sh <arg>
 Where arg is:
 create
 delete
+update
 EOF
 }
 
