@@ -1,5 +1,3 @@
-aws cloudformation create-stack --stack-name MythicalMysfitsCoreStack --capabilities CAPABILITY_NAMED_IAM --template-body file://~/environment/aws-modern-application-workshop/module-2/cfn/core.yml
-
 #!/bin/bash
 
 set -e
@@ -22,33 +20,39 @@ create_static_site() {
 
     echo "Deploying bucket stack..."
     aws cloudformation create-stack \
-        --stack-name "${MODULE_1_STACK_YML}" \
+        --stack-name "${MODULE_1_STACK_NAME}" \
         --template-body file://"${MODULE_1_STACK_YML}" \
         --parameters ParameterKey=BucketName,ParameterValue="${bucket_name}" \
         --enable-termination-protection
 
     wait
+    echo "Waiting for stack to be created... (ugh not the best way to do this...)"
+    sleep 10
     echo "Copying to S3..."
     aws s3 cp \
         "${REPO_ROOT}"/mythical-mysfits/web/index.html \
         s3://"${bucket_name}"/index.html
 
+    echo "You should now see this on your browser:"
+    local url="https://${bucket_name}.s3.amazonaws.com/index.html"
+    echo "${url}"
+    curl "${url}" | head -15
 }
 
-create_core() {
-    # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
-    aws cloudformation create-stack \
-        --stack-name "${MYTHICAL_MYSFITS_CORE_YML}" \
-        --template-body file://"${MYTHICAL_MYSFITS_CORE_YML}" \
-        --capabilities CAPABILITY_NAMED_IAM \
-        --parameters "${parameters}" \
-        --enable-termination-protection
-}
-
-delete_core() {
-    aws cloudformation delete-stack \
-        --stack-name "${MYTHICAL_MYSFITS_CORE_YML}" \
-}
+# create_core() {
+#     # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
+#     aws cloudformation create-stack \
+#         --stack-name "${MYTHICAL_MYSFITS_CORE_YML}" \
+#         --template-body file://"${MYTHICAL_MYSFITS_CORE_YML}" \
+#         --capabilities CAPABILITY_NAMED_IAM \
+#         --parameters "${parameters}" \
+#         --enable-termination-protection
+# }
+# 
+# delete_core() {
+#     aws cloudformation delete-stack \
+#         --stack-name "${MYTHICAL_MYSFITS_CORE_YML}" \
+# }
 
 usage() {
     cat <<EOF
@@ -63,9 +67,9 @@ EOF
 main() {
     args="$@"
 
-    if [[ "${AWS_PROFILE}" == "prod"  ]]; then
+    if [[ "${AWS_PROFILE}" == "prod" ]]; then
         echo "In environment: ${AWS_PROFILE}"
-    elif [[ "${AWS_PROFILE}" == "qa"  ]]; then
+    elif [[ "${AWS_PROFILE}" == "qa" ]]; then
         echo "In environment: ${AWS_PROFILE}"
     else
         echo "Unknown AWS_PROFILE ${AWS_PROFILE}"
@@ -74,6 +78,8 @@ main() {
     fi
 
     if [[ "${args}" == "create" ]]; then
+        echo "Creating.."
+
         # Module 1
         create_static_site
 
@@ -82,6 +88,7 @@ main() {
 
         # TODO add more
     elif [[ "${args}" == "delete" ]]; then
+        echo "Deleting.."
         # Module 2
         # delete_core
 
