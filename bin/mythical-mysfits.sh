@@ -39,20 +39,14 @@ create_static_site() {
     curl "${url}" | head -15
 }
 
-# create_core() {
-#     # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
-#     aws cloudformation create-stack \
-#         --stack-name "${MYTHICAL_MYSFITS_CORE_YML}" \
-#         --template-body file://"${MYTHICAL_MYSFITS_CORE_YML}" \
-#         --capabilities CAPABILITY_NAMED_IAM \
-#         --parameters "${parameters}" \
-#         --enable-termination-protection
-# }
-# 
-# delete_core() {
-#     aws cloudformation delete-stack \
-#         --stack-name "${MYTHICAL_MYSFITS_CORE_YML}" \
-# }
+create_core() {
+    # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
+    aws cloudformation create-stack \
+        --stack-name "${MODULE_2_CORE_STACK_NAME}" \
+        --template-body file://"${MODULE_2_CORE_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --enable-termination-protection
+}
 
 usage() {
     cat <<EOF
@@ -61,6 +55,8 @@ Reference: https://github.com/aws-samples/aws-modern-application-workshop/tree/p
 
 Usage: ./bin/mythical-mysfits.sh <arg>
 Where arg is:
+create-module-1
+create-module-2
 EOF
 }
 
@@ -77,22 +73,11 @@ main() {
         echo "Must be prod or qa"
     fi
 
-    if [[ "${args}" == "create" ]]; then
-        echo "Creating.."
-
+    if [[ "${args}" == "create-module-1" ]]; then
         # Module 1
         create_static_site
-
-        # Module 2
-        # create_core
-
-        # TODO add more
-    elif [[ "${args}" == "delete" ]]; then
-        echo "Deleting.."
-        # Module 2
-        # delete_core
-
-        # TODO add more
+    elif [[ "${args}" == "create-module-2" ]]; then
+        create_core
     else
         echo "No command run :("
         usage
