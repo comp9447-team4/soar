@@ -5,29 +5,33 @@ set -u
 
 source "${REPO_ROOT}"/bin/_utils.sh
 
-export MODULE_1_STACK_NAME="MythicalMystfitsStaticSiteStack"
-export MODULE_1_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/static-site.yml"
-
-export MODULE_2_CORE_STACK_NAME="MythicalMysfitsCoreStack"
-export MODULE_2_CORE_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/core.yml"
-
 export AWS_REGION="us-east-1"
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
 
+# Module 1
+export STATIC_SITE_STACK_NAME="MythicalMystfitsStaticSiteStack"
+export STATIC_SITE_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/static-site.yml"
+# Module 2
+export CORE_STACK_NAME="MythicalMysfitsCoreStack"
+export CORE_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/core.yml"
+export ECR_STACK_NAME="MythicalMysfitsECRStack"
+export ECR_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecr.yml"
 
+# Module 1
 create_static_site() {
     local bucket_name
     bucket_name="${AWS_PROFILE}-comp9447-team4-mythical-mysfits"
 
     echo "Deploying bucket stack..."
     aws cloudformation create-stack \
-        --stack-name "${MODULE_1_STACK_NAME}" \
-        --template-body file://"${MODULE_1_STACK_YML}" \
+        --stack-name "${STATIC_SITE_STACK_NAME}" \
+        --template-body file://"${STATIC_SITE_STACK_YML}" \
         --parameters ParameterKey=BucketName,ParameterValue="${bucket_name}" \
         --enable-termination-protection
 
     wait
-    echo "Waiting for stack to be created... (ugh not the best way to do this...)"
-    sleep 10
+    echo "Waiting for stack to be created..."
+    wait_build "${STATIC_SITE_STACK_NAME}"
     echo "Copying to S3..."
     aws s3 cp \
         "${REPO_ROOT}"/mythical-mysfits/web/index.html \
@@ -39,20 +43,55 @@ create_static_site() {
     curl "${url}" | head -15
 }
 
-# create_core() {
-#     # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
-#     aws cloudformation create-stack \
-#         --stack-name "${MYTHICAL_MYSFITS_CORE_YML}" \
-#         --template-body file://"${MYTHICAL_MYSFITS_CORE_YML}" \
-#         --capabilities CAPABILITY_NAMED_IAM \
-#         --parameters "${parameters}" \
-#         --enable-termination-protection
-# }
-# 
-# delete_core() {
-#     aws cloudformation delete-stack \
-#         --stack-name "${MYTHICAL_MYSFITS_CORE_YML}" \
-# }
+# Module 2
+create_core() {
+    # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
+    aws cloudformation create-stack \
+        --stack-name "${CORE_STACK_NAME}" \
+        --template-body file://"${CORE_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --enable-termination-protection
+}
+
+create_ecr() {
+    aws cloudformation create-stack \
+        --stack-name "${ECR_STACK_NAME}" \
+        --template-body file://"${ECR_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --enable-termination-protection
+
+}
+
+build_docker_image() {
+    cd "${REPO_ROOT}/mythical-mysfits/app"
+    # I'd prefer using immutable tags but latest will do for now...
+    sudo docker build \
+           . \
+           -t "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
+    cd -
+}
+
+login_to_ecr() {
+    aws ecr get-login-password \
+        --region "${AWS_REGION}" \
+        | sudo docker login \
+                 --username AWS \
+                 --password-stdin "${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_REGION}".amazonaws.com
+}
+
+push_image_to_ecr() {
+    login_to_ecr
+    sudo docker push "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
+}
+
+deploy_ecs() {
+    # TODO Move this to cfn..
+    # aws ecs create-cluster --cluster-name MythicalMysfits-Cluster
+    # aws logs create-log-group --log-group-name mythicalmysfits-logs
+    # aws ecs register-task-definition --cli-input-json \
+    #    file://~/environment/aws-modern-application-workshop/module-2/aws-cli/task-definition.json
+    # aws elbv2 create-load-balancer --name mysfits-nlb --scheme internet-facing --type network --subnets REPLACE_ME_PUBLIC_SUBNET_ONE REPLACE_ME_PUBLIC_SUBNET_TWO
+}
 
 usage() {
     cat <<EOF
@@ -61,6 +100,8 @@ Reference: https://github.com/aws-samples/aws-modern-application-workshop/tree/p
 
 Usage: ./bin/mythical-mysfits.sh <arg>
 Where arg is:
+create-module-1
+create-module-2
 EOF
 }
 
@@ -77,22 +118,18 @@ main() {
         echo "Must be prod or qa"
     fi
 
-    if [[ "${args}" == "create" ]]; then
-        echo "Creating.."
-
+    if [[ "${args}" == "create-module-1" ]]; then
         # Module 1
         create_static_site
+    elif [[ "${args}" == "create-module-2" ]]; then
+        wait_build "${STATIC_SITE_STACK_NAME}"
+        create_core
+        wait_build "${CORE_STACK_NAME}"
+        create_ecr
+        wait_build "${ECR_STACK_NAME}"
+        build_docker_image
+        push_image_to_ecr
 
-        # Module 2
-        # create_core
-
-        # TODO add more
-    elif [[ "${args}" == "delete" ]]; then
-        echo "Deleting.."
-        # Module 2
-        # delete_core
-
-        # TODO add more
     else
         echo "No command run :("
         usage
