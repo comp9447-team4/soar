@@ -6,6 +6,7 @@ set -u
 source "${REPO_ROOT}"/bin/_utils.sh
 
 export AWS_REGION="us-east-1"
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
 
 # Module 1
 export STATIC_SITE_STACK_NAME="MythicalMystfitsStaticSiteStack"
@@ -62,12 +63,34 @@ create_ecr() {
 }
 
 build_docker_image() {
-    account_id=$(aws sts get-caller-identity | jq -r '.Account')
-    cd "${REPO_ROOT}/mythical-mysfits/Dockerfile"
-    docker build \
+    cd "${REPO_ROOT}/mythical-mysfits/app"
+    # I'd prefer using immutable tags but latest will do for now...
+    sudo docker build \
            . \
-           -t "${account_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
+           -t "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
     cd -
+}
+
+login_to_ecr() {
+    aws ecr get-login-password \
+        --region "${AWS_REGION}" \
+        | sudo docker login \
+                 --username AWS \
+                 --password-stdin "${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_REGION}".amazonaws.com
+}
+
+push_image_to_ecr() {
+    login_to_ecr
+    sudo docker push "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
+}
+
+deploy_ecs() {
+    # TODO Move this to cfn..
+    # aws ecs create-cluster --cluster-name MythicalMysfits-Cluster
+    # aws logs create-log-group --log-group-name mythicalmysfits-logs
+    # aws ecs register-task-definition --cli-input-json \
+    #    file://~/environment/aws-modern-application-workshop/module-2/aws-cli/task-definition.json
+    # aws elbv2 create-load-balancer --name mysfits-nlb --scheme internet-facing --type network --subnets REPLACE_ME_PUBLIC_SUBNET_ONE REPLACE_ME_PUBLIC_SUBNET_TWO
 }
 
 usage() {
@@ -100,11 +123,13 @@ main() {
         create_static_site
     elif [[ "${args}" == "create-module-2" ]]; then
         wait_build "${STATIC_SITE_STACK_NAME}"
-        # create_core
+        create_core
         wait_build "${CORE_STACK_NAME}"
         create_ecr
         wait_build "${ECR_STACK_NAME}"
         build_docker_image
+        push_image_to_ecr
+
     else
         echo "No command run :("
         usage
