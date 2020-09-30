@@ -16,6 +16,8 @@ export CORE_STACK_NAME="MythicalMysfitsCoreStack"
 export CORE_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/core.yml"
 export ECR_STACK_NAME="MythicalMysfitsECRStack"
 export ECR_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecr.yml"
+export ECS_STACK_NAME="MythicalMysfitsECSStack"
+export ECS_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecs.yml"
 
 # Module 1
 create_static_site() {
@@ -88,6 +90,11 @@ push_image_to_ecr() {
 
 create_ecs() {
     echo "Creating ecs stack..."
+    aws cloudformation create-stack \
+        --stack-name "${ECS_STACK_NAME}" \
+        --template-body file://"${ECS_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --enable-termination-protection
 }
 
 usage() {
@@ -120,15 +127,19 @@ main() {
         # Module 1
         create_static_site
     elif [[ "${args}" == "create-module-2" ]]; then
-        wait_build "${STATIC_SITE_STACK_NAME}"
-        create_core
+        # wait_build "${STATIC_SITE_STACK_NAME}"
+        # create_core
 
-        wait_build "${CORE_STACK_NAME}"
-        create_ecr
+        # wait_build "${CORE_STACK_NAME}"
+        # create_ecr
 
+        # wait_build "${ECR_STACK_NAME}"
+        # build_docker_image
+        # push_image_to_ecr
+
+        wait
         wait_build "${ECR_STACK_NAME}"
-        build_docker_image
-        push_image_to_ecr
+        create_ecs
 
     else
         echo "No command run :("
