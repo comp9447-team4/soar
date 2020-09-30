@@ -28,6 +28,7 @@ export CICD_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/cicd.yml"
 export MYTHICAL_MYSFITS_REPO="${REPO_ROOT}/../MythicalMysfitsService-Repository"
 export ECR_IMAGE="${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_REGION}".amazonaws.com
 export ECR_IMAGE_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
+export ARTIFACTS_BUCKET="${AWS_PROFILE}-comp9447-team4-mythical-mysfits-artifacts"
 
 # Module 1
 create_static_site() {
@@ -143,13 +144,12 @@ create_fargate_service(){
 
 create_cicd() {
     local bucket_name
-    bucket_name="${AWS_PROFILE}-comp9447-team4-mythical-mysfits-artifacts"
     aws cloudformation create-stack \
         --stack-name "${CICD_STACK_NAME}" \
         --template-body file://"${CICD_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
-        --parameters ParameterKey=BucketName,ParameterValue="${bucket_name}" \
-        --enable-termination-protection
+        --parameters ParameterKey=BucketName,ParameterValue="${ARTIFACTS_BUCKET}"
+
     wait_build "${CICD_STACK_NAME}"
 }
 
@@ -211,8 +211,8 @@ main() {
         # create_ecs
         # create_fargate_service
 
-        update_bucket
-        # create_cicd
+        # update_bucket
+        create_cicd
         # init_mystical_mysfits_repo
 
     else

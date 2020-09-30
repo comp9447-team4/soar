@@ -22,8 +22,8 @@ Resources:
           Effect: Allow
           Principal:
             AWS:
-            - !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodeBuildServiceRole
-            - !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodePipelineServiceRole
+            - !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole
+            - !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodePipelineServiceRole
           Action:
           - s3:GetObject
           - s3:GetObjectVersion
@@ -39,8 +39,8 @@ Resources:
           Effect: Allow
           Principal:
             AWS:
-            - !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodeBuildServiceRole
-            - !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodePipelineServiceRole
+            - !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole
+            - !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodePipelineServiceRole
           Action: s3:PutObject
           Resource:
           - Fn::Sub:
@@ -69,15 +69,15 @@ Resources:
         Image: aws/codebuild/python:3.5.2
         PrivilegedMode: true
         EnvironmentVariables:
-        - name: AWS_ACCOUNT_ID
-          value: !Sub "${AWS::AccountId}"
-        - name: AWS_DEFAULT_REGION
-          value: !Sub "${AWS::Region}"
-        type: LINUX_CONTAINER
-      ServiceRole: !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodeBuildServiceRole
+        - Name: AWS_ACCOUNT_ID
+          Value: !Sub "${AWS::AccountId}"
+        - Name: AWS_DEFAULT_REGION
+          Value: !Sub "${AWS::Region}"
+        Type: LINUX_CONTAINER
+      ServiceRole: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole
       Source:
-        type: CODECOMMIT
-        location: !Sub "https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/MythicalMysfitsService-Repository"
+        Type: CODECOMMIT
+        Location: !Sub "https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/MythicalMysfitsService-Repository"
 
 
   # aws codepipeline create-pipeline --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-pipeline.json
@@ -85,7 +85,7 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: MythicalMysfitsServiceCICDPipeline
-      RoleArn: !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodePipelineServiceRole
+      RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodePipelineServiceRole
       Stages:
       - Name: Source
         Actions:
@@ -133,5 +133,5 @@ Resources:
             FileName: imagedefinitions.json
       ArtifactStore:
         Type: S3
-        Location: REPLACE_ME_ARTIFACTS_BUCKET_NAME
+        Location: !Ref ArtifactsBucket
 
