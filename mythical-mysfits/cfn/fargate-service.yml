@@ -1,0 +1,35 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: https://aws.amazon.com/getting-started/hands-on/build-modern-app-fargate-lambda-dynamodb-python/module-two/
+Parameters:
+  TaskDefArn:
+    Type: String
+Resources:
+# aws ecs create-service --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/service-definition.json
+  FargateService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - Listener
+    Properties:
+      ServiceName: MythicalMysfits-Service
+      Cluster: !ImportValue MythicalMysfitsECSStack:ECSCluster
+      LaunchType: FARGATE
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 0
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsVpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+          - !ImportValue MythicalMysfitsCoreStack:FargateContainerSecurityGroup
+          Subnets:
+          - !ImportValue MythicalMysfitsCoreStack:PublicSubnetOne
+          - !ImportValue MythicalMysfitsCoreStack:PublicSubnetTwo
+      # https://stackoverflow.com/questions/32727520/cloudformation-template-for-creating-ecs-service-stuck-in-create-in-progress
+      # aws ecs list-task-definitions
+      TaskDefinition: !Ref TaskDefArn
+      LoadBalancers:
+      - ContainerName: MythicalMysfits-Service
+        ContainerPort: 8080
+        TargetGroupArn: !ImportValue MythicalMysfitsECSStack:NLBTargetGroup

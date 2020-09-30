@@ -19,8 +19,11 @@ export ECR_STACK_NAME="MythicalMysfitsECRStack"
 export ECR_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecr.yml"
 export ECS_STACK_NAME="MythicalMysfitsECSStack"
 export ECS_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecs.yml"
+export FARGATE_SERVICE_STACK_NAME="MythicalMysfitsECSStack"
+export FARGATE_SERVICE_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecs.yml"
 export CICD_STACK_NAME="MythicalMysfitsCICDStack"
 export CICD_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/cicd.yml"
+export MYTHICAL_MYSFITS_REPO="${REPO_ROOT}/../MythicalMysfitsService-Repository"
 
 # Module 1
 create_static_site() {
@@ -71,7 +74,7 @@ create_ecr() {
 }
 
 build_docker_image() {
-    cd "${REPO_ROOT}/mythical-mysfits/app"
+    cd "${REPO_ROOT}/mythical-mysfits/module-2/app"
     # I'd prefer using immutable tags but latest will do for now...
     sudo docker build \
            . \
@@ -100,10 +103,19 @@ create_ecs() {
         --template-body file://"${ECS_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --enable-termination-protection
-
-    echo "Creating fargate service..."
     wait_build "${ECS_STACK_NAME}"
-    aws ecs create-service --cli-input-json "${REPO_ROOT}"/mythical-mysfits/module-2/aws-cli/service-definition.json
+
+    echo "Creating fargate service separately because cfn doesn't play well with it..."
+    echo "https://stackoverflow.com/questions/32727520/cloudformation-template-for-creating-ecs-service-stuck-in-create-in-progress"
+
+    local task_def_arn=$(aws ecs list-task-definitions --family-prefix mythicalmysfits | jq -r .taskDefinitionArns[0][-1:])
+    aws cloudformation create-stack \
+        --stack-name "${FARGATE_SERVICE_STACK_NAME}" \
+        --template-body file://"${FARGATE_SERVICE_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=TaskDefArn,ParameterValue="${task_def_arn}" \
+        --enable-termination-protection
+    wait_build "${FARGATE_SERVICE_STACK_NAME}"
 }
 
 create_cicd() {
@@ -119,11 +131,12 @@ create_cicd() {
 }
 
 init_mystical_mysfits_repo() {
+    echo "Copying Module 2 app code into mythical mysfits repo..."
     cd "${REPO_ROOT}/.."
     git clone https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/MythicalMysfitsService-Repository
+    cp -r "${REPO_ROOT}"/mythical-mysfits/module-2/app/* "${MYTHICAL_MYSFITS_REPO}"
 
-    cp -r "${REPO_ROOT}"/mythical-mysfits/app/* "${REPO_ROOT}"/../MythicalMysfitsService-Repository/
-
+    cd "${MYTHICAL_MYSFITS_REPO}"
     git add .
     git commit -m "I changed the age of one of the mysfits."
     git push

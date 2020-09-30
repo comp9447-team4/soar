@@ -78,33 +78,15 @@ Resources:
       LoadBalancerArn: !Ref NLB
       Protocol: TCP
       Port: 80
-
-  # WTTFFFFFFFFFFFFFF!!
-  # aws ecs create-service --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/service-definition.json
-  # FargateService:
-  #   Type: AWS::ECS::Service
-  #   DependsOn:
-  #     - Listener
-  #   Properties:
-  #     ServiceName: MythicalMysfits-Service
-  #     Cluster: !Ref ECSCluster
-  #     LaunchType: FARGATE
-  #     DeploymentConfiguration:
-  #       MaximumPercent: 200
-  #       MinimumHealthyPercent: 0
-  #     DesiredCount: 1
-  #     NetworkConfiguration:
-  #       AwsVpcConfiguration:
-  #         AssignPublicIp: DISABLED
-  #         SecurityGroups:
-  #         - !ImportValue MythicalMysfitsCoreStack:FargateContainerSecurityGroup
-  #         Subnets:
-  #         - !ImportValue MythicalMysfitsCoreStack:PublicSubnetOne
-  #         - !ImportValue MythicalMysfitsCoreStack:PublicSubnetTwo
-  #     # https://stackoverflow.com/questions/32727520/cloudformation-template-for-creating-ecs-service-stuck-in-create-in-progress
-  #     TaskDefinition: !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/mythicalmysfitsservice:123"
-  #     LoadBalancers:
-  #     - ContainerName: MythicalMysfits-Service
-  #       ContainerPort: 8080
-  #       TargetGroupArn: !Ref NLBTargetGroup
+Outputs:
+  ECSCluster:
+    Description: ECSCluster
+    Value: !Ref ECSCluster
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ECSCluster' ] ]
+  NLBTargetGroup:
+    Description: NLBTargetGroup
+    Value: !Ref NLBTargetGroup
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'NLBTargetGroup' ] ]
 
