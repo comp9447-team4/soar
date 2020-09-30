@@ -26,6 +26,8 @@ export FARGATE_SERVICE_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/fargate-serv
 export CICD_STACK_NAME="MythicalMysfitsCICDStack"
 export CICD_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/cicd.yml"
 export MYTHICAL_MYSFITS_REPO="${REPO_ROOT}/../MythicalMysfitsService-Repository"
+export ECR_IMAGE="${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_REGION}".amazonaws.com
+export ECR_IMAGE_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
 
 # Module 1
 create_static_site() {
@@ -78,7 +80,7 @@ build_docker_image() {
     # I'd prefer using immutable tags but latest will do for now...
     sudo docker build \
            . \
-           -t "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
+           -t "${ECR_IMAGE_TAG}"
     cd -
 }
 
@@ -87,7 +89,7 @@ login_to_ecr() {
         --region "${AWS_REGION}" \
         | sudo docker login \
                  --username AWS \
-                 --password-stdin "${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_REGION}".amazonaws.com
+                 --password-stdin "${ECR_IMAGE}"
 }
 
 push_image_to_ecr() {
@@ -98,11 +100,12 @@ push_image_to_ecr() {
 
 create_ecs() {
     echo "Creating ecs stack..."
-    aws cloudformation create-stack \
+    aws cloudformation update-stack \
         --stack-name "${ECS_STACK_NAME}" \
         --template-body file://"${ECS_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
-        --enable-termination-protection
+        --parameters ParameterKey=ECRImageTag,ParameterValue="${ECR_IMAGE_TAG}" \
+    #--enable-termination-protection
     wait_build "${ECS_STACK_NAME}"
 
 }
@@ -126,8 +129,8 @@ create_fargate_service(){
     )
 
     echo "${parameters}"
-    #aws ecs create-service \
-    #    --cli-input-json "${parameters}"
+    aws ecs create-service \
+       --cli-input-json "${parameters}"
 
     # local task_def_arn=$(aws ecs list-task-definitions --family-prefix mythicalmysfitsservice | jq -r '.taskDefinitionArns[0]')
     # aws cloudformation create-stack \
@@ -205,10 +208,10 @@ main() {
         # build_docker_image
         # push_image_to_ecr
 
-        # create_ecs
-        # update_bucket
-
+        create_ecs
         create_fargate_service
+
+        # update_bucket
         # create_cicd
         # init_mystical_mysfits_repo
 

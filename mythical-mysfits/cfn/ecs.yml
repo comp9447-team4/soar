@@ -1,6 +1,9 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: https://aws.amazon.com/getting-started/hands-on/build-modern-app-fargate-lambda-dynamodb-python/module-two/
+Parameters:
+  ECRImageTag:
+    Type: String
 Resources:
   # aws ecs create-cluster --cluster-name MythicalMysfits-Cluster
   ECSCluster:
@@ -29,7 +32,7 @@ Resources:
       TaskRoleArn: !ImportValue MythicalMysfitsCoreStack:ECSTaskRole
       ContainerDefinitions:
       - name: MythicalMysfits-Service
-        image: mythicalmysfits/service:latest
+        image: !Ref ECRImageTag
         portMappings:
         - containerPort: 8080
           protocol: http
