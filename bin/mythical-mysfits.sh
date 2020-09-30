@@ -111,6 +111,19 @@ create_cicd() {
         --enable-termination-protection
 }
 
+init_mystical_mysfits_repo() {
+    cd "${REPO_ROOT}/.."
+    git clone https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/MythicalMysfitsService-Repository
+
+    cp -r "${REPO_ROOT}"/mythical-mysfits/app/* "${REPO_ROOT}"/../MythicalMysfitsService-Repository/
+
+    git add .
+    git commit -m "I changed the age of one of the mysfits."
+    git push
+
+    cd "${REPO_ROOT}"
+}
+
 
 usage() {
     cat <<EOF
