@@ -164,9 +164,12 @@ init_mystical_mysfits_repo() {
     cp -r "${REPO_ROOT}"/mythical-mysfits/module-2/app/* "${MYTHICAL_MYSFITS_REPO}"
 
     cd "${MYTHICAL_MYSFITS_REPO}"
-    git add .
-    git commit -m "I changed the age of one of the mysfits."
-    git push
+    echo "Follow some git commands..."
+    # git add .
+    # git config --global credential.helper '!aws codecommit credential-helper $@'
+    # git config --global credential.UseHttpPath true
+    # git commit -m "I changed the age of one of the mysfits."
+    # git push
 
     cd "${REPO_ROOT}"
 }
@@ -202,19 +205,20 @@ main() {
         # Module 1
         create_static_site
     elif [[ "${args}" == "create-module-2" ]]; then
-        # create_core
-        # create_ecr
+        create_core
+        create_ecr
 
-        # build_docker_image
-        # push_image_to_ecr
+        build_docker_image
+        push_image_to_ecr
 
-        # create_ecs
-        # create_fargate_service
-
-        # update_bucket
+        create_ecs
+        create_fargate_service
         create_cicd
-        # init_mystical_mysfits_repo
 
+        init_mystical_mysfits_repo
+    elif [[ "${args}" == "update-bucket" ]]; then
+        echo "Uploading static content to bucket..."
+        update_bucket
     else
         echo "No command run :("
         usage
