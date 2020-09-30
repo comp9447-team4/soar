@@ -28,6 +28,7 @@ export CICD_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/cicd.yml"
 export MYTHICAL_MYSFITS_REPO="${REPO_ROOT}/../MythicalMysfitsService-Repository"
 export ECR_IMAGE="${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_REGION}".amazonaws.com
 export ECR_IMAGE_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
+export ARTIFACTS_BUCKET="${AWS_PROFILE}-comp9447-team4-mythical-mysfits-artifacts"
 
 # Module 1
 create_static_site() {
@@ -143,13 +144,12 @@ create_fargate_service(){
 
 create_cicd() {
     local bucket_name
-    bucket_name="${AWS_PROFILE}-comp9447-team4-mythical-mysfits-artifacts"
     aws cloudformation create-stack \
         --stack-name "${CICD_STACK_NAME}" \
         --template-body file://"${CICD_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
-        --parameters ParameterKey=BucketName,ParameterValue="${bucket_name}" \
-        --enable-termination-protection
+        --parameters ParameterKey=BucketName,ParameterValue="${ARTIFACTS_BUCKET}"
+
     wait_build "${CICD_STACK_NAME}"
 }
 
@@ -164,9 +164,12 @@ init_mystical_mysfits_repo() {
     cp -r "${REPO_ROOT}"/mythical-mysfits/module-2/app/* "${MYTHICAL_MYSFITS_REPO}"
 
     cd "${MYTHICAL_MYSFITS_REPO}"
-    git add .
-    git commit -m "I changed the age of one of the mysfits."
-    git push
+    echo "Follow some git commands..."
+    # git add .
+    # git config --global credential.helper '!aws codecommit credential-helper $@'
+    # git config --global credential.UseHttpPath true
+    # git commit -m "I changed the age of one of the mysfits."
+    # git push
 
     cd "${REPO_ROOT}"
 }
@@ -202,19 +205,20 @@ main() {
         # Module 1
         create_static_site
     elif [[ "${args}" == "create-module-2" ]]; then
-        # create_core
-        # create_ecr
+        create_core
+        create_ecr
 
-        # build_docker_image
-        # push_image_to_ecr
+        build_docker_image
+        push_image_to_ecr
 
-        # create_ecs
-        # create_fargate_service
+        create_ecs
+        create_fargate_service
+        create_cicd
 
+        init_mystical_mysfits_repo
+    elif [[ "${args}" == "update-bucket" ]]; then
+        echo "Uploading static content to bucket..."
         update_bucket
-        # create_cicd
-        # init_mystical_mysfits_repo
-
     else
         echo "No command run :("
         usage
