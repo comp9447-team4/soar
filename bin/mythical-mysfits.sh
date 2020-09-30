@@ -5,6 +5,7 @@ set -u
 
 source "${REPO_ROOT}"/bin/_utils.sh
 
+export AWS_PAGER=""
 export AWS_REGION="us-east-1"
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
 
@@ -18,6 +19,8 @@ export ECR_STACK_NAME="MythicalMysfitsECRStack"
 export ECR_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecr.yml"
 export ECS_STACK_NAME="MythicalMysfitsECSStack"
 export ECS_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecs.yml"
+export CICD_STACK_NAME="MythicalMysfitsCICDStack"
+export CICD_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/cicd.yml"
 
 # Module 1
 create_static_site() {
@@ -97,6 +100,18 @@ create_ecs() {
         --enable-termination-protection
 }
 
+create_cicd() {
+    local bucket_name
+    bucket_name="${AWS_PROFILE}-comp9447-team4-mythical-mysfits-artifacts"
+    aws cloudformation create-stack \
+        --stack-name "${CICD_STACK_NAME}" \
+        --template-body file://"${CICD_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=BucketName,ParameterValue="${bucket_name}" \
+        --enable-termination-protection
+}
+
+
 usage() {
     cat <<EOF
 Creates the Mythical Mysfits core stack.
@@ -128,18 +143,21 @@ main() {
         create_static_site
     elif [[ "${args}" == "create-module-2" ]]; then
         # wait_build "${STATIC_SITE_STACK_NAME}"
+
         # create_core
-
         # wait_build "${CORE_STACK_NAME}"
-        # create_ecr
 
+        # create_ecr
         # wait_build "${ECR_STACK_NAME}"
         # build_docker_image
         # push_image_to_ecr
 
         wait
-        wait_build "${ECR_STACK_NAME}"
         create_ecs
+        wait_build "${ECS_STACK_NAME}"
+
+        create_cicd
+        wait_build "${CICD_STACK_NAME}"
 
     else
         echo "No command run :("

@@ -72,9 +72,34 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
-        TargetGroupArn: !Ref NLBTargetGroup
+      - TargetGroupArn: !Ref NLBTargetGroup
         Type: forward
       LoadBalancerArn: !Ref NLB
-      Protocol: HTTP
+      Protocol: TCP
       Port: 80
+
+  # aws ecs create-service --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/service-definition.json
+  FargateService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: MythicalMysfits-Service
+      Cluster: !Ref ECSCluster
+      LaunchType: FARGATE
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 0
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsVpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+          - !ImportValue MythicalMysfitsCoreStack:FargateContainerSecurityGroup
+          Subnets:
+          - !ImportValue MythicalMysfitsCoreStack:PublicSubnetOne
+          - !ImportValue MythicalMysfitsCoreStack:PublicSubnetTwo
+      TaskDefinition: mythicalmysfitsservice
+      LoadBalancers:
+      - ContainerName: MythicalMysfits-Service
+        ContainerPort: 8080
+        TargetGroupArn: !Ref NLBTargetGroup
 
