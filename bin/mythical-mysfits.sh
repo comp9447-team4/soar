@@ -100,14 +100,14 @@ push_image_to_ecr() {
 
 create_ecs() {
     echo "Creating ecs stack..."
-    aws cloudformation update-stack \
+    aws cloudformation create-stack \
         --stack-name "${ECS_STACK_NAME}" \
         --template-body file://"${ECS_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters ParameterKey=ECRImageTag,ParameterValue="${ECR_IMAGE_TAG}" \
-    #--enable-termination-protection
-    wait_build "${ECS_STACK_NAME}"
+        --enable-termination-protection
 
+    wait_build "${ECS_STACK_NAME}"
 }
 
 create_fargate_service(){
@@ -208,10 +208,10 @@ main() {
         # build_docker_image
         # push_image_to_ecr
 
-        create_ecs
-        create_fargate_service
+        # create_ecs
+        # create_fargate_service
 
-        # update_bucket
+        update_bucket
         # create_cicd
         # init_mystical_mysfits_repo
 
