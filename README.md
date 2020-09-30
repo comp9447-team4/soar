@@ -87,7 +87,12 @@ output = json
 
 ## Having issues with SSO?
 
-Remove the cache and retry.
+Login again
+```
+aws sso login --profile qa
+```
+
+If the above doesn't work, remove the cache and retry.
 
 ```
 mv ~/.aws/sso ~/.aws/sso.bak

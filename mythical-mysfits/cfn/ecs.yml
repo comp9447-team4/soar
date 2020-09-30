@@ -1,0 +1,66 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: https://aws.amazon.com/getting-started/hands-on/build-modern-app-fargate-lambda-dynamodb-python/module-two/
+Resources:
+  # aws ecs create-cluster --cluster-name MythicalMysfits-Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: MythicalMysfits-Cluster
+      Tags:
+      - Key: Component
+        Value: MythicalMysfits
+  # aws logs create-log-group --log-group-name mythicalmysfits-logs
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: mythicalmysfits-logs
+      Tags:
+      - Key: Component
+        Value: MythicalMysfits
+  # aws ecs register-task-definition
+  # --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/task-definition.json
+  ECSTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: mythicalmysfitsservice
+      ExecutionRoleArn: !Ref MythicalMysfitsCoreStack:EcsServiceRole
+      Cpu: '256'
+      Memory: '512'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE
+      TaskRoleArn: !Ref MythicalMysfitsCoreStack:ECSTaskRole
+      ContainerDefinitions:
+      - name: MythicalMysfits-Service
+        image: mythicalmysfits/service:latest
+        portMappings:
+        - containerPort: 8080
+          protocol: http
+        logConfiguration:
+          logDriver: awslogs
+          options:
+            awslogs-group: mythicalmysfits-logs
+            awslogs-region: us-east-1
+            awslogs-stream-prefix: awslogs-mythicalmysfits-service
+        essential: true
+    # aws elbv2 create-load-balancer --name mysfits-nlb --scheme internet-facing --type network --subnets REPLACE_ME_PUBLIC_SUBNET_ONE REPLACE_ME_PUBLIC_SUBNET_TWO > ~/environment/nlb-output.json
+    LoadBalancer:
+      Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+      Properties:
+        Name: mysfits-nlb
+        Scheme: internet-facing
+        Type: network
+        Subnets:
+          - !Ref MythicalMysfitsCoreStack:PublicSubnetOne
+          - !Ref MythicalMysfitsCoreStack:PublicSubnetTwo
+    # aws elbv2 create-target-group --name MythicalMysfits-TargetGroup --port 8080 --protocol TCP --target-type ip --vpc-id REPLACE_ME_VPC_ID --health-check-interval-seconds 10 --health-check-path / --health-check-protocol HTTP --healthy-threshold-count 3 --unhealthy-threshold-count 3 > ~/environment/target-group-output.json
+    TargetGroup:
+      Type: AWS::ElasticLoadBalancingV2::TargetGroup
+      Properties:
+        Name: MythicalMysfits-TargetGroup
+        Port: 8080
+        Protocol: TCP
+        TargetType: ip
+        VpcId: !Ref MythicalMysfitsCoreStack:VPCId
+    # aws elbv2 create-listener --default-actions TargetGroupArn=REPLACE_ME_NLB_TARGET_GROUP_ARN,Type=forward --load-balancer-arn REPLACE_ME_NLB_ARN --port 80 --protocol TCP

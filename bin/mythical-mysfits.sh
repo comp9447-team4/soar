@@ -54,6 +54,7 @@ create_core() {
 }
 
 create_ecr() {
+    echo "Creating ECR..."
     aws cloudformation create-stack \
         --stack-name "${ECR_STACK_NAME}" \
         --template-body file://"${ECR_STACK_YML}" \
@@ -80,17 +81,13 @@ login_to_ecr() {
 }
 
 push_image_to_ecr() {
+    echo "Pushing image to ECR..."
     login_to_ecr
     sudo docker push "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
 }
 
-deploy_ecs() {
-    # TODO Move this to cfn..
-    # aws ecs create-cluster --cluster-name MythicalMysfits-Cluster
-    # aws logs create-log-group --log-group-name mythicalmysfits-logs
-    # aws ecs register-task-definition --cli-input-json \
-    #    file://~/environment/aws-modern-application-workshop/module-2/aws-cli/task-definition.json
-    # aws elbv2 create-load-balancer --name mysfits-nlb --scheme internet-facing --type network --subnets REPLACE_ME_PUBLIC_SUBNET_ONE REPLACE_ME_PUBLIC_SUBNET_TWO
+create_ecs() {
+    echo "Creating ecs stack..."
 }
 
 usage() {
@@ -98,7 +95,7 @@ usage() {
 Creates the Mythical Mysfits core stack.
 Reference: https://github.com/aws-samples/aws-modern-application-workshop/tree/python
 
-Usage: ./bin/mythical-mysfits.sh <arg>
+Usage: AWS_PROFILE=qa ./bin/mythical-mysfits.sh <arg>
 Where arg is:
 create-module-1
 create-module-2
@@ -116,6 +113,7 @@ main() {
         echo "Unknown AWS_PROFILE ${AWS_PROFILE}"
         echo "Unknown AWS_PROFILE. Must be 'qa' or 'prod'. Did you setup your aws cli properly? See README."
         echo "Must be prod or qa"
+        usage
     fi
 
     if [[ "${args}" == "create-module-1" ]]; then
@@ -124,8 +122,10 @@ main() {
     elif [[ "${args}" == "create-module-2" ]]; then
         wait_build "${STATIC_SITE_STACK_NAME}"
         create_core
+
         wait_build "${CORE_STACK_NAME}"
         create_ecr
+
         wait_build "${ECR_STACK_NAME}"
         build_docker_image
         push_image_to_ecr
