@@ -56,6 +56,7 @@ create_core() {
         --template-body file://"${CORE_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --enable-termination-protection
+    wait_build "${CORE_STACK_NAME}"
 }
 
 create_ecr() {
@@ -65,6 +66,7 @@ create_ecr() {
         --template-body file://"${ECR_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --enable-termination-protection
+    wait_build "${ECR_STACK_NAME}"
 
 }
 
@@ -98,6 +100,10 @@ create_ecs() {
         --template-body file://"${ECS_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --enable-termination-protection
+
+    echo "Creating fargate service..."
+    wait_build "${ECS_STACK_NAME}"
+    aws ecs create-service --cli-input-json "${REPO_ROOT}"/mythical-mysfits/module-2/aws-cli/service-definition.json
 }
 
 create_cicd() {
@@ -109,6 +115,7 @@ create_cicd() {
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters ParameterKey=BucketName,ParameterValue="${bucket_name}" \
         --enable-termination-protection
+    wait_build "${CICD_STACK_NAME}"
 }
 
 init_mystical_mysfits_repo() {
@@ -155,22 +162,14 @@ main() {
         # Module 1
         create_static_site
     elif [[ "${args}" == "create-module-2" ]]; then
-        # wait_build "${STATIC_SITE_STACK_NAME}"
-
         # create_core
-        # wait_build "${CORE_STACK_NAME}"
-
         # create_ecr
-        # wait_build "${ECR_STACK_NAME}"
         # build_docker_image
         # push_image_to_ecr
 
-        wait
         create_ecs
-        wait_build "${ECS_STACK_NAME}"
 
         create_cicd
-        wait_build "${CICD_STACK_NAME}"
 
     else
         echo "No command run :("
