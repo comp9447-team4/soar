@@ -1,0 +1,137 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Module 2 CICD https://aws.amazon.com/getting-started/hands-on/build-modern-app-fargate-lambda-dynamodb-python/module-two/
+Parameters:
+  BucketName:
+    Type: String
+Resources:
+  # aws s3 mb s3://REPLACE_ME_CHOOSE_ARTIFACTS_BUCKET_NAME
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+
+  # aws s3api put-bucket-policy --bucket REPLACE_ME_ARTIFACTS_BUCKET_NAME --policy file://~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json
+  ArtifactsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ArtifactsBucket
+      PolicyDocument:
+        Statement:
+        - Sid: WhitelistedGet
+          Effect: Allow
+          Principal:
+            AWS:
+            - !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodeBuildServiceRole
+            - !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodePipelineServiceRole
+          Action:
+          - s3:GetObject
+          - s3:GetObjectVersion
+          - s3:GetBucketVersioning
+          Resource:
+          - Fn::Sub:
+            - 'arn:aws:s3:::${BucketName}/*'
+            - BucketName: !Ref ArtifactsBucket
+          - Fn::Sub:
+            - 'arn:aws:s3:::${BucketName}'
+            - BucketName: !Ref ArtifactsBucket
+        - Sid: WhitelistedPut
+          Effect: Allow
+          Principal:
+            AWS:
+            - !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodeBuildServiceRole
+            - !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodePipelineServiceRole
+          Action: s3:PutObject
+          Resource:
+          - Fn::Sub:
+            - 'arn:aws:s3:::${BucketName}/*'
+            - BucketName: !Ref ArtifactsBucket
+          - Fn::Sub:
+            - 'arn:aws:s3:::${BucketName}'
+            - BucketName: !Ref ArtifactsBucket
+
+  # aws codecommit create-repository --repository-name MythicalMysfitsService-Repository
+  CodeCommitRepository:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryName: MythicalMysfitsService-Repository
+
+
+  # aws codebuild create-project --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-build-project.json
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: MythicalMysfitsServiceCodeBuildProject
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/python:3.5.2
+        PrivilegedMode: true
+        EnvironmentVariables:
+        - name: AWS_ACCOUNT_ID
+          value: !Sub "${AWS::AccountId}"
+        - name: AWS_DEFAULT_REGION
+          value: !Sub "${AWS::Region}"
+        type: LINUX_CONTAINER
+      ServiceRole: !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodeBuildServiceRole
+      Source:
+        type: CODECOMMIT
+        location: !Sub "https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/MythicalMysfitsService-Repository"
+
+
+  # aws codepipeline create-pipeline --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-pipeline.json
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: MythicalMysfitsServiceCICDPipeline
+      RoleArn: !ImportValue MythicalMysfitsCore:MythicalMysfitsServiceCodePipelineServiceRole
+      Stages:
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: AWS
+            Version: '1'
+            Provider: CodeCommit
+          OutputArtifacts:
+          - Name: MythicalMysfitsService-SourceArtifact
+          Configuration:
+            BranchName: master
+            RepositoryName: MythicalMysfitsService-Repository
+          RunOrder: 1
+      - Name: Build
+        Actions:
+        - Name: Build
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Version: '1'
+            Provider: CodeBuild
+          OutputArtifacts:
+          - Name: MythicalMysfitsService-BuildArtifact
+          InputArtifacts:
+          - Name: MythicalMysfitsService-SourceArtifact
+          Configuration:
+            ProjectName: MythicalMysfitsServiceCodeBuildProject
+          RunOrder: 1
+      - Name: Deploy
+        Actions:
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: ECS
+          InputArtifacts:
+          - Name: MythicalMysfitsService-BuildArtifact
+          Configuration:
+            ClusterName: MythicalMysfits-Cluster
+            ServiceName: MythicalMysfits-Service
+            FileName: imagedefinitions.json
+      ArtifactStore:
+        Type: S3
+        Location: REPLACE_ME_ARTIFACTS_BUCKET_NAME
+

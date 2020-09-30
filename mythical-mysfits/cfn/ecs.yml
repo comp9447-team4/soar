@@ -1,0 +1,101 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: https://aws.amazon.com/getting-started/hands-on/build-modern-app-fargate-lambda-dynamodb-python/module-two/
+Parameters:
+  ECRImageTag:
+    Type: String
+Resources:
+  # aws ecs create-cluster --cluster-name MythicalMysfits-Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: MythicalMysfits-Cluster
+
+  # aws logs create-log-group --log-group-name mythicalmysfits-logs
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: mythicalmysfits-logs
+
+  # aws ecs register-task-definition
+  # --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/task-definition.json
+  ECSTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: mythicalmysfitsservice
+      ExecutionRoleArn: !ImportValue MythicalMysfitsCoreStack:EcsServiceRole
+      Cpu: '256'
+      Memory: '512'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE
+      TaskRoleArn: !ImportValue MythicalMysfitsCoreStack:ECSTaskRole
+      ContainerDefinitions:
+      - name: MythicalMysfits-Service
+        image: !Ref ECRImageTag
+        portMappings:
+        - containerPort: 8080
+          protocol: http
+        logConfiguration:
+          logDriver: awslogs
+          options:
+            awslogs-group: mythicalmysfits-logs
+            awslogs-region: us-east-1
+            awslogs-stream-prefix: awslogs-mythicalmysfits-service
+        essential: true
+
+  # aws elbv2 create-load-balancer --name mysfits-nlb --scheme internet-facing --type network --subnets REPLACE_ME_PUBLIC_SUBNET_ONE REPLACE_ME_PUBLIC_SUBNET_TWO > ~/environment/nlb-output.json
+  NLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: mysfits-nlb
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+        - !ImportValue MythicalMysfitsCoreStack:PublicSubnetOne
+        - !ImportValue MythicalMysfitsCoreStack:PublicSubnetTwo
+
+  # aws elbv2 create-target-group --name MythicalMysfits-TargetGroup --port 8080 --protocol TCP --target-type ip --vpc-id REPLACE_ME_VPC_ID --health-check-interval-seconds 10 --health-check-path / --health-check-protocol HTTP --healthy-threshold-count 3 --unhealthy-threshold-count 3 > ~/environment/target-group-output.json
+  NLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: NLB
+    Properties:
+      Name: MythicalMysfits-TargetGroup
+      Port: 8080
+      Protocol: TCP
+      TargetType: ip
+      VpcId: !ImportValue MythicalMysfitsCoreStack:VPCId
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 3
+
+  # aws elbv2 create-listener --default-actions TargetGroupArn=REPLACE_ME_NLB_TARGET_GROUP_ARN,Type=forward --load-balancer-arn REPLACE_ME_NLB_ARN --port 80 --protocol TCP
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+      - TargetGroupArn: !Ref NLBTargetGroup
+        Type: forward
+      LoadBalancerArn: !Ref NLB
+      Protocol: TCP
+      Port: 80
+Outputs:
+  ECSCluster:
+    Description: ECSCluster
+    Value: !Ref ECSCluster
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ECSCluster' ] ]
+  NLBTargetGroup:
+    Description: NLBTargetGroup
+    Value: !Ref NLBTargetGroup
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'NLBTargetGroup' ] ]
+  NLBDNSName:
+    Description: NLB DNS Name
+    Value: !GetAtt NLB.DNSName
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'NLBDNSName' ] ]
+
+
