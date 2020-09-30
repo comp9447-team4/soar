@@ -79,121 +79,121 @@
   </body>
   <script>
 
-    var mysfitsApiEndpoint = 'REPLACE_ME'; // example: 'http://mythi-publi-abcd12345-01234567890123.elb.us-east-1.amazonaws.com'
+   var mysfitsApiEndpoint = 'http://mysfits-nlb-9fdfbb0ef0ab4030.elb.us-east-1.amazonaws.com'; // example: 'http://mythi-publi-abcd12345-01234567890123.elb.us-east-1.amazonaws.com'
 
-    var app = angular.module('mysfitsApp', []);
+   var app = angular.module('mysfitsApp', []);
 
-    var gridScope;
+   var gridScope;
 
-    var filterScope;
+   var filterScope;
 
-    app.controller('clearFilterController', function($scope) {
-    });
+   app.controller('clearFilterController', function($scope) {
+   });
 
-    app.controller('mysfitsFilterController', function($scope) {
+   app.controller('mysfitsFilterController', function($scope) {
 
-      filterScope = $scope;
+       filterScope = $scope;
 
-      // The possible options for Mysfits to populate the dropdown filters.
-      $scope.filterOptionsList =
-       {
-         "categories": [
+       // The possible options for Mysfits to populate the dropdown filters.
+       $scope.filterOptionsList =
            {
-             "title": "Good/Evil",
-             "selections":  [
-               "Good",
-               "Neutral",
-               "Evil"
-             ]
-           },
-           {
-             "title": "Lawful/Chaotic",
-             "selections":  [
-               "Lawful",
-               "Neutral",
-               "Chaotic"
-             ]
-           }
-         ]
-       };
+               "categories": [
+                   {
+                       "title": "Good/Evil",
+                       "selections":  [
+                           "Good",
+                           "Neutral",
+                           "Evil"
+                       ]
+                   },
+                   {
+                       "title": "Lawful/Chaotic",
+                       "selections":  [
+                           "Lawful",
+                           "Neutral",
+                           "Chaotic"
+                       ]
+                   }
+               ]
+           };
 
        /*
           The View All button has been selected, retrieve all the mysfits.
-      */
+        */
        $scope.removeFilter = function() {
-         allMysfits = getAllMysfits(applyGridScope);
+           allMysfits = getAllMysfits(applyGridScope);
        }
 
        /*
-         This API hasn't been implemented on the service backend yet. You will
-         implement it during module 3!
-       */
+          This API hasn't been implemented on the service backend yet. You will
+          implement it during module 3!
+        */
        $scope.queryMysfits = function(filterCategory, filterValue) {
 
            var filterCategoryQS = "";
            if (filterCategory==="Good/Evil") {
-             filterCategoryQS = "GoodEvil";
+               filterCategoryQS = "GoodEvil";
            } else {
-             filterCategoryQS = "LawChaos"
+               filterCategoryQS = "LawChaos"
            }
            var mysfitsApi = mysfitsApiEndpoint + '/mysfits?' + 'filter=' + filterCategoryQS + "&value=" + filterValue;
 
            $.ajax({
-             url : mysfitsApi,
-             type : 'GET',
-             success : function(response) {
-               applyGridScope(response.mysfits)
-             },
-             error : function(response) {
-               console.log("could not retrieve mysfits list.");
-               console.log(response.message);
-             }
+               url : mysfitsApi,
+               type : 'GET',
+               success : function(response) {
+                   applyGridScope(response.mysfits)
+               },
+               error : function(response) {
+                   console.log("could not retrieve mysfits list.");
+                   console.log(response.message);
+               }
            });
        }
 
 
 
-    });
+   });
 
-    /*
+   /*
       Populate the main mysfit grid on page load.
     */
-    app.controller('mysfitsListController', function($scope) {
+   app.controller('mysfitsListController', function($scope) {
 
-      gridScope = $scope;
+       gridScope = $scope;
 
-      getAllMysfits(applyGridScope);
+       getAllMysfits(applyGridScope);
 
-    });
+   });
 
-    /*
+   /*
       Reload the grid of mysfits whenever a new list is retrieved based
       on the filters selected.
     */
-    function applyGridScope(mysfitsList) {
-      gridScope.mysfits = mysfitsList;
-      gridScope.$apply();
-    }
+   function applyGridScope(mysfitsList) {
+       gridScope.mysfits = mysfitsList;
+       gridScope.$apply();
+   }
 
-    /*
+   /*
       Retrieve the full list of mysfits from the backend service API.
     */
-    function getAllMysfits(callback) {
+   function getAllMysfits(callback) {
 
-      var mysfitsApi = mysfitsApiEndpoint + '/mysfits';
+       var mysfitsApi = mysfitsApiEndpoint + '/mysfits';
 
-      $.ajax({
-        url : mysfitsApi,
-        type : 'GET',
-        success : function(response) {
-          callback(response.mysfits);
-        },
-        error : function(response) {
-          console.log("could not retrieve mysfits list.");
-          console.log(response.message);
-        }
-      });
-    }
+       $.ajax({
+           url : mysfitsApi,
+           type : 'GET',
+           success : function(response) {
+               callback(response.mysfits);
+           },
+           error : function(response) {
+               console.log("could not retrieve mysfits list.");
+               console.log(response.message);
+           }
+       });
+   }
 
 
   </script>

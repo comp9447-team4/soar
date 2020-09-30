@@ -89,4 +89,10 @@ Outputs:
     Value: !Ref NLBTargetGroup
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'NLBTargetGroup' ] ]
+  NLBDNSName:
+    Description: NLB DNS Name
+    Value: !GetAtt NLB.DNSName
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'NLBDNSName' ] ]
+
 

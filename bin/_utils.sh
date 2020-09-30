@@ -29,3 +29,12 @@ wait_build() {
     aws cloudformation wait stack-exists --stack-name "${stack_name}" > /dev/null
     aws cloudformation wait stack-create-complete --stack-name "${stack_name}" > /dev/null
 }
+
+get_cfn_export() {
+    local export_names=$(aws cloudformation list-exports | jq -r '.Exports' )
+    local val=$(echo "${export_names}" |
+                       jq -c "map(select(.Name==\"$1\")| .Value)" |
+                       jq -r '.[0]' |
+                       sed 's/\//\\\//g')
+    echo "$val"
+}
