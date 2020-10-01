@@ -97,5 +97,10 @@ Outputs:
     Value: !GetAtt NLB.DNSName
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'NLBDNSName' ] ]
+  NlbArn:
+    Description: NLB Arn
+    Value: !Ref NLB
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'NlbArn' ] ]
 
 

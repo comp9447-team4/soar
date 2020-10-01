@@ -223,6 +223,32 @@ module_3_s3_updates() {
     rm -rf "${REPO_ROOT}"/tmp
 }
 
+######################################################################################
+# Module 4
+# https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-4
+######################################################################################
+
+export USER_POOL_STACK_NAME="MythicalMysfitsUserPoolStack"
+export USER_POOL_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/user-pool.yml"
+create_user_pool() {
+    echo "Creating user pool..."
+    aws cloudformation create-stack \
+        --stack-name "${USER_POOL_STACK_NAME}" \
+        --template-body file://"${USER_POOL_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_PROFILE}" \
+        --enable-termination-protection
+    wait_build "${USER_POOL_STACK_NAME}"
+}
+
+module_4_code_updates() {
+    cp "${REPO_ROOT}/mythical-mysfits/module-4/app/*" "${MYTHICAL_MYSFITS_REPO}"
+    cd "${MYTHICAL_MYSFITS_REPO}"
+    git add .
+    # git commit -m "Update service code backend to enable additional website features."
+    # git push
+}
+
 usage() {
     cat <<EOF
 Creates the Mythical Mysfits core stack.
@@ -233,6 +259,7 @@ Where arg is:
 create-module-1
 create-module-2
 create-module-3
+create-module-4
 EOF
 }
 
@@ -269,6 +296,9 @@ main() {
         write_dynamodb_items
         module_3_repo_updates
         module_3_s3_updates
+    elif [[ "${args}" == "create-module-4" ]]; then
+        create_user_pool
+
     elif [[ "${args}" == "update-bucket" ]]; then
         echo "Uploading static content to bucket..."
         update_bucket
