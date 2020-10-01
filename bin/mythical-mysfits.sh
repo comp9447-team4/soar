@@ -164,11 +164,11 @@ init_mystical_mysfits_repo() {
 
     cd "${MYTHICAL_MYSFITS_REPO}"
     echo "Follow some git commands..."
-    # git add .
-    # git config --global credential.helper '!aws codecommit credential-helper $@'
-    # git config --global credential.UseHttpPath true
-    # git commit -m "I changed the age of one of the mysfits."
-    # git push
+    git add .
+    git config --global credential.helper '!aws codecommit credential-helper $@'
+    git config --global credential.UseHttpPath true
+    git commit -m "I changed the age of one of the mysfits."
+    git push
 
     cd "${REPO_ROOT}"
 }
@@ -196,19 +196,31 @@ write_dynamodb_items() {
         file://"${REPO_ROOT}"/mythical-mysfits/module-3/aws-cli/populate-dynamodb.json
 }
 
-module_3_updates() {
+module_3_repo_updates() {
     cp "${REPO_ROOT}"/mythical-mysfits/module-3/app/service/* \
        "${MYTHICAL_MYSFITS_REPO}"/service/
     cd "${MYTHICAL_MYSFITS_REPO}"
 
-    # git add .
-    # git commit -m "Add new integration to DynamoDB."
-    # git push
+    git add .
+    git commit -m "Add new integration to DynamoDB."
+    git push
+    cd "${REPO_ROOT}"
 
-    aws s3 cp --recursive \
-        "${REPO_ROOT}"/module-3/web/ \
+}
+module_3_s3_updates() {
+    local nlb_dns_name=$(get_cfn_export MythicalMysfitsECSStack:NLBDNSName)
+    local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-3/web/index.html" |
+                         sed "s/REPLACE_ME/http:\/\/${nlb_dns_name}/g"
+    )
+
+    mkdir -p "${REPO_ROOT}"/tmp
+    echo "${new_index_html}" > "${REPO_ROOT}"/tmp/index.html
+
+    aws s3 cp "${REPO_ROOT}"/tmp/index.html \
         s3://"${STATIC_SITE_BUCKET_NAME}"/
     cd "${REPO_ROOT}"
+
+    rm -rf "${REPO_ROOT}"/tmp
 }
 
 usage() {
@@ -220,6 +232,7 @@ Usage: AWS_PROFILE=qa ./bin/mythical-mysfits.sh <arg>
 Where arg is:
 create-module-1
 create-module-2
+create-module-3
 EOF
 }
 
@@ -238,7 +251,6 @@ main() {
     fi
 
     if [[ "${args}" == "create-module-1" ]]; then
-        # Module 1
         create_static_site
     elif [[ "${args}" == "create-module-2" ]]; then
         create_core
@@ -255,7 +267,8 @@ main() {
     elif [[ "${args}" == "create-module-3" ]]; then
         create_dynamodb
         write_dynamodb_items
-        # module_3_updates
+        module_3_repo_updates
+        module_3_s3_updates
     elif [[ "${args}" == "update-bucket" ]]; then
         echo "Uploading static content to bucket..."
         update_bucket
