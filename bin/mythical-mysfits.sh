@@ -196,7 +196,7 @@ write_dynamodb_items() {
         file://"${REPO_ROOT}"/mythical-mysfits/module-3/aws-cli/populate-dynamodb.json
 }
 
-module_3_repo_updates() {
+module_3_code_updates() {
     cp "${REPO_ROOT}"/mythical-mysfits/module-3/app/service/* \
        "${MYTHICAL_MYSFITS_REPO}"/service/
     cd "${MYTHICAL_MYSFITS_REPO}"
@@ -208,6 +208,7 @@ module_3_repo_updates() {
 
 }
 module_3_s3_updates() {
+    echo "Running a state of the art CI/CD to render static content! (not)..."
     local nlb_dns_name=$(get_cfn_export MythicalMysfitsECSStack:NLBDNSName)
     local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-3/web/index.html" |
                          sed "s/REPLACE_ME/http:\/\/${nlb_dns_name}/g"
@@ -223,6 +224,76 @@ module_3_s3_updates() {
     rm -rf "${REPO_ROOT}"/tmp
 }
 
+######################################################################################
+# Module 4
+# https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-4
+######################################################################################
+
+export USER_POOL_STACK_NAME="MythicalMysfitsUserPoolStack"
+export USER_POOL_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/user-pool.yml"
+create_user_pool() {
+    echo "Creating user pool..."
+    aws cloudformation create-stack \
+        --stack-name "${USER_POOL_STACK_NAME}" \
+        --template-body file://"${USER_POOL_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_PROFILE}" \
+        --enable-termination-protection
+    wait_build "${USER_POOL_STACK_NAME}"
+
+    # echo "Updating user pool..."
+    # aws cloudformation update-stack \
+    #     --stack-name "${USER_POOL_STACK_NAME}" \
+    #     --template-body file://"${USER_POOL_STACK_YML}" \
+    #     --capabilities CAPABILITY_NAMED_IAM \
+    #     --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_PROFILE}"
+}
+
+module_4_code_updates() {
+    cp -r "${REPO_ROOT}"/mythical-mysfits/module-4/app/* "${MYTHICAL_MYSFITS_REPO}"
+    cd "${MYTHICAL_MYSFITS_REPO}"
+    git add .
+    git commit -m "Update service code backend to enable additional website features."
+    git push
+    cd "${REPO_ROOT}"
+}
+
+module_4_s3_updates() {
+    echo "Running a state of the art CI/CD to render static content! (not)..."
+    local cognito_user_pool_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolId)
+    local cognito_user_pool_client_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolClientId)
+    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
+    local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-4/web/index.html" |
+                               sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+                               sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/" |
+                               sed "s/var awsRegion = 'REPLACE_ME';/var awsRegion = \'${AWS_REGION}\';/" |
+                               sed "s/var mysfitsApiEndpoint = 'REPLACE_ME';/var mysfitsApiEndpoint = \'${api_endpoint}\';/g"
+          )
+    local new_register_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-4/web/register.html" |
+                                  sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+                                  sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+    )
+    local new_confirm_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-4/web/confirm.html" |
+                                  sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+                                  sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+          )
+
+    rm -rf "${REPO_ROOT}"/tmp
+    mkdir -p "${REPO_ROOT}"/tmp
+    cp -r "${REPO_ROOT}"/mythical-mysfits/module-4/web/* "${REPO_ROOT}"/tmp
+    echo "${new_index_html}" > "${REPO_ROOT}"/tmp/index.html
+    echo "${new_register_html}" > "${REPO_ROOT}"/tmp/register.html
+    echo "${new_confirm_html}" > "${REPO_ROOT}"/tmp/confirm.html
+
+    aws s3 cp --recursive \
+        "${REPO_ROOT}"/tmp/ \
+        s3://"${STATIC_SITE_BUCKET_NAME}"/
+
+    cd "${REPO_ROOT}"
+    echo "Cleaning up..."
+    rm -rf "${REPO_ROOT}"/tmp
+}
+
 usage() {
     cat <<EOF
 Creates the Mythical Mysfits core stack.
@@ -233,6 +304,7 @@ Where arg is:
 create-module-1
 create-module-2
 create-module-3
+create-module-4
 EOF
 }
 
@@ -267,8 +339,13 @@ main() {
     elif [[ "${args}" == "create-module-3" ]]; then
         create_dynamodb
         write_dynamodb_items
-        module_3_repo_updates
+        module_3_code_updates
         module_3_s3_updates
+    elif [[ "${args}" == "create-module-4" ]]; then
+        create_user_pool
+        module_4_code_updates
+        module_4_s3_updates
+
     elif [[ "${args}" == "update-bucket" ]]; then
         echo "Uploading static content to bucket..."
         update_bucket
