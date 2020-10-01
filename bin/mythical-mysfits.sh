@@ -43,13 +43,10 @@ create_static_site() {
     wait
     echo "Waiting for stack to be created..."
     wait_build "${STATIC_SITE_STACK_NAME}"
-    echo "Copying to S3..."
-    aws s3 cp \
-        "${REPO_ROOT}"/mythical-mysfits/web/index.html \
-        s3://"${bucket_name}"/index.html
+    update_bucket
 
     echo "You should now see this on your browser:"
-    local url="https://${bucket_name}.s3.amazonaws.com/index.html"
+    local url="http://${STATIC_SITE_BUCKET_NAME}.s3-website.${AWS_REGION}.amazonaws.com"
     echo "${url}"
     curl "${url}" | head -15
 }
@@ -154,6 +151,7 @@ create_cicd() {
 }
 
 update_bucket() {
+    echo "Copying index.html to static bucket..."
     aws s3 cp "${REPO_ROOT}"/mythical-mysfits/module-2/web/index.html s3://"${STATIC_SITE_BUCKET_NAME}"/index.html
 }
 

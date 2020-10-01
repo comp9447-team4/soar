@@ -9,6 +9,8 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref BucketName
+      WebsiteConfiguration:
+        IndexDocument: index.html
   MythicalMysfitsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -20,6 +22,3 @@ Resources:
           Principal: "*"
           Action: s3:GetObject
           Resource: !Sub 'arn:aws:s3:::${BucketName}/*'
-      Tags:
-        - Key: Component
-          Value: MythicalMysfits
