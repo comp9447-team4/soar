@@ -294,6 +294,35 @@ module_4_s3_updates() {
     rm -rf "${REPO_ROOT}"/tmp
 }
 
+######################################################################################
+# Module 5
+# https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-5
+######################################################################################
+create_streaming_service() {
+    # aws codecommit create-repository --repository-name MythicalMysfitsStreamingService-Repository
+
+    # aws s3 mb s3://REPLACE_ME_YOUR_BUCKET_NAME/
+
+}
+
+export STREAMING_SERVICE_REPO=""
+module_5_code_updates() {
+    # cd ~/environment/
+    # git clone REPLACE_ME_WITH_ABOVE_CLONE_URL
+    # cd ~/environment/MythicalMysfitsStreamingService-Repository/
+    # cp -r ~/environment/aws-modern-application-workshop/module-5/app/streaming/* .
+    # cp ~/environment/aws-modern-application-workshop/module-5/cfn/* .
+}
+
+package_lambda() {
+    # sam package --template-file ./real-time-streaming.yml --output-template-file ./transformed-streaming.yml --s3-bucket REPLACE_ME_YOUR_BUCKET_NAME
+    # aws cloudformation deploy --template-file /home/ec2-user/environment/MythicalMysfitsStreamingService-Repository/transformed-streaming.yml --stack-name MythicalMysfitsStreamingStack --capabilities CAPABILITY_IAM
+}
+
+module_5_s3_updates() {
+    # aws s3 cp ~/environment/aws-modern-application-workshop/module-5/web/index.html s3://YOUR-S3-BUCKET/
+}
+
 usage() {
     cat <<EOF
 Creates the Mythical Mysfits core stack.
@@ -335,16 +364,18 @@ main() {
         create_fargate_service
         create_cicd
 
-        init_mystical_mysfits_repo
+        # init_mystical_mysfits_repo
     elif [[ "${args}" == "create-module-3" ]]; then
         create_dynamodb
         write_dynamodb_items
-        module_3_code_updates
-        module_3_s3_updates
+        # module_3_code_updates
+        # module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
         create_user_pool
-        module_4_code_updates
-        module_4_s3_updates
+        # module_4_code_updates
+        # module_4_s3_updates
+    elif [[ "${args}" == "create-module-5" ]]; then
+
 
     elif [[ "${args}" == "update-bucket" ]]; then
         echo "Uploading static content to bucket..."
