@@ -551,4 +551,24 @@ Resources:
           UserPoolId: !Ref UserPool
           VpcLink: !Ref VpcLink
 
-
+Outputs:
+  CognitoUserPoolId:
+    Value: !Ref UserPool
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CognitoUserPoolId' ] ]
+  CognitoUserClientId:
+    Value: !Ref UserPoolClient
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CognitoUserPoolClientId' ] ]
+  ApiEndpoint:
+    Value:
+      Fn::Join:
+        - ''
+        - - 'https://'
+          - !Ref RestApi
+          - '.execute-api.'
+          - !Ref AWS::Region
+          - '.amazonaws.com/'
+          - !Ref AwsEnvironment
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ApiEndpoint' ] ]

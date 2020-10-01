@@ -239,6 +239,13 @@ create_user_pool() {
         --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_PROFILE}" \
         --enable-termination-protection
     wait_build "${USER_POOL_STACK_NAME}"
+
+    # echo "Updating user pool..."
+    # aws cloudformation update-stack \
+    #     --stack-name "${USER_POOL_STACK_NAME}" \
+    #     --template-body file://"${USER_POOL_STACK_YML}" \
+    #     --capabilities CAPABILITY_NAMED_IAM \
+    #     --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_PROFILE}"
 }
 
 module_4_code_updates() {
@@ -247,6 +254,26 @@ module_4_code_updates() {
     git add .
     # git commit -m "Update service code backend to enable additional website features."
     # git push
+}
+
+module_4_s3_updates() {
+    local cognito_user_pool_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolId)
+    local cognito_user_pool_client_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolClientId)
+    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
+    local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-4/web/index.html" |
+                               sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+                               sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/" |
+                               sed "s/var awsRegion = 'REPLACE_ME';/var awsRegion = \'${AWS_REGION}\';/" |
+                               sed "s/var mysfitsApiEndpoint = 'REPLACE_ME';/var mysfitsApiEndpoint = \'${api_endpoint}\';/g"
+          )
+
+    mkdir -p "${REPO_ROOT}"/tmp
+    echo "${new_index_html}" > "${REPO_ROOT}"/tmp/index.html
+
+    # aws s3 cp "${REPO_ROOT}"/tmp/index.html \
+    #     s3://"${STATIC_SITE_BUCKET_NAME}"/
+    # cd "${REPO_ROOT}"
+    # rm -rf "${REPO_ROOT}"/tmp
 }
 
 usage() {
@@ -297,7 +324,9 @@ main() {
         module_3_repo_updates
         module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
-        create_user_pool
+        # create_user_pool
+        # module_4_code_updates
+        module_4_s3_updates
 
     elif [[ "${args}" == "update-bucket" ]]; then
         echo "Uploading static content to bucket..."
