@@ -1,0 +1,46 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Module 3 https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-3
+
+Resources:
+  # aws dynamodb create-table --cli-input-json file://~/environment/aws-modern-application-workshop/module-3/aws-cli/dynamodb-table.json
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: MysfitsTable
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      AttributeDefinitions:
+      - AttributeName: MysfitId
+        AttributeType: S
+      - AttributeName: GoodEvil
+        AttributeType: S
+      - AttributeName: LawChaos
+        AttributeType: S
+      KeySchema:
+      - AttributeName: MysfitId
+        KeyType: HASH
+      GlobalSecondaryIndexes:
+      - IndexName: LawChaosIndex
+        KeySchema:
+        - AttributeName: LawChaos
+          KeyType: HASH
+        - AttributeName: MysfitId
+          KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+      - IndexName: GoodEvilIndex
+        KeySchema:
+        - AttributeName: GoodEvil
+          KeyType: HASH
+        - AttributeName: MysfitId
+          KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
