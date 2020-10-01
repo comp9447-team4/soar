@@ -196,7 +196,7 @@ write_dynamodb_items() {
         file://"${REPO_ROOT}"/mythical-mysfits/module-3/aws-cli/populate-dynamodb.json
 }
 
-module_3_repo_updates() {
+module_3_code_updates() {
     cp "${REPO_ROOT}"/mythical-mysfits/module-3/app/service/* \
        "${MYTHICAL_MYSFITS_REPO}"/service/
     cd "${MYTHICAL_MYSFITS_REPO}"
@@ -208,6 +208,7 @@ module_3_repo_updates() {
 
 }
 module_3_s3_updates() {
+    echo "Running a state of the art CI/CD to render static content! (not)..."
     local nlb_dns_name=$(get_cfn_export MythicalMysfitsECSStack:NLBDNSName)
     local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-3/web/index.html" |
                          sed "s/REPLACE_ME/http:\/\/${nlb_dns_name}/g"
@@ -249,14 +250,16 @@ create_user_pool() {
 }
 
 module_4_code_updates() {
-    cp "${REPO_ROOT}/mythical-mysfits/module-4/app/*" "${MYTHICAL_MYSFITS_REPO}"
+    cp -r "${REPO_ROOT}"/mythical-mysfits/module-4/app/* "${MYTHICAL_MYSFITS_REPO}"
     cd "${MYTHICAL_MYSFITS_REPO}"
     git add .
-    # git commit -m "Update service code backend to enable additional website features."
-    # git push
+    git commit -m "Update service code backend to enable additional website features."
+    git push
+    cd "${REPO_ROOT}"
 }
 
 module_4_s3_updates() {
+    echo "Running a state of the art CI/CD to render static content! (not)..."
     local cognito_user_pool_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolId)
     local cognito_user_pool_client_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolClientId)
     local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
@@ -266,14 +269,29 @@ module_4_s3_updates() {
                                sed "s/var awsRegion = 'REPLACE_ME';/var awsRegion = \'${AWS_REGION}\';/" |
                                sed "s/var mysfitsApiEndpoint = 'REPLACE_ME';/var mysfitsApiEndpoint = \'${api_endpoint}\';/g"
           )
+    local new_register_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-4/web/register.html" |
+                                  sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+                                  sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+    )
+    local new_confirm_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-4/web/confirm.html" |
+                                  sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+                                  sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+          )
 
+    rm -rf "${REPO_ROOT}"/tmp
     mkdir -p "${REPO_ROOT}"/tmp
+    cp -r "${REPO_ROOT}"/mythical-mysfits/module-4/web/* "${REPO_ROOT}"/tmp
     echo "${new_index_html}" > "${REPO_ROOT}"/tmp/index.html
+    echo "${new_register_html}" > "${REPO_ROOT}"/tmp/register.html
+    echo "${new_confirm_html}" > "${REPO_ROOT}"/tmp/confirm.html
 
-    # aws s3 cp "${REPO_ROOT}"/tmp/index.html \
-    #     s3://"${STATIC_SITE_BUCKET_NAME}"/
-    # cd "${REPO_ROOT}"
-    # rm -rf "${REPO_ROOT}"/tmp
+    aws s3 cp --recursive \
+        "${REPO_ROOT}"/tmp/ \
+        s3://"${STATIC_SITE_BUCKET_NAME}"/
+
+    cd "${REPO_ROOT}"
+    echo "Cleaning up..."
+    rm -rf "${REPO_ROOT}"/tmp
 }
 
 usage() {
@@ -321,11 +339,11 @@ main() {
     elif [[ "${args}" == "create-module-3" ]]; then
         create_dynamodb
         write_dynamodb_items
-        module_3_repo_updates
+        module_3_code_updates
         module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
-        # create_user_pool
-        # module_4_code_updates
+        create_user_pool
+        module_4_code_updates
         module_4_s3_updates
 
     elif [[ "${args}" == "update-bucket" ]]; then
