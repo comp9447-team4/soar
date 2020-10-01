@@ -9,28 +9,13 @@ export AWS_PAGER=""
 export AWS_REGION="us-east-1"
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
 
+######################################################################################
 # Module 1
+######################################################################################
 export STATIC_SITE_STACK_NAME="MythicalMystfitsStaticSiteStack"
-export STATIC_SITE_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/static-site.yml"
+export STATIC_SITE_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/static-site.yml"
 export STATIC_SITE_BUCKET_NAME="${AWS_PROFILE}-comp9447-team4-mythical-mysfits"
 
-# Module 2
-export CORE_STACK_NAME="MythicalMysfitsCoreStack"
-export CORE_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/core.yml"
-export ECR_STACK_NAME="MythicalMysfitsECRStack"
-export ECR_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecr.yml"
-export ECS_STACK_NAME="MythicalMysfitsECSStack"
-export ECS_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/ecs.yml"
-export FARGATE_SERVICE_STACK_NAME="MythicalMysfitsFargateServiceStack"
-export FARGATE_SERVICE_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/fargate-service.yml"
-export CICD_STACK_NAME="MythicalMysfitsCICDStack"
-export CICD_STACK_YML="${REPO_ROOT}/mythical-mysfits/cfn/cicd.yml"
-export MYTHICAL_MYSFITS_REPO="${REPO_ROOT}/../MythicalMysfitsService-Repository"
-export ECR_IMAGE="${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_REGION}".amazonaws.com
-export ECR_IMAGE_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
-export ARTIFACTS_BUCKET="${AWS_PROFILE}-comp9447-team4-mythical-mysfits-artifacts"
-
-# Module 1
 create_static_site() {
 
     echo "Deploying bucket stack..."
@@ -51,7 +36,23 @@ create_static_site() {
     curl "${url}" | head -15
 }
 
+######################################################################################
 # Module 2
+######################################################################################
+export CORE_STACK_NAME="MythicalMysfitsCoreStack"
+export CORE_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/core.yml"
+export ECR_STACK_NAME="MythicalMysfitsECRStack"
+export ECR_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/ecr.yml"
+export ECS_STACK_NAME="MythicalMysfitsECSStack"
+export ECS_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/ecs.yml"
+export FARGATE_SERVICE_STACK_NAME="MythicalMysfitsFargateServiceStack"
+export FARGATE_SERVICE_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/fargate-service.yml"
+export CICD_STACK_NAME="MythicalMysfitsCICDStack"
+export CICD_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/cicd.yml"
+export MYTHICAL_MYSFITS_REPO="${REPO_ROOT}/../MythicalMysfitsService-Repository"
+export ECR_IMAGE="${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_REGION}".amazonaws.com
+export ECR_IMAGE_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
+export ARTIFACTS_BUCKET="${AWS_PROFILE}-comp9447-team4-mythical-mysfits-artifacts"
 create_core() {
     # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
     aws cloudformation create-stack \
@@ -172,6 +173,43 @@ init_mystical_mysfits_repo() {
     cd "${REPO_ROOT}"
 }
 
+######################################################################################
+# Module 3
+# https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-3
+######################################################################################
+export DYNAMODB_STACK_NAME="MythicalMysfitsDynamoDBStack"
+export DYNAMODB_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/dynamodb.yml"
+
+create_dynamodb() {
+    aws cloudformation create-stack \
+        --stack-name "${DYNAMODB_STACK_NAME}" \
+        --template-body file://"${DYNAMODB_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --enable-termination-protection
+    wait_build "${DYNAMODB_STACK_NAME}"
+}
+
+write_dynamodb_items() {
+    aws dynamodb \
+        batch-write-item \
+        --request-items \
+        file://"${REPO_ROOT}"/mythical-mysfits/module-3/aws-cli/populate-dynamodb.json
+}
+
+module_3_updates() {
+    cp "${REPO_ROOT}"/mythical-mysfits/module-3/app/service/* \
+       "${MYTHICAL_MYSFITS_REPO}"/service/
+    cd "${MYTHICAL_MYSFITS_REPO}"
+
+    # git add .
+    # git commit -m "Add new integration to DynamoDB."
+    # git push
+
+    aws s3 cp --recursive \
+        "${REPO_ROOT}"/module-3/web/ \
+        s3://"${STATIC_SITE_BUCKET_NAME}"/
+    cd "${REPO_ROOT}"
+}
 
 usage() {
     cat <<EOF
@@ -214,6 +252,10 @@ main() {
         create_cicd
 
         init_mystical_mysfits_repo
+    elif [[ "${args}" == "create-module-3" ]]; then
+        create_dynamodb
+        write_dynamodb_items
+        # module_3_updates
     elif [[ "${args}" == "update-bucket" ]]; then
         echo "Uploading static content to bucket..."
         update_bucket
