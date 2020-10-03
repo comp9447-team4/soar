@@ -84,6 +84,8 @@ Resources:
           Configuration:
             ProjectName: MythicalMysfitsServiceCodeBuildProject
           RunOrder: 1
+      # CFN deployment
+      # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CloudFormation.html
       - Name: Deploy
         Actions:
         - Name: Deploy
@@ -95,8 +97,9 @@ Resources:
           InputArtifacts:
           - Name: MythicalMysfitsService-BuildArtifact
           Configuration:
+            ActionMode: CHANGE_SET_EXECUTE
             StackName: MythicalMysfitsStreamingLambdaStack
-            FileName: transformed-streaming.json
+            TemplatePath: transformed-streaming.json
       ArtifactStore:
         Type: S3
         Location: !Ref ArtifactsBucket
