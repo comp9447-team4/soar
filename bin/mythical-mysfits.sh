@@ -160,8 +160,6 @@ init_mystical_mysfits_repo() {
     echo "Copying Module 2 app code into mythical mysfits repo..."
     cd "${REPO_ROOT}/.."
     rm -rf "${MYTHICAL_MYSFITS_REPO}"
-    git clone https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/MythicalMysfitsService-Repository
-    cp -r "${REPO_ROOT}"/mythical-mysfits/module-2/app/* "${MYTHICAL_MYSFITS_REPO}"
 
     cd "${MYTHICAL_MYSFITS_REPO}"
     echo "Follow some git commands..."
@@ -338,13 +336,16 @@ package_streaming_lambda() {
     echo "Gonna make changes to streaming service..."
     echo "Going to streaming service repo..."
     cd "${STREAMING_SERVICE_REPO}"
+    git reset --hard HEAD
     local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
     local lambda_artifacts_bucket=$(get_cfn_export MythicalMysfitsStreamingServiceStack:LambdaArtifactsBucket)
 
     echo "Changing api endpoint of stream processor..."
     local new_stream_processor=$( cat ./streamProcessor.py |
-        sed "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndPoint = \'${api_endpoint}\'/g"
+        sed "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndpoint = \'${api_endpoint}\'/g"
     )
+    echo "${new_stream_processor}" > ./streamProcessor.py
+    echo "Written new stream processor"
 
     echo "Installing requests..."
     pip3 install requests -t .
@@ -462,25 +463,29 @@ main() {
         create_fargate_service
         create_cicd
 
+        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # init_mystical_mysfits_repo
     elif [[ "${args}" == "create-module-3" ]]; then
         create_dynamodb
         write_dynamodb_items
+
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # module_3_code_updates
         # module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
         create_user_pool
+
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # module_4_code_updates
         # module_4_s3_updates
     elif [[ "${args}" == "create-module-5" ]]; then
-        # create_streaming_service
-        # init_streaming_service_repo
-        # package_streaming_lambda
-        # deploy_streaming_lambda
-        module_5_static_site_updates
+        create_streaming_service
+        init_streaming_service_repo
+        package_streaming_lambda
+        deploy_streaming_lambda
 
+        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
+        # module_5_static_site_updates
     else
         echo "No command run :("
         usage
