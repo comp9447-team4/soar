@@ -18,6 +18,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
+      - cd mythical-mysfits/mysfits-service/
       - docker build -t mythicalmysfits/service:latest .
       # Tag the built docker image using the appropriate Amazon ECR endpoint and relevant
       # repository for our service container. This ensures that when the docker push
