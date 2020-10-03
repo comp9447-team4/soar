@@ -339,7 +339,7 @@ module_5_code_updates() {
     echo "Going to streaming service repo..."
     cd "${STREAMING_SERVICE_REPO}"
     local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
-    local lambda_artifacts_repo=$(get_cfn_export MythicalMysfitsStreamingServiceStack:LambdaArtifactsBucket)
+    local lambda_artifacts_bucket=$(get_cfn_export MythicalMysfitsStreamingServiceStack:LambdaArtifactsBucket)
 
     echo "Changing api endpoint of stream processor..."
     local new_stream_processor=$( cat ./streamProcessor.py |
