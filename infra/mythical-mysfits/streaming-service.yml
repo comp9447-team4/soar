@@ -5,17 +5,101 @@ Parameters:
   LambdaArtifactsBucketName:
     Type: String
 Resources:
-  # aws codecommit create-repository --repository-name MythicalMysfitsStreamingService-Repository
-  StreamingServiceRepo:
-    Type: AWS::CodeCommit::Repository
-    Properties:
-      RepositoryName: MythicalMysfitsStreamingService-Repository
+  # # aws codecommit create-repository --repository-name MythicalMysfitsStreamingService-Repository
+  # StreamingServiceRepo:
+  #   Type: AWS::CodeCommit::Repository
+  #   Properties:
+  #     RepositoryName: MythicalMysfitsStreamingService-Repository
 
   # aws s3 mb s3://REPLACE_ME_YOUR_BUCKET_NAME/
   LambdaArtifactsBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref LambdaArtifactsBucketName
+
+  MysticalMysfitsStreamingServiceCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: MysticalMysfitsStreamingServiceCodeBuildProject
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/python:3.5.2
+        PrivilegedMode: true
+        EnvironmentVariables:
+        - Name: AWS_ACCOUNT_ID
+          Value: !Sub "${AWS::AccountId}"
+        - Name: AWS_DEFAULT_REGION
+          Value: !Sub "${AWS::Region}"
+        Type: LINUX_CONTAINER
+      ServiceRole: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole
+      # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codebuild-project-source.html
+      # For source code in a GitHub repository, the HTTPS clone URL to the repository that contains the source and the build spec. You must connect your AWS account to your GitHub account. Use the AWS CodeBuild console to start creating a build project. When you use the console to connect (or reconnect) with GitHub, on the GitHub Authorize application page, for Organization access, choose Request access next to each repository you want to allow AWS CodeBuild to have access to, and then choose Authorize application. (After you have connected to your GitHub account, you do not need to finish creating the build project. You can leave the AWS CodeBuild console.) To instruct AWS CodeBuild to use this connection, in the source object, set the auth object's type value to OAUTH. 
+      Source:
+        Type: GITHUB
+        Location: https://github.com/comp9447-team4/soar
+        BuildSpec: mythical-mysfits/mysfits-streaming-service/buildspec.yml
+        ReportBuildStatus: true
+        Auth:
+          Type: OAUTH
+
+
+  MythicalMysfitsStreamingServiceCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: MythicalMysfitsStreamingServiceCodePipeline
+      RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodePipelineServiceRole
+      Stages:
+      # Use Github Codestar as source
+      # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: AWS
+            Version: '1'
+            Provider: CodeStarSourceConnection
+          OutputArtifacts:
+          - Name: MythicalMysfitsService-SourceArtifact
+          Configuration:
+            ConnectionArn: !ImportValue GithubRepoCodeStarConnectionArn
+            BranchName: master
+            FullRepositoryId: comp9447-team4/soar
+          RunOrder: 1
+      - Name: Build
+        Actions:
+        - Name: Build
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Version: '1'
+            Provider: CodeBuild
+          OutputArtifacts:
+          - Name: MythicalMysfitsService-BuildArtifact
+          InputArtifacts:
+          - Name: MythicalMysfitsService-SourceArtifact
+          Configuration:
+            ProjectName: MythicalMysfitsServiceCodeBuildProject
+          RunOrder: 1
+      - Name: Deploy
+        Actions:
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CloudFormation
+          InputArtifacts:
+          - Name: MythicalMysfitsService-BuildArtifact
+          Configuration:
+            StackName: MythicalMysfitsStreamingLambdaStack
+            FileName: transformed-streaming.json
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactsBucket
 
 Outputs:
   LambdaArtifactsBucket:
