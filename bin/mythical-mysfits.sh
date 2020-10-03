@@ -159,6 +159,7 @@ update_bucket() {
 init_mystical_mysfits_repo() {
     echo "Copying Module 2 app code into mythical mysfits repo..."
     cd "${REPO_ROOT}/.."
+    rm -rf "${MYTHICAL_MYSFITS_REPO}"
     git clone https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/MythicalMysfitsService-Repository
     cp -r "${REPO_ROOT}"/mythical-mysfits/module-2/app/* "${MYTHICAL_MYSFITS_REPO}"
 
@@ -299,24 +300,37 @@ module_4_s3_updates() {
 # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-5
 ######################################################################################
 export STREAMING_SERVICE_REPO="${REPO_ROOT}"/../MythicalMysfitsStreamingService-Repository
-
+export STREAMING_SERVICE_STACK_NAME="MythicalMysfitsStreamingServiceStack"
+export STREAMING_SERVICE_STACK_YML="${REPO_ROOT}"/infra/mythical-mysfits/streaming-service.yml
 create_streaming_service() {
     echo "Creating streaming service stack..."
-    # aws codecommit create-repository --repository-name MythicalMysfitsStreamingService-Repository
-
-    # aws s3 mb s3://REPLACE_ME_YOUR_BUCKET_NAME/
-
-
-
+    local lambda_artifacts_bucket_name="${AWS_PROFILE}"-comp9447-team4-mythical-mysfits-lambda-artifacts
+    aws cloudformation create-stack \
+        --stack-name "${STREAMING_SERVICE_STACK_NAME}" \
+        --template-body file://"${STREAMING_SERVICE_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=LambdaArtifactsBucketName,ParameterValue="${lambda_artifacts_bucket_name}" \
+        --enable-termination-protection
+    wait_build "${STREAMING_SERVICE_STACK_NAME}"
 }
 
 init_streaming_service_repo() {
     echo "Cloning repository..."
     cd "${REPO_ROOT}"/..
+    rm -rf "${STREAMING_SERVICE_REPO}"
     git clone https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/MythicalMysfitsStreamingService-Repository
     echo "Copying files to the streaming service repo..."
     cp -r "${REPO_ROOT}"/mythical-mysfits/module-5/app/streaming/* "${STREAMING_SERVICE_REPO}"
     cp "${REPO_ROOT}"/mythical-mysfits/module-5/cfn/* "${STREAMING_SERVICE_REPO}"
+
+    cd "${STREAMING_SERVICE_REPO}"
+    git add .
+    # git config --global credential.helper '!aws codecommit credential-helper $@'
+    # git config --global credential.UseHttpPath true
+    git commit -m "New stream processing service."
+    git push
+
+    cd "${REPO_ROOT}"
 }
 
 module_5_code_updates() {
@@ -343,10 +357,12 @@ module_5_code_updates() {
 package_lambda() {
     # sam package --template-file ./real-time-streaming.yml --output-template-file ./transformed-streaming.yml --s3-bucket REPLACE_ME_YOUR_BUCKET_NAME
     # aws cloudformation deploy --template-file /home/ec2-user/environment/MythicalMysfitsStreamingService-Repository/transformed-streaming.yml --stack-name MythicalMysfitsStreamingStack --capabilities CAPABILITY_IAM
+    echo "Later!"
 }
 
 module_5_s3_updates() {
     # aws s3 cp ~/environment/aws-modern-application-workshop/module-5/web/index.html s3://YOUR-S3-BUCKET/
+    echo "later!"
 }
 
 usage() {
@@ -360,6 +376,7 @@ create-module-1
 create-module-2
 create-module-3
 create-module-4
+create-module-5
 EOF
 }
 
@@ -403,8 +420,8 @@ main() {
         # module_4_code_updates
         # module_4_s3_updates
     elif [[ "${args}" == "create-module-5" ]]; then
-        create_streaming_service
-        # init_streaming_service_repo
+        # create_streaming_service
+        init_streaming_service_repo
         # module_5_code_updates
 
     else
