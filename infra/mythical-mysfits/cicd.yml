@@ -51,14 +51,14 @@ Resources:
             - BucketName: !Ref ArtifactsBucket
 
   # aws codecommit create-repository --repository-name MythicalMysfitsService-Repository
-  CodeCommitRepository:
-    Type: AWS::CodeCommit::Repository
-    Properties:
-      RepositoryName: MythicalMysfitsService-Repository
+  # CodeCommitRepository:
+  #   Type: AWS::CodeCommit::Repository
+  #   Properties:
+  #     RepositoryName: MythicalMysfitsService-Repository
 
 
   # aws codebuild create-project --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-build-project.json
-  CodeBuildProject:
+  CodeBuildProjectMysfitsService:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: MythicalMysfitsServiceCodeBuildProject
@@ -75,18 +75,26 @@ Resources:
           Value: !Sub "${AWS::Region}"
         Type: LINUX_CONTAINER
       ServiceRole: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole
+      # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codebuild-project-source.html
+      # For source code in a GitHub repository, the HTTPS clone URL to the repository that contains the source and the build spec. You must connect your AWS account to your GitHub account. Use the AWS CodeBuild console to start creating a build project. When you use the console to connect (or reconnect) with GitHub, on the GitHub Authorize application page, for Organization access, choose Request access next to each repository you want to allow AWS CodeBuild to have access to, and then choose Authorize application. (After you have connected to your GitHub account, you do not need to finish creating the build project. You can leave the AWS CodeBuild console.) To instruct AWS CodeBuild to use this connection, in the source object, set the auth object's type value to OAUTH. 
       Source:
-        Type: CODECOMMIT
-        Location: !Sub "https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/MythicalMysfitsService-Repository"
+        Type: GITHUB
+        Location: https://github.com/comp9447-team4/soar
+        BuildSpec: mythical-mysfits/mysfits-service/buildspec.yml
+        ReportBuildStatus: true
+        Auth:
+          Type: OAUTH
 
 
   # aws codepipeline create-pipeline --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-pipeline.json
-  CodePipeline:
+  CodePipelineMysfitsService:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: MythicalMysfitsServiceCICDPipeline
       RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodePipelineServiceRole
       Stages:
+      # Use Github Codestar as source
+      # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
       - Name: Source
         Actions:
         - InputArtifacts: []
@@ -95,12 +103,13 @@ Resources:
             Category: Source
             Owner: AWS
             Version: '1'
-            Provider: CodeCommit
+            Provider: CodeStarSourceConnection
           OutputArtifacts:
           - Name: MythicalMysfitsService-SourceArtifact
           Configuration:
+            ConnectionArn: !ImportValue GithubRepoCodeStarConnectionArn
             BranchName: master
-            RepositoryName: MythicalMysfitsService-Repository
+            FullRepositoryId: comp9447-team4/soar
           RunOrder: 1
       - Name: Build
         Actions:

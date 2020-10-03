@@ -1,0 +1,16 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html
+Resources:
+  GithubRepoCodeStarConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: soar-codestar-connection
+      Description: This will be pending, finish the setup by going to the console
+      ProviderType: GitHub
+Outputs:
+  GithubRepoCodeStarConnectionArn:
+    Value: !Ref GithubRepoCodeStartConnection
+    Export:
+      Name: GithubRepoCodeStarConnectionArn
+
