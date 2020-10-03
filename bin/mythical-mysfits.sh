@@ -334,23 +334,42 @@ init_streaming_service_repo() {
 }
 
 module_5_code_updates() {
-    echo "Changing api endpoint of stream processor..."
+
+    echo "Gonna make changes to streaming service..."
+    echo "Going to streaming service repo..."
     cd "${STREAMING_SERVICE_REPO}"
     local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
-    local new_stream_processor
-    sed "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndPoint = '${api_endpoint}'/g"
+    local lambda_artifacts_repo=$(get_cfn_export MythicalMysfitsStreamingServiceStack:LambdaArtifactsBucket)
+
+    echo "Changing api endpoint of stream processor..."
+    local new_stream_processor=$( cat ./streamProcessor.py |
+        sed "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndPoint = \'${api_endpoint}\'/g"
+    )
 
     echo "Installing requests..."
     pip3 install requests -t .
 
-    echo "Packaging sam package..."
+    echo "Creating sam package..."
     sam package \
         --template-file ./real-time-streaming.yml \
         --output-template-file ./transformed-streaming.yml \
-        --s3-bucket REPLACE_ME_YOUR_BUCKET_NAME
+        --s3-bucket "${lambda_artifacts_bucket}"
+    wait
+    cd "${REPO_ROOT}"
+}
 
+deploy_streaming_lambda() {
+    echo "Going to streaming service repo..."
+    cd "${STREAMING_SERVICE_REPO}"
     echo "Deploying lambda..."
-    aws cloudformation deploy --template-file /home/ec2-user/environment/MythicalMysfitsStreamingService-Repository/transformed-streaming.yml --stack-name MythicalMysfitsStreamingStack --capabilities CAPABILITY_IAM
+    aws cloudformation deploy \
+        --template-file ./transformed-streaming.yml \
+        --stack-name MythicalMysfitsStreamingStack \
+        --capabilities CAPABILITY_IAM \
+        --enable-termination-protection
+
+    echo "Lambda being deployed..."
+    echo "Going back to main repo..."
     cd "${REPO_ROOT}"
 }
 
@@ -421,8 +440,9 @@ main() {
         # module_4_s3_updates
     elif [[ "${args}" == "create-module-5" ]]; then
         # create_streaming_service
-        init_streaming_service_repo
-        # module_5_code_updates
+        # init_streaming_service_repo
+        module_5_code_updates
+        # deploy_streaming_lambda
 
     else
         echo "No command run :("
