@@ -7,7 +7,24 @@ Resources:
     Properties:
       ConnectionName: soar-codestar-connection
       ProviderType: GitHub
+  CodeStarServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: aws-codestar-service-role
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSCodeStarServiceRole
+      Path: /service-role/
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: codestar.amazonaws.com
+          Action: sts:AssumeRole
 Outputs:
+  CodeStarServiceRole:
+    Value: !Ref CodeStarServiceRole
+    Export:
+      Name: CodeStarServiceRole
   GithubRepoCodeStarConnectionArn:
     Value: !Ref GithubRepoCodeStarConnection
     Export:
