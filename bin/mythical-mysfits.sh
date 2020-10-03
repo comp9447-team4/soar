@@ -333,7 +333,7 @@ init_streaming_service_repo() {
     cd "${REPO_ROOT}"
 }
 
-module_5_code_updates() {
+package_streaming_lambda() {
 
     echo "Gonna make changes to streaming service..."
     echo "Going to streaming service repo..."
@@ -365,21 +365,15 @@ deploy_streaming_lambda() {
     aws cloudformation deploy \
         --template-file ./transformed-streaming.yml \
         --stack-name MythicalMysfitsStreamingStack \
-        --capabilities CAPABILITY_IAM \
-        --enable-termination-protection
+        --capabilities CAPABILITY_IAM
 
     echo "Lambda being deployed..."
     echo "Going back to main repo..."
     cd "${REPO_ROOT}"
 }
 
-package_lambda() {
-    # sam package --template-file ./real-time-streaming.yml --output-template-file ./transformed-streaming.yml --s3-bucket REPLACE_ME_YOUR_BUCKET_NAME
-    # aws cloudformation deploy --template-file /home/ec2-user/environment/MythicalMysfitsStreamingService-Repository/transformed-streaming.yml --stack-name MythicalMysfitsStreamingStack --capabilities CAPABILITY_IAM
-    echo "Later!"
-}
 
-module_5_s3_updates() {
+module_5_static_site_updates() {
     # aws s3 cp ~/environment/aws-modern-application-workshop/module-5/web/index.html s3://YOUR-S3-BUCKET/
     echo "later!"
 }
@@ -441,7 +435,7 @@ main() {
     elif [[ "${args}" == "create-module-5" ]]; then
         # create_streaming_service
         # init_streaming_service_repo
-        module_5_code_updates
+        # package_streaming_lambda
         # deploy_streaming_lambda
 
     else
