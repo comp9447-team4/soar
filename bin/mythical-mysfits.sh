@@ -375,7 +375,49 @@ deploy_streaming_lambda() {
 
 module_5_static_site_updates() {
     # aws s3 cp ~/environment/aws-modern-application-workshop/module-5/web/index.html s3://YOUR-S3-BUCKET/
-    echo "later!"
+    echo "Running a state of the art CI/CD to render static content! (not)..."
+    local cognito_user_pool_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolId)
+    echo "${cognito_user_pool_id}"
+    local cognito_user_pool_client_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolClientId)
+    echo "${cognito_user_pool_client_id}"
+    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
+    echo "${api_endpoint}"
+    local streaming_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingStack |
+        jq -r '.Stacks[0].Outputs[0].OutputValue' |
+        sed -r 's/\//\\\//g'
+    )
+    echo "${streaming_api_endpoint}"
+
+    local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-5/web/index.html" |
+        sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+        sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/" |
+        sed "s/var awsRegion = 'REPLACE_ME';/var awsRegion = \'${AWS_REGION}\';/" |
+        sed "s/var streamingApiEndpoint = 'REPLACE_ME'/var streamingApiEndpoint = \'${streaming_api_endpoint}\'/g" |
+        sed "s/var mysfitsApiEndpoint = 'REPLACE_ME';/var mysfitsApiEndpoint = \'${api_endpoint}\';/g"
+    )
+    local new_register_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-5/web/register.html" |
+        sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+        sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+    )
+    local new_confirm_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-5/web/confirm.html" |
+        sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+        sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+    )
+
+    rm -rf "${REPO_ROOT}"/tmp
+    mkdir -p "${REPO_ROOT}"/tmp
+    cp -r "${REPO_ROOT}"/mythical-mysfits/module-5/web/* "${REPO_ROOT}"/tmp
+    echo "${new_index_html}" > "${REPO_ROOT}"/tmp/index.html
+    echo "${new_register_html}" > "${REPO_ROOT}"/tmp/register.html
+    echo "${new_confirm_html}" > "${REPO_ROOT}"/tmp/confirm.html
+
+    aws s3 cp --recursive \
+        "${REPO_ROOT}"/tmp/ \
+        s3://"${STATIC_SITE_BUCKET_NAME}"/
+
+    cd "${REPO_ROOT}"
+    echo "Cleaning up..."
+    rm -rf "${REPO_ROOT}"/tmp
 }
 
 usage() {
@@ -437,6 +479,7 @@ main() {
         # init_streaming_service_repo
         # package_streaming_lambda
         # deploy_streaming_lambda
+        module_5_static_site_updates
 
     else
         echo "No command run :("
