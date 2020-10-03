@@ -298,20 +298,46 @@ module_4_s3_updates() {
 # Module 5
 # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-5
 ######################################################################################
+export STREAMING_SERVICE_REPO="${REPO_ROOT}"/../MythicalMysfitsStreamingService-Repository
+
 create_streaming_service() {
+    echo "Creating streaming service stack..."
     # aws codecommit create-repository --repository-name MythicalMysfitsStreamingService-Repository
 
     # aws s3 mb s3://REPLACE_ME_YOUR_BUCKET_NAME/
 
+
+
 }
 
-export STREAMING_SERVICE_REPO=""
+init_streaming_service_repo() {
+    echo "Cloning repository..."
+    cd "${REPO_ROOT}"/..
+    git clone https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/MythicalMysfitsStreamingService-Repository
+    echo "Copying files to the streaming service repo..."
+    cp -r "${REPO_ROOT}"/mythical-mysfits/module-5/app/streaming/* "${STREAMING_SERVICE_REPO}"
+    cp "${REPO_ROOT}"/mythical-mysfits/module-5/cfn/* "${STREAMING_SERVICE_REPO}"
+}
+
 module_5_code_updates() {
-    # cd ~/environment/
-    # git clone REPLACE_ME_WITH_ABOVE_CLONE_URL
-    # cd ~/environment/MythicalMysfitsStreamingService-Repository/
-    # cp -r ~/environment/aws-modern-application-workshop/module-5/app/streaming/* .
-    # cp ~/environment/aws-modern-application-workshop/module-5/cfn/* .
+    echo "Changing api endpoint of stream processor..."
+    cd "${STREAMING_SERVICE_REPO}"
+    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
+    local new_stream_processor
+    sed "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndPoint = '${api_endpoint}'/g"
+
+    echo "Installing requests..."
+    pip3 install requests -t .
+
+    echo "Packaging sam package..."
+    sam package \
+        --template-file ./real-time-streaming.yml \
+        --output-template-file ./transformed-streaming.yml \
+        --s3-bucket REPLACE_ME_YOUR_BUCKET_NAME
+
+    echo "Deploying lambda..."
+    aws cloudformation deploy --template-file /home/ec2-user/environment/MythicalMysfitsStreamingService-Repository/transformed-streaming.yml --stack-name MythicalMysfitsStreamingStack --capabilities CAPABILITY_IAM
+    cd "${REPO_ROOT}"
 }
 
 package_lambda() {
@@ -368,18 +394,19 @@ main() {
     elif [[ "${args}" == "create-module-3" ]]; then
         create_dynamodb
         write_dynamodb_items
+        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # module_3_code_updates
         # module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
         create_user_pool
+        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # module_4_code_updates
         # module_4_s3_updates
     elif [[ "${args}" == "create-module-5" ]]; then
+        create_streaming_service
+        # init_streaming_service_repo
+        # module_5_code_updates
 
-
-    elif [[ "${args}" == "update-bucket" ]]; then
-        echo "Uploading static content to bucket..."
-        update_bucket
     else
         echo "No command run :("
         usage
