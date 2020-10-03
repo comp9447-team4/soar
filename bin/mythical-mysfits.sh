@@ -159,8 +159,7 @@ update_bucket() {
 init_mystical_mysfits_repo() {
     echo "Copying Module 2 app code into mythical mysfits repo..."
     cd "${REPO_ROOT}/.."
-    git clone https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/MythicalMysfitsService-Repository
-    cp -r "${REPO_ROOT}"/mythical-mysfits/module-2/app/* "${MYTHICAL_MYSFITS_REPO}"
+    rm -rf "${MYTHICAL_MYSFITS_REPO}"
 
     cd "${MYTHICAL_MYSFITS_REPO}"
     echo "Follow some git commands..."
@@ -294,6 +293,134 @@ module_4_s3_updates() {
     rm -rf "${REPO_ROOT}"/tmp
 }
 
+######################################################################################
+# Module 5
+# https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-5
+######################################################################################
+export STREAMING_SERVICE_REPO="${REPO_ROOT}"/../MythicalMysfitsStreamingService-Repository
+export STREAMING_SERVICE_STACK_NAME="MythicalMysfitsStreamingServiceStack"
+export STREAMING_SERVICE_STACK_YML="${REPO_ROOT}"/infra/mythical-mysfits/streaming-service.yml
+create_streaming_service() {
+    echo "Creating streaming service stack..."
+    local lambda_artifacts_bucket_name="${AWS_PROFILE}"-comp9447-team4-mythical-mysfits-lambda-artifacts
+    aws cloudformation create-stack \
+        --stack-name "${STREAMING_SERVICE_STACK_NAME}" \
+        --template-body file://"${STREAMING_SERVICE_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=LambdaArtifactsBucketName,ParameterValue="${lambda_artifacts_bucket_name}" \
+        --enable-termination-protection
+    wait_build "${STREAMING_SERVICE_STACK_NAME}"
+}
+
+init_streaming_service_repo() {
+    echo "Cloning repository..."
+    cd "${REPO_ROOT}"/..
+    rm -rf "${STREAMING_SERVICE_REPO}"
+    git clone https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/MythicalMysfitsStreamingService-Repository
+    echo "Copying files to the streaming service repo..."
+    cp -r "${REPO_ROOT}"/mythical-mysfits/module-5/app/streaming/* "${STREAMING_SERVICE_REPO}"
+    cp "${REPO_ROOT}"/mythical-mysfits/module-5/cfn/* "${STREAMING_SERVICE_REPO}"
+
+    cd "${STREAMING_SERVICE_REPO}"
+    git add .
+    # git config --global credential.helper '!aws codecommit credential-helper $@'
+    # git config --global credential.UseHttpPath true
+    git commit -m "New stream processing service."
+    git push
+
+    cd "${REPO_ROOT}"
+}
+
+package_streaming_lambda() {
+
+    echo "Gonna make changes to streaming service..."
+    echo "Going to streaming service repo..."
+    cd "${STREAMING_SERVICE_REPO}"
+    git reset --hard HEAD
+    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
+    local lambda_artifacts_bucket=$(get_cfn_export MythicalMysfitsStreamingServiceStack:LambdaArtifactsBucket)
+
+    echo "Changing api endpoint of stream processor..."
+    local new_stream_processor=$( cat ./streamProcessor.py |
+        sed "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndpoint = \'${api_endpoint}\'/g"
+    )
+    echo "${new_stream_processor}" > ./streamProcessor.py
+    echo "Written new stream processor"
+
+    echo "Installing requests..."
+    pip3 install requests -t .
+
+    echo "Creating sam package..."
+    sam package \
+        --template-file ./real-time-streaming.yml \
+        --output-template-file ./transformed-streaming.yml \
+        --s3-bucket "${lambda_artifacts_bucket}"
+    wait
+    cd "${REPO_ROOT}"
+}
+
+deploy_streaming_lambda() {
+    echo "Going to streaming service repo..."
+    cd "${STREAMING_SERVICE_REPO}"
+    echo "Deploying lambda..."
+    aws cloudformation deploy \
+        --template-file ./transformed-streaming.yml \
+        --stack-name MythicalMysfitsStreamingStack \
+        --capabilities CAPABILITY_IAM
+
+    echo "Lambda being deployed..."
+    echo "Going back to main repo..."
+    cd "${REPO_ROOT}"
+}
+
+
+module_5_static_site_updates() {
+    # aws s3 cp ~/environment/aws-modern-application-workshop/module-5/web/index.html s3://YOUR-S3-BUCKET/
+    echo "Running a state of the art CI/CD to render static content! (not)..."
+    local cognito_user_pool_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolId)
+    echo "${cognito_user_pool_id}"
+    local cognito_user_pool_client_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolClientId)
+    echo "${cognito_user_pool_client_id}"
+    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
+    echo "${api_endpoint}"
+    local streaming_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingStack |
+        jq -r '.Stacks[0].Outputs[0].OutputValue' |
+        sed -r 's/\//\\\//g'
+    )
+    echo "${streaming_api_endpoint}"
+
+    local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-5/web/index.html" |
+        sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+        sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/" |
+        sed "s/var awsRegion = 'REPLACE_ME';/var awsRegion = \'${AWS_REGION}\';/" |
+        sed "s/var streamingApiEndpoint = 'REPLACE_ME'/var streamingApiEndpoint = \'${streaming_api_endpoint}\'/g" |
+        sed "s/var mysfitsApiEndpoint = 'REPLACE_ME';/var mysfitsApiEndpoint = \'${api_endpoint}\';/g"
+    )
+    local new_register_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-5/web/register.html" |
+        sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+        sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+    )
+    local new_confirm_html=$(cat "${REPO_ROOT}/mythical-mysfits/module-5/web/confirm.html" |
+        sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+        sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+    )
+
+    rm -rf "${REPO_ROOT}"/tmp
+    mkdir -p "${REPO_ROOT}"/tmp
+    cp -r "${REPO_ROOT}"/mythical-mysfits/module-5/web/* "${REPO_ROOT}"/tmp
+    echo "${new_index_html}" > "${REPO_ROOT}"/tmp/index.html
+    echo "${new_register_html}" > "${REPO_ROOT}"/tmp/register.html
+    echo "${new_confirm_html}" > "${REPO_ROOT}"/tmp/confirm.html
+
+    aws s3 cp --recursive \
+        "${REPO_ROOT}"/tmp/ \
+        s3://"${STATIC_SITE_BUCKET_NAME}"/
+
+    cd "${REPO_ROOT}"
+    echo "Cleaning up..."
+    rm -rf "${REPO_ROOT}"/tmp
+}
+
 usage() {
     cat <<EOF
 Creates the Mythical Mysfits core stack.
@@ -305,6 +432,7 @@ create-module-1
 create-module-2
 create-module-3
 create-module-4
+create-module-5
 EOF
 }
 
@@ -335,20 +463,29 @@ main() {
         create_fargate_service
         create_cicd
 
-        init_mystical_mysfits_repo
+        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
+        # init_mystical_mysfits_repo
     elif [[ "${args}" == "create-module-3" ]]; then
         create_dynamodb
         write_dynamodb_items
-        module_3_code_updates
-        module_3_s3_updates
+
+        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
+        # module_3_code_updates
+        # module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
         create_user_pool
-        module_4_code_updates
-        module_4_s3_updates
 
-    elif [[ "${args}" == "update-bucket" ]]; then
-        echo "Uploading static content to bucket..."
-        update_bucket
+        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
+        # module_4_code_updates
+        # module_4_s3_updates
+    elif [[ "${args}" == "create-module-5" ]]; then
+        create_streaming_service
+        init_streaming_service_repo
+        package_streaming_lambda
+        deploy_streaming_lambda
+
+        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
+        # module_5_static_site_updates
     else
         echo "No command run :("
         usage

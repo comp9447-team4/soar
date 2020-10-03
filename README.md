@@ -36,7 +36,7 @@ If you've set it up properly, you would be able to login to the console and see 
 
 Use the `developer` role for normal use and `billing` to keep track of $.
 
-## AWS CLI
+## AWS CLI V2
 
 Install AWS CLI 2. Version 2 is required for AWS SSO.
 
@@ -115,23 +115,68 @@ These are written in `bash` which glues together AWS commands. This works best u
 This varies by OS but these instructions are for a Debian / Ubuntu based system.
 You can also use `brew` for MacOS or Chocolatey for `Windows`.
 
+If you have Windows, it is recommended to use a Virtual Machine instead with Linux for best compatability with bash.
+
+See: https://www.virtualbox.org/
+
+
+## AWS CLI v2
+See https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html#cliv2-linux-install
+
+```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+
 ## Jq
 json parsing for API calls
 
 ```
-sudo apt install direnv jq
+sudo apt install jq
 ```
 
 ## Direnv
 Setup direnv for environment variables. This is used for substituing environment variables to params.
 It's optional, you can just set your environment variables as in `.envrc-demo`.
 ```
+sudo apt install direnv
+
 cp .envrc-demo .envrc
 direnv allow
 
 echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
 
 # DO NOT COMMIT YOUR .envrc
+```
+
+## Docker
+https://docs.docker.com/engine/install/ubuntu/
+
+This is required by AWS SAM.
+
+## AWS SAM
+Used for deploying lambdas for Mythical Mysfits. We can also use this for our own deployments for the SOAR solution.
+
+
+https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install-linux.html
+
+```
+# install brew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
+test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
+echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
+
+brew --version
+
+# Install AWS SAM
+brew tap aws/tap
+brew install aws-sam-cli
+
+sam --version
 ```
 
 
