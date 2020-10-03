@@ -63,6 +63,14 @@ create_core() {
     wait_build "${CORE_STACK_NAME}"
 }
 
+update_core() {
+    # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
+    aws cloudformation update-stack \
+        --stack-name "${CORE_STACK_NAME}" \
+        --template-body file://"${CORE_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM
+}
+
 create_ecr() {
     echo "Creating ECR..."
     aws cloudformation create-stack \
@@ -487,6 +495,10 @@ main() {
 
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # module_5_static_site_updates
+    elif [[ "${args}" == "create-cicd" ]]; then
+        create_cicd
+    elif [[ "${args}" == "update-core" ]]; then
+        update_core
     else
 
         echo "No command run :("
