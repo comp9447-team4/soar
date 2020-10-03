@@ -141,12 +141,12 @@ create_fargate_service(){
 }
 
 create_cicd() {
-    local bucket_name
     aws cloudformation create-stack \
         --stack-name "${CICD_STACK_NAME}" \
         --template-body file://"${CICD_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
-        --parameters ParameterKey=BucketName,ParameterValue="${ARTIFACTS_BUCKET}"
+        --parameters ParameterKey=BucketName,ParameterValue="${ARTIFACTS_BUCKET}" \
+        --enable-termination-protection
 
     wait_build "${CICD_STACK_NAME}"
 }
@@ -461,6 +461,7 @@ main() {
 
         create_ecs
         create_fargate_service
+        echo "Did you create codestar?"
         create_cicd
 
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
@@ -487,6 +488,7 @@ main() {
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # module_5_static_site_updates
     else
+
         echo "No command run :("
         usage
     fi

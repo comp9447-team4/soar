@@ -1,0 +1,14 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html. Go to Codepipeline connections to activate this.
+Resources:
+  GithubRepoCodeStarConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: soar-codestar-connection
+      ProviderType: GitHub
+Outputs:
+  GithubRepoCodeStarConnectionArn:
+    Value: !Ref GithubRepoCodeStarConnection
+    Export:
+      Name: GithubRepoCodeStarConnectionArn
