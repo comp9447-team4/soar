@@ -16,14 +16,17 @@ phases:
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
     commands:
+      - cd mythical-mysfits/mysfits-service/
+      - pwd
       - echo Build started on `date`
       - echo Building the Docker image...
-      - cd mythical-mysfits/mysfits-service/
       - docker build -t mythicalmysfits/service:latest .
       # Tag the built docker image using the appropriate Amazon ECR endpoint and relevant
       # repository for our service container. This ensures that when the docker push
       # command is executed later, it will be pushed to the appropriate repository.
       - docker tag mythicalmysfits/service:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mythicalmysfits/service:latest
+      - cd -
+      - pwd
   post_build:
     commands:
       - echo Build completed on `date`
