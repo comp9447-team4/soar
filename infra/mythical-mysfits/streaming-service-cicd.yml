@@ -6,7 +6,7 @@ Resources:
   MysticalMysfitsStreamingServiceCodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: MysticalMysfitsStreamingServiceCodeBuildProject
+      Name: MythicalMysfitsStreamingServiceCodeBuildProject
       BadgeEnabled: true
       Artifacts:
         Type: NO_ARTIFACTS
@@ -49,10 +49,10 @@ Resources:
             Version: '1'
             Provider: CodeStarSourceConnection
           OutputArtifacts:
-          - Name: MythicalMysfitsService-SourceArtifact
+          - Name: StreamingServiceSourceArtifact
           Configuration:
             ConnectionArn: !ImportValue GithubRepoCodeStarConnectionArn
-            BranchName: master
+            BranchName: master # TODO maybe set this to release branch for prod
             FullRepositoryId: comp9447-team4/soar
           RunOrder: 1
       - Name: Build
@@ -64,11 +64,11 @@ Resources:
             Version: '1'
             Provider: CodeBuild
           OutputArtifacts:
-          - Name: MythicalMysfitsService-BuildArtifact
+          - Name: StreamingServiceBuildArtifact
           InputArtifacts:
-          - Name: MythicalMysfitsService-SourceArtifact
+          - Name: StreamingServiceSourceArtifact
           Configuration:
-            ProjectName: MythicalMysfitsServiceCodeBuildProject
+            ProjectName: MythicalMysfitsStreamingServiceCodeBuildProject
           RunOrder: 1
       # CFN deployment
       # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CloudFormation.html
@@ -81,11 +81,11 @@ Resources:
             Version: '1'
             Provider: CloudFormation
           InputArtifacts:
-          - Name: MythicalMysfitsService-BuildArtifact
+          - Name: StreamingServiceBuildArtifact
           Configuration:
-            ActionMode: CHANGE_SET_EXECUTE
+            ActionMode: REPLACE_ON_FAILURE
             StackName: MythicalMysfitsStreamingServiceLambdaStack
-            TemplatePath: transformed-streaming.json
+            TemplatePath: "StreamingServiceBuildArtifact::transformed-streaming.json"
       ArtifactStore:
         Type: S3
         Location: !ImportValue MythicalMysfitsCICDStack:CodeBuildArtifactsBucket
