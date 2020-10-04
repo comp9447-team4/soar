@@ -41,7 +41,14 @@ delete() {
     local parameters
     parameters=$(get_parameters)
     echo "${parameters}"
-    aws cloudformation delete-stack --stack-name "${BUDGETS_STACK_NAME}"
+    aws cloudformation \
+        update-termination-protection \
+        --stack-name "${BUDGETS_STACK_NAME}" \
+        --no-enable-termination-protection
+
+    aws cloudformation \
+        delete-stack \
+        --stack-name "${BUDGETS_STACK_NAME}"
 }
 
 usage() {
