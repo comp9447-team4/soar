@@ -374,6 +374,11 @@ Resources:
               - !Sub "arn:aws:iam::${AWS::AccountId}:role/MythicalMysfits*"
               - !Sub "arn:aws:iam::${AWS::AccountId}:policy/MythicalMysfits*"
             Effect: Allow
+          - Action:
+            - "s3:*"
+            Resource: "*"
+            # TODO Resource: "arn:aws:s3::${AWS::AccountId}:bucket/My"
+            Effect: Allow
           # TODO: make this more concentrated
           - Action:
             - "apigateway:*"
@@ -386,8 +391,8 @@ Resources:
             Effect: Allow
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
-      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
 
+      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
   # An IAM role that allows the AWS CodeBuild service to perform the actions
   # required to complete a build of our source code retrieved from CodeCommit,
   # and push the created image to ECR.
