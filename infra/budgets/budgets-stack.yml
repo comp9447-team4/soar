@@ -8,11 +8,11 @@ Parameters:
     ConstraintDescription: Must be a valid email address.
     Description: Email address to notify budgets
 Resources:
-  BudgetWithCredits:
+  BudgetExcCredits:
     Type: "AWS::Budgets::Budget"
     Properties:
       Budget:
-        BudgetName: "$100 Budget with Credits"
+        BudgetName: "$100 Budget (exc) Credits"
         BudgetLimit:
           Amount: 100
           Unit: USD
@@ -21,6 +21,44 @@ Resources:
         CostTypes:
           IncludeCredit: false
       NotificationsWithSubscribers:
+        # 10% actual and forecasted
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 10
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 10
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        # 20% actual and forecasted
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 20
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 20
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
         # 50% actual and forecasted
         - Notification:
             NotificationType: ACTUAL
@@ -78,19 +116,58 @@ Resources:
             # TODO: Discord notification via SNS
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
-  BudgetActualMoney:
+
+  BudgetIncCredits:
     Type: "AWS::Budgets::Budget"
     Properties:
       Budget:
-        BudgetName: "Sh*t! Actual money being spent!"
+        BudgetName: "$100 Budget (inc) Credits"
         BudgetLimit:
-          Amount: 1
+          Amount: 100
           Unit: USD
         TimeUnit: MONTHLY
         BudgetType: COST
         CostTypes:
           IncludeCredit: true
       NotificationsWithSubscribers:
+        # 10% actual and forecasted
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 10
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 10
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        # 20% actual and forecasted
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 20
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 20
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            # TODO: Discord notification via SNS
+            - SubscriptionType: EMAIL
+              Address: !Ref NotificationEmail1
         # 50% actual and forecasted
         - Notification:
             NotificationType: ACTUAL
