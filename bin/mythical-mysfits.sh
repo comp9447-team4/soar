@@ -63,11 +63,12 @@ create_core() {
 }
 
 update_core() {
-    # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
+    echo "Updating core roles..."
     aws cloudformation update-stack \
         --stack-name "${CORE_STACK_NAME}" \
         --template-body file://"${CORE_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM
+    aws cloudformation wait stack-update-complete --stack-name "${CORE_STACK_NAME}"
 }
 
 create_ecr() {
@@ -328,6 +329,7 @@ create_streaming_service_cicd() {
         --enable-termination-protection
     wait_build "${STREAMING_SERVICE_STACK_NAME}"
 }
+
 update_streaming_service_cicd() {
     echo "Updating streaming service stack..."
     aws cloudformation update-stack \
