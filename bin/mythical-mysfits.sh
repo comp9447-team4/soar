@@ -52,7 +52,6 @@ export CICD_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/cicd.yml"
 export MYTHICAL_MYSFITS_REPO="${REPO_ROOT}/../MythicalMysfitsService-Repository"
 export ECR_IMAGE="${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_REGION}".amazonaws.com
 export ECR_IMAGE_TAG="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/mythicalmysfits/service:latest"
-export ARTIFACTS_BUCKET="${AWS_PROFILE}-comp9447-team4-mythical-mysfits-artifacts"
 create_core() {
     # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-2
     aws cloudformation create-stack \
@@ -153,10 +152,22 @@ create_cicd() {
         --stack-name "${CICD_STACK_NAME}" \
         --template-body file://"${CICD_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
-        --parameters ParameterKey=BucketName,ParameterValue="${ARTIFACTS_BUCKET}" \
+        --parameters ParameterKey=AwsProfile,ParameterValue="${AWS_PROFILE}" \
         --enable-termination-protection
 
     wait_build "${CICD_STACK_NAME}"
+}
+
+delete_cicd() {
+    echo "Deleting cicd stack..."
+    aws cloudformation \
+        update-termination-protection \
+        --stack-name "${CICD_STACK_NAME}" \
+        --no-enable-termination-protection
+
+    aws cloudformation \
+        delete-stack \
+        --stack-name "${CICD_STACK_NAME}"
 }
 
 update_bucket() {
@@ -310,12 +321,10 @@ export STREAMING_SERVICE_STACK_NAME="MythicalMysfitsStreamingServiceStack"
 export STREAMING_SERVICE_STACK_YML="${REPO_ROOT}"/infra/mythical-mysfits/streaming-service.yml
 create_streaming_service() {
     echo "Creating streaming service stack..."
-    local lambda_artifacts_bucket_name="${AWS_PROFILE}"-comp9447-team4-mythical-mysfits-lambda-artifacts
     aws cloudformation create-stack \
         --stack-name "${STREAMING_SERVICE_STACK_NAME}" \
         --template-body file://"${STREAMING_SERVICE_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
-        --parameters ParameterKey=LambdaArtifactsBucketName,ParameterValue="${lambda_artifacts_bucket_name}" \
         --enable-termination-protection
     wait_build "${STREAMING_SERVICE_STACK_NAME}"
 }
@@ -497,6 +506,8 @@ main() {
         # module_5_static_site_updates
     elif [[ "${args}" == "create-cicd" ]]; then
         create_cicd
+    elif [[ "${args}" == "delete-cicd" ]]; then
+        delete_cicd
     elif [[ "${args}" == "update-core" ]]; then
         update_core
     else

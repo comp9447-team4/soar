@@ -1,26 +1,13 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Module 5 streaming
-Parameters:
-  LambdaArtifactsBucketName:
-    Type: String
+
 Resources:
-  # # aws codecommit create-repository --repository-name MythicalMysfitsStreamingService-Repository
-  # StreamingServiceRepo:
-  #   Type: AWS::CodeCommit::Repository
-  #   Properties:
-  #     RepositoryName: MythicalMysfitsStreamingService-Repository
-
-  # aws s3 mb s3://REPLACE_ME_YOUR_BUCKET_NAME/
-  LambdaArtifactsBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref LambdaArtifactsBucketName
-
   MysticalMysfitsStreamingServiceCodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: MysticalMysfitsStreamingServiceCodeBuildProject
+      BadgeEnabled: true
       Artifacts:
         Type: NO_ARTIFACTS
       Environment:
@@ -39,11 +26,10 @@ Resources:
       Source:
         Type: GITHUB
         Location: https://github.com/comp9447-team4/soar
-        BuildSpec: mythical-mysfits/mysfits-streaming-service/buildspec.yml
+        BuildSpec: mythical-mysfits/streaming-service/buildspec.yml
         ReportBuildStatus: true
         Auth:
           Type: OAUTH
-
 
   MythicalMysfitsStreamingServiceCodePipeline:
     Type: AWS::CodePipeline::Pipeline
