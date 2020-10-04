@@ -46,4 +46,4 @@ phases:
     - echo "Completed streaming service build on `date`"
 
 artifacts:
-  files: ./mythical-mysfits/mysfits-streaming-service/transformed-streaming.yml
+  files: ./mythical-mysfits/streaming-service/transformed-streaming.yml

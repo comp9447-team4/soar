@@ -85,7 +85,7 @@ Resources:
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
             StackName: MythicalMysfitsStreamingServiceLambdaStack
-            TemplatePath: :"StreamingServiceBuildArtifact::transformed-streaming.json"
+            TemplatePath: "StreamingServiceBuildArtifact::transformed-streaming.json"
       ArtifactStore:
         Type: S3
         Location: !ImportValue MythicalMysfitsCICDStack:CodeBuildArtifactsBucket
