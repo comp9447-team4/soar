@@ -386,6 +386,7 @@ Resources:
             Effect: Allow
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
+      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
 
   # An IAM role that allows the AWS CodeBuild service to perform the actions
   # required to complete a build of our source code retrieved from CodeCommit,
