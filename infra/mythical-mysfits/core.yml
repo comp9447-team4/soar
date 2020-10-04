@@ -327,6 +327,7 @@ Resources:
           Principal:
             Service:
             - codepipeline.amazonaws.com
+            - cloudformation.amazonaws.com
           Action:
           - sts:AssumeRole
       Path: "/"
@@ -365,7 +366,16 @@ Resources:
             - iam:PassRole
             Resource: "*"
             Effect: Allow
+          - Action:
+            - cloudformation:*
+            Resource: "*"
+            Effect: Allow
           Version: "2012-10-17"
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
+      - arn:aws:iam::aws:policy/AWSLambdaFullAccess
 
   # An IAM role that allows the AWS CodeBuild service to perform the actions
   # required to complete a build of our source code retrieved from CodeCommit,
@@ -417,6 +427,8 @@ Resources:
             - "ecr:InitiateLayerUpload"
             - "ecr:GetAuthorizationToken"
             Resource: "*"
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
 
 
 # These are the values output by the CloudFormation template. Be careful
