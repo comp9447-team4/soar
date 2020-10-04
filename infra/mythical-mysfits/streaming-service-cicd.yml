@@ -86,7 +86,7 @@ Resources:
             ActionMode: REPLACE_ON_FAILURE
             StackName: MythicalMysfitsStreamingServiceLambdaStack
             TemplatePath: "StreamingServiceBuildArtifact::mythical-mysfits/streaming-service/transformed-streaming.yml"
-            RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole.Arn
+            RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole
       ArtifactStore:
         Type: S3
         Location: !ImportValue MythicalMysfitsCICDStack:CodeBuildArtifactsBucket
