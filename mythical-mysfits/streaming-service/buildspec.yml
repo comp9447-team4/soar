@@ -6,8 +6,22 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      python: 3.5.2
+    commands:
+      - apt-get update -y
+      - apt-get install -y jq 
+
+  pre_build:
+    commands:
+      - echo "Checking versions of build dependencies"
+      - jq --version
+      - pip --version
+      - sam --version
   build:
     commands:
+    - source ./bin/_utils.sh
     - cd mythical-mysfits/mysfits-streaming-service/
     - service_api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint:ApiEndpoint)
     - echo "${lambda_artifacts_bucket}"
@@ -19,6 +33,7 @@ phases:
         --s3-bucket "${lambda_artifacts_bucket}"
     - cd -
   post_build:
-  - echo "Completed streaming service build on `date`"
+    commands:
+    - echo "Completed streaming service build on `date`"
 artifacts:
   files: ./mythical-mysfits/mysfits-streaming-service/transformed-streaming.yml

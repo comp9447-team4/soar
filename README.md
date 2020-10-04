@@ -26,7 +26,7 @@ Dallas Yan
 Service | Status
 --- | ---
 MythicalMysfitsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoidENmREJOQlJOWXljOHFyeDkweEp3dFdEWStCaWx1UXNiaFBES2R0V2xPOElWbk04SW9XY3l1NXdod3J4a0svSnVFbFZGcDBlK3NuZFBLNUpXV3llYmJvPSIsIml2UGFyYW1ldGVyU3BlYyI6InkrWktsZzFvSEtXOGZsZk4iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
-MythicalMysfitsStreaming | TODO
+MythicalMysfitsStreamingService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoidkFvT1p2K0lHTUpMUWlITTJ3NVZWRkhUNmppR3Q2WG1IOW5XaVhOY3BleVVQNE8yaDcvV3ZKTHFYWjJoRG9NdlU5ZUUyeDdsODl0YlNnNE1yYUdsL09VPSIsIml2UGFyYW1ldGVyU3BlYyI6InpTdHJTVllIeFZnbFl3ZjQiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
 
 ## Prod Build Statuses
 

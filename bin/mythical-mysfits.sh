@@ -316,10 +316,10 @@ module_4_s3_updates() {
 # Module 5
 # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-5
 ######################################################################################
-export STREAMING_SERVICE_REPO="${REPO_ROOT}"/../MythicalMysfitsStreamingService-Repository
-export STREAMING_SERVICE_STACK_NAME="MythicalMysfitsStreamingServiceStack"
-export STREAMING_SERVICE_STACK_YML="${REPO_ROOT}"/infra/mythical-mysfits/streaming-service.yml
-create_streaming_service() {
+# export STREAMING_SERVICE_REPO="${REPO_ROOT}"/../MythicalMysfitsStreamingService-Repository
+export STREAMING_SERVICE_STACK_NAME="MythicalMysfitsStreamingServiceCICDStack"
+export STREAMING_SERVICE_STACK_YML="${REPO_ROOT}"/infra/mythical-mysfits/streaming-service-cicd.yml
+create_streaming_service_cicd() {
     echo "Creating streaming service stack..."
     aws cloudformation create-stack \
         --stack-name "${STREAMING_SERVICE_STACK_NAME}" \
@@ -327,6 +327,14 @@ create_streaming_service() {
         --capabilities CAPABILITY_NAMED_IAM \
         --enable-termination-protection
     wait_build "${STREAMING_SERVICE_STACK_NAME}"
+}
+update_streaming_service_cicd() {
+    echo "Updating streaming service stack..."
+    aws cloudformation update-stack \
+        --stack-name "${STREAMING_SERVICE_STACK_NAME}" \
+        --template-body file://"${STREAMING_SERVICE_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM
+    aws cloudformation wait stack-update-complete "${STREAMING_SERVICE_STACK_NAME}"
 }
 
 init_streaming_service_repo() {
@@ -508,6 +516,10 @@ main() {
         create_cicd
     elif [[ "${args}" == "delete-cicd" ]]; then
         delete_cicd
+    elif [[ "${args}" == "create-streaming-service-cicd" ]]; then
+        create_streaming_service_cicd
+    elif [[ "${args}" == "update-streaming-service-cicd" ]]; then
+        update_streaming_service_cicd
     elif [[ "${args}" == "update-core" ]]; then
         update_core
     else

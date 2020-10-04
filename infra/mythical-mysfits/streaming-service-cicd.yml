@@ -12,7 +12,7 @@ Resources:
         Type: NO_ARTIFACTS
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/python:3.5.2
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
         PrivilegedMode: true
         EnvironmentVariables:
         - Name: AWS_ACCOUNT_ID
@@ -84,15 +84,8 @@ Resources:
           - Name: MythicalMysfitsService-BuildArtifact
           Configuration:
             ActionMode: CHANGE_SET_EXECUTE
-            StackName: MythicalMysfitsStreamingLambdaStack
+            StackName: MythicalMysfitsStreamingServiceLambdaStack
             TemplatePath: transformed-streaming.json
       ArtifactStore:
         Type: S3
-        Location: !Ref ArtifactsBucket
-
-Outputs:
-  LambdaArtifactsBucket:
-    Description: The lambda artifacts bucket
-    Value: !Ref LambdaArtifactsBucket
-    Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LambdaArtifactsBucket' ] ]
+        Location: !ImportValue MythicalMysfitsCICDStack:CodeBuildArtifactsBucket
