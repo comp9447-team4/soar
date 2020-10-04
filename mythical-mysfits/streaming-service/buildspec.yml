@@ -9,11 +9,10 @@ phases:
   build:
     commands:
     - cd mythical-mysfits/mysfits-streaming-service/
-    - lambda_artifacts_bucket="${AWS_PROFILE}"-comp9447-team4-mythical-mysfits-lambda-artifacts
+    - service_api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint:ApiEndpoint)
     - echo "${lambda_artifacts_bucket}"
-    - sed -i "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndpoint = \'${api_endpoint}\'/g" streamProcessor.py
-    - which pip3
-    - pip3 install requests -t .
+    - sed -i "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndpoint = \'${service_api_endpoint}\'/g" streamProcessor.py
+    - pip install requests -t .
     - sam package \
         --template-file ./real-time-streaming.yml \
         --output-template-file ./transformed-streaming.yml \

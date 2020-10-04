@@ -19,6 +19,19 @@ William Yin
 Dallas Yan
 ```
 
+# Build Statuses
+
+## QA Build Statuses
+
+Service | Status
+--- | ---
+MythicalMysfitsService | [](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoidENmREJOQlJOWXljOHFyeDkweEp3dFdEWStCaWx1UXNiaFBES2R0V2xPOElWbk04SW9XY3l1NXdod3J4a0svSnVFbFZGcDBlK3NuZFBLNUpXV3llYmJvPSIsIml2UGFyYW1ldGVyU3BlYyI6InkrWktsZzFvSEtXOGZsZk4iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+MythicalMysfitsStreaming | TODO
+
+## Prod Build Statuses
+
+TODO
+
 # User Setup
 
 ## AWS SSO

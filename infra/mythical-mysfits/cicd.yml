@@ -8,12 +8,11 @@ Parameters:
     - qa
     - prod
 Resources:
-  # aws s3 mb s3://REPLACE_ME_CHOOSE_ARTIFACTS_BUCKET_NAME
   CodeBuildArtifactsBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName:
-        Fn::Sub
+        Fn::Sub:
         - "${AwsProfile}-comp9447-team4-mythical-mysfits-codebuild-artifacts"
         - AwsProfile: !Ref AwsProfile
 
@@ -21,7 +20,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName:
-        Fn::Sub
+        Fn::Sub:
         - "${AwsProfile}-comp9447-team4-mythical-mysfits-lambda-artifacts"
         - AwsProfile: !Ref AwsProfile
 
@@ -64,18 +63,13 @@ Resources:
             - 'arn:aws:s3:::${BucketName}'
             - BucketName: !Ref CodeBuildArtifactsBucket
 
-  # aws codecommit create-repository --repository-name MythicalMysfitsService-Repository
-  # CodeCommitRepository:
-  #   Type: AWS::CodeCommit::Repository
-  #   Properties:
-  #     RepositoryName: MythicalMysfitsService-Repository
-
-
+  # BUILD PROJECT
   # aws codebuild create-project --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-build-project.json
   CodeBuildProjectMysfitsService:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: MythicalMysfitsServiceCodeBuildProject
+      BadgeEnabled: true
       Artifacts:
         Type: NO_ARTIFACTS
       Environment:
@@ -100,6 +94,7 @@ Resources:
           Type: OAUTH
 
 
+  # CODEPIPELINE
   # aws codepipeline create-pipeline --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-pipeline.json
   CodePipelineMysfitsService:
     Type: AWS::CodePipeline::Pipeline
