@@ -334,6 +334,7 @@ Resources:
       Policies:
       - PolicyName: MythicalMysfitsService-codepipeline-service-policy
         PolicyDocument:
+          Version: "2012-10-17"
           Statement:
           - Action:
             - codecommit:GetBranch
@@ -366,11 +367,13 @@ Resources:
             - iam:PassRole
             Resource: "*"
             Effect: Allow
+          # Make any changes to IAM related to Mysfits prefix
           - Action:
-            - cloudformation:*
-            Resource: "*"
+            - "iam:*"
+            Resource:
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/MythicalMysfits*"
+              - !Sub "arn:aws:iam::${AWS::AccountId}:policy/MythicalMysfits*"
             Effect: Allow
-          Version: "2012-10-17"
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
       - arn:aws:iam::aws:policy/AmazonS3FullAccess
@@ -399,7 +402,6 @@ Resources:
           - Effect: Allow
             Action:
             - "cloudformation:ListExports"
-            - iam:Create*
             Resource: "*"
           - Effect: "Allow"
             Action:
