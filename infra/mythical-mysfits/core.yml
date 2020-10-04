@@ -365,6 +365,10 @@ Resources:
             - iam:PassRole
             Resource: "*"
             Effect: Allow
+          - Action:
+            - cloudformation:*
+            Resource: "*"
+            Effect: Allow
           Version: "2012-10-17"
 
   # An IAM role that allows the AWS CodeBuild service to perform the actions

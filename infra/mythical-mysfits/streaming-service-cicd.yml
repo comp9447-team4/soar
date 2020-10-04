@@ -85,7 +85,28 @@ Resources:
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
             StackName: MythicalMysfitsStreamingServiceLambdaStack
-            TemplatePath: "StreamingServiceBuildArtifact::transformed-streaming.json"
+            TemplatePath: "StreamingServiceBuildArtifact::mythical-mysfits/streaming-service/transformed-streaming.yml"
+            RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole.Arn
       ArtifactStore:
         Type: S3
         Location: !ImportValue MythicalMysfitsCICDStack:CodeBuildArtifactsBucket
+
+  # StreamingServiceDeployCfnRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     RoleName: StreamingServiceCfnRole
+  #     AssumeRolePolicyDocument:
+  #       Version: '2008-10-17'
+  #       Statement:
+  #       - Effect: Allow
+  #         Principal:
+  #           Service: codedeploy.amazonaws.com
+  #         Action:
+  #           - sts:AssumeRole
+  #     ManagedPolicyArns:
+  #     - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+  #     # - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
+  #     # - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+        
+
