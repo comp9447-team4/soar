@@ -6,15 +6,36 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      python: 3.8
+
+  pre_build:
+    commands:
+      - echo "Checking versions of build dependencies"
+      - jq --version
+      - pip --version
+      - sam --version
+
   build:
     commands:
     - cd mythical-mysfits/mysfits-streaming-service/
-    - sed -i "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndpoint = \'${api_endpoint}\'/g" streamProcessor.py
-    - pip3 install requests -t .
+    - service_api_endpoint=$(aws cloudformation list-exports |
+        jq -c "map(select(.Name==\"MythicalMysfitsUserPoolStack:ApiEndpoint:ApiEndpoint\")| .Value)" |
+        jq -r '.[0]' |
+        sed 's/\//\\\//g')
+    - echo "${lambda_artifacts_bucket}"
+    - sed -i "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndpoint = \'${service_api_endpoint}\'/g" ./streamProcessor.py
+    - pip install requests -t .
     - sam package \
         --template-file ./real-time-streaming.yml \
         --output-template-file ./transformed-streaming.yml \
         --s3-bucket "${lambda_artifacts_bucket}"
     - cd -
+
+  post_build:
+    commands:
+    - echo "Completed streaming service build on `date`"
+
 artifacts:
   files: ./mythical-mysfits/mysfits-streaming-service/transformed-streaming.yml

@@ -2,20 +2,33 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Module 2 CICD https://aws.amazon.com/getting-started/hands-on/build-modern-app-fargate-lambda-dynamodb-python/module-two/
 Parameters:
-  BucketName:
+  AwsProfile:
     Type: String
+    AllowedValues:
+    - qa
+    - prod
 Resources:
-  # aws s3 mb s3://REPLACE_ME_CHOOSE_ARTIFACTS_BUCKET_NAME
-  ArtifactsBucket:
+  CodeBuildArtifactsBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref BucketName
+      BucketName:
+        Fn::Sub:
+        - "${AwsProfile}-comp9447-team4-mythical-mysfits-codebuild-artifacts"
+        - AwsProfile: !Ref AwsProfile
+
+  LambdaArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub:
+        - "${AwsProfile}-comp9447-team4-mythical-mysfits-lambda-artifacts"
+        - AwsProfile: !Ref AwsProfile
 
   # aws s3api put-bucket-policy --bucket REPLACE_ME_ARTIFACTS_BUCKET_NAME --policy file://~/environment/aws-modern-application-workshop/module-2/aws-cli/artifacts-bucket-policy.json
-  ArtifactsBucketPolicy:
+  CodeBuildArtifactsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref ArtifactsBucket
+      Bucket: !Ref CodeBuildArtifactsBucket
       PolicyDocument:
         Statement:
         - Sid: WhitelistedGet
@@ -31,10 +44,10 @@ Resources:
           Resource:
           - Fn::Sub:
             - 'arn:aws:s3:::${BucketName}/*'
-            - BucketName: !Ref ArtifactsBucket
+            - BucketName: !Ref CodeBuildArtifactsBucket
           - Fn::Sub:
             - 'arn:aws:s3:::${BucketName}'
-            - BucketName: !Ref ArtifactsBucket
+            - BucketName: !Ref CodeBuildArtifactsBucket
         - Sid: WhitelistedPut
           Effect: Allow
           Principal:
@@ -45,23 +58,18 @@ Resources:
           Resource:
           - Fn::Sub:
             - 'arn:aws:s3:::${BucketName}/*'
-            - BucketName: !Ref ArtifactsBucket
+            - BucketName: !Ref CodeBuildArtifactsBucket
           - Fn::Sub:
             - 'arn:aws:s3:::${BucketName}'
-            - BucketName: !Ref ArtifactsBucket
+            - BucketName: !Ref CodeBuildArtifactsBucket
 
-  # aws codecommit create-repository --repository-name MythicalMysfitsService-Repository
-  # CodeCommitRepository:
-  #   Type: AWS::CodeCommit::Repository
-  #   Properties:
-  #     RepositoryName: MythicalMysfitsService-Repository
-
-
+  # BUILD PROJECT
   # aws codebuild create-project --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-build-project.json
   CodeBuildProjectMysfitsService:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: MythicalMysfitsServiceCodeBuildProject
+      BadgeEnabled: true
       Artifacts:
         Type: NO_ARTIFACTS
       Environment:
@@ -86,6 +94,7 @@ Resources:
           Type: OAUTH
 
 
+  # CODEPIPELINE
   # aws codepipeline create-pipeline --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/code-pipeline.json
   CodePipelineMysfitsService:
     Type: AWS::CodePipeline::Pipeline
@@ -142,5 +151,16 @@ Resources:
             FileName: imagedefinitions.json
       ArtifactStore:
         Type: S3
-        Location: !Ref ArtifactsBucket
+        Location: !Ref CodeBuildArtifactsBucket
 
+Outputs:
+  CodeBuildArtifactsBucket:
+    Value: !Ref CodeBuildArtifactsBucket
+    Description: CodeBuildArtifactsBucket
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CodeBuildArtifactsBucket' ] ]
+  LambdaArtifactsBucket:
+    Value: !Ref LambdaArtifactsBucket
+    Description: Lambda artifacts bucket
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LambdaArtifactsBucket' ] ]
