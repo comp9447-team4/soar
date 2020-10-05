@@ -18,16 +18,16 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.8
       Events:
-        Remind:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /remind
-            Method: get
-        # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedule.html
+        # Remind:
+        #   Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        #   Properties:
+        #     Path: /remind
+        #     Method: get
+        # # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedule.html
         Schedule:
           Type: Schedule
           Properties:
-            Schedule: "rate(1 day)"
+            Schedule: "cron(0 22 * * ? *)"
       Environment:
         Variables:
           DISCORD_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762560716351733770/J6MCoWF8Krmx8izcCG7cD14FSFljJOgm-S5IZy3VbND9dZcGQm88mpWyLGQfcLr7J7ZQ
@@ -39,9 +39,9 @@ Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  StandupReminderApi:
-    Description: "API Gateway endpoint URL for Prod stage for standup reminder function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/remind/"
+  # StandupReminderApi:
+  #   Description: "API Gateway endpoint URL for Prod stage for standup reminder function"
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/remind/"
   StandUpReminderFunction:
     Description: "Stand Up Lambda Function ARN"
     Value: !GetAtt StandUpReminderFunction.Arn
