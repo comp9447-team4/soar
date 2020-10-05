@@ -23,14 +23,16 @@ Resources:
           Properties:
             Path: /remind
             Method: get
+        # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedule.html
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: "rate(1 day)"
       Environment:
         Variables:
           DISCORD_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762560716351733770/J6MCoWF8Krmx8izcCG7cD14FSFljJOgm-S5IZy3VbND9dZcGQm88mpWyLGQfcLr7J7ZQ
           DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762644386009317407/R1qXCsrycsrTx6QFa-dgpyFbMjzFDhK2WnxQiqmQP-N07mID7Hs-bGYU0-ENb61v1d6G
-          # DISCORD_ALERTS_CHANNEL_WEBHOOK_ARN: !ImportValue Secrets:DiscordAlertsChannelWebhook
-          # DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK_ARN: !ImportValue Secrets:DiscordDevAlertsChannelWebhook
           IS_DEV: 0
-    Secrets:
 
 
 Outputs:
