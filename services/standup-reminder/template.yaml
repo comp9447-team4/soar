@@ -25,9 +25,11 @@ Resources:
             Method: get
       Environment:
         Variables:
-          DISCORD_ALERTS_CHANNEL_WEBHOOK: !ImportValue Secrets:DiscordAlertsChannelWebhook
-          DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: !ImportValue Secrets:DiscordDevAlertsChannelWebhook
-          IS_DEV: true
+          DISCORD_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762560716351733770/J6MCoWF8Krmx8izcCG7cD14FSFljJOgm-S5IZy3VbND9dZcGQm88mpWyLGQfcLr7J7ZQ
+          DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762644386009317407/R1qXCsrycsrTx6QFa-dgpyFbMjzFDhK2WnxQiqmQP-N07mID7Hs-bGYU0-ENb61v1d6G
+          # DISCORD_ALERTS_CHANNEL_WEBHOOK_ARN: !ImportValue Secrets:DiscordAlertsChannelWebhook
+          # DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK_ARN: !ImportValue Secrets:DiscordDevAlertsChannelWebhook
+          IS_DEV: 0
     Secrets:
 
 
@@ -41,6 +43,6 @@ Outputs:
   StandUpReminderFunction:
     Description: "Stand Up Lambda Function ARN"
     Value: !GetAtt StandUpReminderFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  StandUpReminderFunctionIamRole:
+    Description: "Implicit IAM Role created for Stand Up Reminder function"
+    Value: !GetAtt StandUpReminderFunctionRole.Arn

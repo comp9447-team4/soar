@@ -16,9 +16,10 @@ IS_DEV=1 \
 ```
 # Build
 sam build
-# Test if you can invoke it locally
+
+# Try to invoke it
 sam local invoke
 
 # Deploy
-sam deploy --guided
+sam deploy
 ```
