@@ -5,11 +5,11 @@ import uuid
 import random
 import time
 # UNCOMMENT_BEFORE_2ND_DEPLOYMENT - below 2 lines
-#from aws_xray_sdk.core import xray_recorder
-#from aws_xray_sdk.core import patch_all
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
 
 # UNCOMMENT_BEFORE_2ND_DEPLOYMENT - below 1 line
-#patch_all()
+patch_all()
 
 ddb = boto3.client('dynamodb')
 logger = logging.getLogger()
