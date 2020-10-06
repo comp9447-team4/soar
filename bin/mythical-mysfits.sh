@@ -588,22 +588,22 @@ main() {
 
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # module_3_code_updates
-        # module_3_s3_updates
+        module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
         create_user_pool
 
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # module_4_code_updates
-        # module_4_s3_updates
+        module_4_s3_updates
     elif [[ "${args}" == "create-module-5" ]]; then
         create_streaming_service
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
         # init_streaming_service_repo
         # package_streaming_lambda
         # deploy_streaming_lambda
-        # module_5_static_site_updates
+        module_5_static_site_updates
     elif [[ "${args}" == "create-module-6" ]]; then
-        # create_questions_service_cicd
+        create_questions_service_cicd
         module_6_static_site_updates
 
 
