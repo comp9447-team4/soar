@@ -529,6 +529,14 @@ module_6_static_site_updates() {
     rm -rf "${REPO_ROOT}"/tmp
 }
 
+update_questions_api_enable_xray() {
+    # nah lets do this in cfn
+    aws apigateway update-stage \
+        --rest-api-id REPLACE_ME_QUESTIONS_REST_API_ID \
+        --stage-name prod \
+        --patch-operations op=replace,path=/tracingEnabled,value=true
+}
+
 usage() {
     cat <<EOF
 Creates the Mythical Mysfits core stack.
