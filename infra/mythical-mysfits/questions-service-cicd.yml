@@ -1,12 +1,15 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Module 5 streaming
-
+Description: Module 6 Questions
+Parameters:
+  AdministratorEmailAddress:
+    Type: String
+    Description: The email to send alerts to for xray
 Resources:
-  MysticalMysfitsQuestsionsServiceCodeBuildProject:
+  MysticalMysfitsQuestionsServiceCodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: MythicalMysfitsQuestsionsServiceCodeBuildProject
+      Name: MythicalMysfitsQuestionsServiceCodeBuildProject
       BadgeEnabled: true
       Artifacts:
         Type: NO_ARTIFACTS
@@ -31,10 +34,10 @@ Resources:
         Auth:
           Type: OAUTH
 
-  MythicalMysfitsQuestsionsServiceCodePipeline:
+  MythicalMysfitsQuestionsServiceCodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: MythicalMysfitsQuestsionsServiceCodePipeline
+      Name: MythicalMysfitsQuestionsServiceCodePipeline
       RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodePipelineServiceRole
       Stages:
       # Use Github Codestar as source
@@ -49,7 +52,7 @@ Resources:
             Version: '1'
             Provider: CodeStarSourceConnection
           OutputArtifacts:
-          - Name: QuestsionsServiceSourceArtifact
+          - Name: QuestionsServiceSourceArtifact
           Configuration:
             ConnectionArn: !ImportValue GithubRepoCodeStarConnectionArn
             BranchName: master # TODO maybe set this to release branch for prod
@@ -64,11 +67,11 @@ Resources:
             Version: '1'
             Provider: CodeBuild
           OutputArtifacts:
-          - Name: QuestsionsServiceBuildArtifact
+          - Name: QuestionsServiceBuildArtifact
           InputArtifacts:
-          - Name: QuestsionsServiceSourceArtifact
+          - Name: QuestionsServiceSourceArtifact
           Configuration:
-            ProjectName: MythicalMysfitsQuestsionsServiceCodeBuildProject
+            ProjectName: MythicalMysfitsQuestionsServiceCodeBuildProject
           RunOrder: 1
       # CFN deployment
       # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CloudFormation.html
@@ -81,13 +84,19 @@ Resources:
             Version: '1'
             Provider: CloudFormation
           InputArtifacts:
-          - Name: QuestsionsServiceBuildArtifact
+          - Name: QuestionsServiceBuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: MythicalMysfitsQuestsionsServiceLambdaStack
-            TemplatePath: "QuestsionsServiceBuildArtifact::mythical-mysfits/streaming-service/transformed-streaming.yml"
+            StackName: MythicalMysfitsQuestionsServiceStack
+            TemplatePath: "QuestionsServiceBuildArtifact::mythical-mysfits/questions-service/transformed-questions.yml"
             RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodePipelineServiceRole
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+            ParameterOverrides:
+              Fn::Join:
+              - ""
+              - - '{"AdministratorEmailAddress":"'
+                - !Ref AdministratorEmailAddress
+                - '"}'
       ArtifactStore:
         Type: S3
         Location: !ImportValue MythicalMysfitsCICDStack:CodeBuildArtifactsBucket

@@ -19,31 +19,23 @@ phases:
 
   build:
     commands:
-    - cd mythical-mysfits/streaming-service/
+    - cd mythical-mysfits/questions-service/
     - lambda_artifacts_bucket=$(aws cloudformation list-exports |
         jq -r '.Exports' |
         jq -c "map(select(.Name==\"MythicalMysfitsCICDStack:LambdaArtifactsBucket\")| .Value)" |
         jq -r '.[0]' |
         sed 's/\//\\\//g')
     - echo "${lambda_artifacts_bucket}"
-    - service_api_endpoint=$(aws cloudformation list-exports |
-        jq -r '.Exports' |
-        jq -c "map(select(.Name==\"MythicalMysfitsUserPoolStack:ApiEndpoint\")| .Value)" |
-        jq -r '.[0]' |
-        sed 's/\//\\\//g')
-    - echo "${service_api_endpoint}"
-    - sed -i "s/apiEndpoint = 'REPLACE_ME_API_ENDPOINT'/apiEndpoint = \'${service_api_endpoint}\'/g" ./streamProcessor.py
-    - pip install requests==2.23.0 -t .
     - >-
       sam package
-      --template-file ./real-time-streaming.yml
-      --output-template-file ./transformed-streaming.yml
+      --template-file ./customer-questions.yml
+      --output-template-file ./transformed-questions.yml
       --s3-bucket "${lambda_artifacts_bucket}"
     - cd -
 
   post_build:
     commands:
-    - echo "Completed streaming service build on `date`"
+    - echo "Completed questions service build on `date`"
 
 artifacts:
-  files: ./mythical-mysfits/streaming-service/transformed-streaming.yml
+  files: ./mythical-mysfits/questions-service/transformed-questions.yml
