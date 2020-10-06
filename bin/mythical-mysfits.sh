@@ -452,7 +452,7 @@ module_5_static_site_updates() {
 # Module 6
 # https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-6
 ######################################################################################
-export QUESTIONS_SERVICE_CICD_STACK_NAME="MythicalMysfitsQuestionsServiceStack"
+export QUESTIONS_SERVICE_CICD_STACK_NAME="MythicalMysfitsQuestionsServiceCICDStack"
 export QUESTIONS_SERVICE_CICD_STACK_YML="${REPO_ROOT}"/infra/mythical-mysfits/questions-service-cicd.yml
 create_questions_service_cicd() {
     echo "Creating questions service cicd stack..."

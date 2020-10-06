@@ -389,10 +389,14 @@ Resources:
             - "lambda:*"
             Resource: "*"
             Effect: Allow
+      # !!!!!!!!!!!!! CI has a lot of policies but I am cbf to specify the resources as I'm not getting any help :(
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
-
       - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      - arn:aws:iam::aws:policy/AmazonSNSFullAccess
+      - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
+
   # An IAM role that allows the AWS CodeBuild service to perform the actions
   # required to complete a build of our source code retrieved from CodeCommit,
   # and push the created image to ECR.
