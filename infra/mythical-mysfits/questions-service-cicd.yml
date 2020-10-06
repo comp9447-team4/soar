@@ -1,0 +1,93 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Module 5 streaming
+
+Resources:
+  MysticalMysfitsQuestsionsServiceCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: MythicalMysfitsQuestsionsServiceCodeBuildProject
+      BadgeEnabled: true
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+        PrivilegedMode: true
+        EnvironmentVariables:
+        - Name: AWS_ACCOUNT_ID
+          Value: !Sub "${AWS::AccountId}"
+        - Name: AWS_DEFAULT_REGION
+          Value: !Sub "${AWS::Region}"
+        Type: LINUX_CONTAINER
+      ServiceRole: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole
+      # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codebuild-project-source.html
+      # For source code in a GitHub repository, the HTTPS clone URL to the repository that contains the source and the build spec. You must connect your AWS account to your GitHub account. Use the AWS CodeBuild console to start creating a build project. When you use the console to connect (or reconnect) with GitHub, on the GitHub Authorize application page, for Organization access, choose Request access next to each repository you want to allow AWS CodeBuild to have access to, and then choose Authorize application. (After you have connected to your GitHub account, you do not need to finish creating the build project. You can leave the AWS CodeBuild console.) To instruct AWS CodeBuild to use this connection, in the source object, set the auth object's type value to OAUTH. 
+      Source:
+        Type: GITHUB
+        Location: https://github.com/comp9447-team4/soar
+        BuildSpec: mythical-mysfits/questions-service/buildspec.yml
+        ReportBuildStatus: true
+        Auth:
+          Type: OAUTH
+
+  MythicalMysfitsQuestsionsServiceCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: MythicalMysfitsQuestsionsServiceCodePipeline
+      RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodePipelineServiceRole
+      Stages:
+      # Use Github Codestar as source
+      # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: AWS
+            Version: '1'
+            Provider: CodeStarSourceConnection
+          OutputArtifacts:
+          - Name: QuestsionsServiceSourceArtifact
+          Configuration:
+            ConnectionArn: !ImportValue GithubRepoCodeStarConnectionArn
+            BranchName: master # TODO maybe set this to release branch for prod
+            FullRepositoryId: comp9447-team4/soar
+          RunOrder: 1
+      - Name: Build
+        Actions:
+        - Name: Build
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Version: '1'
+            Provider: CodeBuild
+          OutputArtifacts:
+          - Name: QuestsionsServiceBuildArtifact
+          InputArtifacts:
+          - Name: QuestsionsServiceSourceArtifact
+          Configuration:
+            ProjectName: MythicalMysfitsQuestsionsServiceCodeBuildProject
+          RunOrder: 1
+      # CFN deployment
+      # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CloudFormation.html
+      - Name: Deploy
+        Actions:
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CloudFormation
+          InputArtifacts:
+          - Name: QuestsionsServiceBuildArtifact
+          Configuration:
+            ActionMode: REPLACE_ON_FAILURE
+            StackName: MythicalMysfitsQuestsionsServiceLambdaStack
+            TemplatePath: "QuestsionsServiceBuildArtifact::mythical-mysfits/streaming-service/transformed-streaming.yml"
+            RoleArn: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodePipelineServiceRole
+            Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+      ArtifactStore:
+        Type: S3
+        Location: !ImportValue MythicalMysfitsCICDStack:CodeBuildArtifactsBucket
