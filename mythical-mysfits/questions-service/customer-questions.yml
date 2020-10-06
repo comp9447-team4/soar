@@ -176,6 +176,7 @@ Resources:
     Properties:
       EndpointConfiguration: REGIONAL
       StageName: prod
+      TracingEnabled: true
       Cors:
         AllowOrigin: "'*'"
         AllowHeaders: "'Content-Type'"
