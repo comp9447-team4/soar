@@ -448,6 +448,33 @@ module_5_static_site_updates() {
     rm -rf "${REPO_ROOT}"/tmp
 }
 
+######################################################################################
+# Module 6
+# https://github.com/aws-samples/aws-modern-application-workshop/tree/python/module-6
+######################################################################################
+export QUESTIONS_SERVICE_CICD_STACK_NAME="MythicalMysfitsQuestionsServiceStack"
+export QUESTIONS_SERVICE_CICD_STACK_YML="${REPO_ROOT}"/infra/mythical-mysfits/questions-service-cicd.yml
+create_questions_service_cicd() {
+    echo "Creating questions service cicd stack..."
+    aws cloudformation create-stack \
+        --stack-name "${QUESTIONS_SERVICE_CICD_STACK_NAME}" \
+        --template-body file://"${QUESTIONS_SERVICE_CICD_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AdministratorEmailAddress,ParameterValue="${DEVELOPER_EMAIL}" \
+        --enable-termination-protection
+    wait_build "${QUESTIONS_SERVICE_CICD_STACK_NAME}"
+}
+
+update_questions_service_cicd() {
+    echo "Updating questions service cicd stack..."
+    aws cloudformation update-stack \
+        --stack-name "${QUESTIONS_SERVICE_CICD_STACK_NAME}" \
+        --template-body file://"${QUESTIONS_SERVICE_CICD_STACK_YML}" \
+        --parameters ParameterKey=AdministratorEmailAddress,ParameterValue="${DEVELOPER_EMAIL}" \
+        --capabilities CAPABILITY_NAMED_IAM
+    aws cloudformation wait stack-update-complete --stack-name "${QUESTIONS_SERVICE_CICD_STACK_NAME}"
+}
+
 usage() {
     cat <<EOF
 Creates the Mythical Mysfits core stack.
@@ -508,12 +535,13 @@ main() {
         # module_4_s3_updates
     elif [[ "${args}" == "create-module-5" ]]; then
         create_streaming_service
-        init_streaming_service_repo
-        package_streaming_lambda
-        deploy_streaming_lambda
-
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
+        # init_streaming_service_repo
+        # package_streaming_lambda
+        # deploy_streaming_lambda
         # module_5_static_site_updates
+    elif [[ "${args}" == "create-module-6" ]]; then
+        create_questions_service_cicd
     elif [[ "${args}" == "create-cicd" ]]; then
         create_cicd
     elif [[ "${args}" == "delete-cicd" ]]; then
@@ -522,10 +550,11 @@ main() {
         create_streaming_service_cicd
     elif [[ "${args}" == "update-streaming-service-cicd" ]]; then
         update_streaming_service_cicd
+    elif [[ "${args}" == "update-questions-service-cicd" ]]; then
+        update_questions_service_cicd
     elif [[ "${args}" == "update-core" ]]; then
         update_core
     else
-
         echo "No command run :("
         usage
     fi

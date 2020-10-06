@@ -1,0 +1,41 @@
+# A buildspec.yml file informs AWS CodeBuild of all the actions that should be
+# taken during a build execution for our application. We are able to divide the
+# build execution in separate pre-defined phases for logical organization, and
+# list the commands that will be executed on the provisioned build server
+# performing a build execution job.
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+
+  pre_build:
+    commands:
+      - echo "Checking versions of build dependencies"
+      - jq --version
+      - pip --version
+      - sam --version
+
+  build:
+    commands:
+    - cd mythical-mysfits/questions-service/
+    - lambda_artifacts_bucket=$(aws cloudformation list-exports |
+        jq -r '.Exports' |
+        jq -c "map(select(.Name==\"MythicalMysfitsCICDStack:LambdaArtifactsBucket\")| .Value)" |
+        jq -r '.[0]' |
+        sed 's/\//\\\//g')
+    - echo "${lambda_artifacts_bucket}"
+    - >-
+      sam package
+      --template-file ./customer-questions.yml
+      --output-template-file ./transformed-questions.yml
+      --s3-bucket "${lambda_artifacts_bucket}"
+    - cd -
+
+  post_build:
+    commands:
+    - echo "Completed questions service build on `date`"
+
+artifacts:
+  files: ./mythical-mysfits/questions-service/transformed-questions.yml
