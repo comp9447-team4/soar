@@ -389,6 +389,10 @@ Resources:
             - "lambda:*"
             Resource: "*"
             Effect: Allow
+          - Action:
+            - "iam:CreateServiceLinkedRole"
+            Resource: "*"
+            Effect: Allow
       # !!!!!!!!!!!!! CI has a lot of policies but I am cbf to specify the resources as I'm not getting any help :(
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
