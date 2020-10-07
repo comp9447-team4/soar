@@ -2,6 +2,19 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Module 5 streaming
 
+Parameters:
+  AwsProfile:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+
 Resources:
   MysticalMysfitsStreamingServiceCodeBuildProject:
     Type: AWS::CodeBuild::Project
@@ -52,7 +65,7 @@ Resources:
           - Name: StreamingServiceSourceArtifact
           Configuration:
             ConnectionArn: !ImportValue GithubRepoCodeStarConnectionArn
-            BranchName: master # TODO maybe set this to release branch for prod
+            BranchName: !FindInMap [Branch, !Ref "AWS::Region", !Ref AwsProfile ]
             FullRepositoryId: comp9447-team4/soar
           RunOrder: 1
       - Name: Build
