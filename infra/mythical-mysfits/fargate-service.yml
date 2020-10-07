@@ -8,8 +8,6 @@ Resources:
 # aws ecs create-service --cli-input-json file://~/environment/aws-modern-application-workshop/module-2/aws-cli/service-definition.json
   FargateService:
     Type: AWS::ECS::Service
-    # DependsOn:
-    #  - Listener
     Properties:
       ServiceName: MythicalMysfits-Service
       Cluster: !ImportValue MythicalMysfitsECSStack:ECSCluster
