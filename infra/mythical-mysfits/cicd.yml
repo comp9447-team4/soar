@@ -1,6 +1,7 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Module 2 CICD https://aws.amazon.com/getting-started/hands-on/build-modern-app-fargate-lambda-dynamodb-python/module-two/
+
 Mappings:
   Branch:
     us-east-1:
@@ -13,6 +14,7 @@ Parameters:
     AllowedValues:
     - qa
     - prod
+
 Resources:
   CodeBuildArtifactsBucket:
     Type: AWS::S3::Bucket
