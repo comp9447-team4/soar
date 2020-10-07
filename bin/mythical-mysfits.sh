@@ -182,7 +182,18 @@ delete_cicd() {
 
 module_2_static_site_updates() {
     echo "Copying index.html to static bucket..."
-    aws s3 cp "${REPO_ROOT}"/mythical-mysfits/modules/module-2/web/index.html s3://"${STATIC_SITE_BUCKET_NAME}"/index.html
+    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
+    local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/modules/module-2/web/index.html" |
+        sed "s/var mysfitsApiEndpoint = 'REPLACE_ME'/var mysfitsApiEndpoint = \'${api_endpoint}\'/g"
+    )
+
+    mkdir -p "${REPO_ROOT}"/tmp
+    echo "${new_index_html}" > "${REPO_ROOT}"/tmp/index.html
+
+    aws s3 cp "${REPO_ROOT}"/tmp/index.html \
+        s3://"${STATIC_SITE_BUCKET_NAME}"/
+
+    rm -rf "${REPO_ROOT}"/tmp
 }
 
 init_mystical_mysfits_repo() {
@@ -244,8 +255,10 @@ module_3_code_updates() {
 module_3_s3_updates() {
     echo "Running a state of the art CI/CD to render static content! (not)..."
     local nlb_dns_name=$(get_cfn_export MythicalMysfitsECSStack:NLBDNSName)
+    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
     local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/modules/module-3/web/index.html" |
-                         sed "s/REPLACE_ME/http:\/\/${nlb_dns_name}/g"
+        sed "s/var mysfitsApiEndpoint = 'REPLACE_ME';/var mysfitsApiEndpoint = \'${api_endpoint}\';/g" |
+        sed "s/REPLACE_ME/http:\/\/${nlb_dns_name}/g"
     )
 
     mkdir -p "${REPO_ROOT}"/tmp
@@ -292,19 +305,19 @@ module_4_s3_updates() {
     local cognito_user_pool_client_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolClientId)
     local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
     local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/modules/module-4/web/index.html" |
-                               sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
-                               sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/" |
-                               sed "s/var awsRegion = 'REPLACE_ME';/var awsRegion = \'${AWS_REGION}\';/" |
-                               sed "s/var mysfitsApiEndpoint = 'REPLACE_ME';/var mysfitsApiEndpoint = \'${api_endpoint}\';/g"
-          )
+        sed "s/var mysfitsApiEndpoint = 'REPLACE_ME';/var mysfitsApiEndpoint = \'${api_endpoint}\';/g" |
+        sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+        sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/" |
+        sed "s/var awsRegion = 'REPLACE_ME';/var awsRegion = \'${AWS_REGION}\';/"
+    )
     local new_register_html=$(cat "${REPO_ROOT}/mythical-mysfits/modules/module-4/web/register.html" |
-                                  sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
-                                  sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+        sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+        sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
     )
     local new_confirm_html=$(cat "${REPO_ROOT}/mythical-mysfits/modules/module-4/web/confirm.html" |
-                                  sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
-                                  sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
-          )
+        sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
+        sed "s/var cognitoUserPoolClientId = 'REPLACE_ME';/var cognitoUserPoolClientId = \'${cognito_user_pool_client_id}\';/"
+    )
 
     rm -rf "${REPO_ROOT}"/tmp
     mkdir -p "${REPO_ROOT}"/tmp
@@ -586,30 +599,30 @@ main() {
         create_static_site
         init_static_site_bucket
     elif [[ "${args}" == "create-module-2" ]]; then
-        # create_core
-        # create_ecr
+        create_core
+        create_ecr
 
-        # build_docker_image
-        # push_image_to_ecr
+        build_docker_image
+        push_image_to_ecr
 
-        # create_ecs
+        create_ecs
         create_fargate_service
 
         echo "Did you create the codestar connection? The CI/CD stack might fail otherwise. This is needed to hook up a Github repo with the CI/CD."
-        echo "Run ./bin/codestar.sh create first!"
-        echo "Now go to CodePipeline -> Settings -> Connections -> Update Pending connection -> Enable Github Oauth"
+        echo "Step 1: Run ./bin/codestar.sh create first!"
+        echo "Step 2: Now go to CodePipeline -> Settings -> Connections -> Update Pending connection -> Enable Github Oauth"
+        echo "Step 3: Create an empty CodeBuild project -> hook it up with Github oauth. -> close the project. There is no way around it :( feedback to take to AWS this isn't a smooth integration"
         read  -n 1 -p "Did you do the steps above? (Press any key to continue):" mainmenuinput
         echo ""
         echo "Ok, gonna create the cicd stack..."
-        # create_cicd
+        create_cicd
+
+        module_2_static_site_updates
 
     elif [[ "${args}" == "create-module-3" ]]; then
         create_dynamodb
         write_dynamodb_items
 
-        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
-        echo "I've actually set it up so that we don't need CodeCommit. All CI/CD is hooked up with Github."
-        # module_3_code_updates
         module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
         create_user_pool
