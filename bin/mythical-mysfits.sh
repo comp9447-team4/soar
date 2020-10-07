@@ -342,6 +342,7 @@ module_4_static_site_updates() {
 # export STREAMING_SERVICE_REPO="${REPO_ROOT}"/../MythicalMysfitsStreamingService-Repository
 export STREAMING_SERVICE_CICD_STACK_NAME="MythicalMysfitsStreamingServiceCICDStack"
 export STREAMING_SERVICE_CICD_YML="${REPO_ROOT}"/infra/mythical-mysfits/streaming-service-cicd.yml
+
 create_streaming_service_cicd() {
     echo "Creating streaming service stack..."
     aws cloudformation create-stack \
@@ -439,7 +440,7 @@ module_5_static_site_updates() {
     echo "${cognito_user_pool_client_id}"
     local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
     echo "${api_endpoint}"
-    local streaming_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingServiceLambdaStack |
+    local streaming_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingServiceCICDStack |
         jq -r '.Stacks[0].Outputs[0].OutputValue' |
         sed -r 's/\//\\\//g'
     )
@@ -463,7 +464,7 @@ module_5_static_site_updates() {
 
     rm -rf "${REPO_ROOT}"/tmp
     mkdir -p "${REPO_ROOT}"/tmp
-    cp -r "${REPO_ROOT}"/mythical-mysfits/module-5/web/* "${REPO_ROOT}"/tmp
+    cp -r "${REPO_ROOT}"/mythical-mysfits/modules/module-5/web/* "${REPO_ROOT}"/tmp
     echo "${new_index_html}" > "${REPO_ROOT}"/tmp/index.html
     echo "${new_register_html}" > "${REPO_ROOT}"/tmp/register.html
     echo "${new_confirm_html}" > "${REPO_ROOT}"/tmp/confirm.html
@@ -513,10 +514,10 @@ module_6_static_site_updates() {
     echo "${cognito_user_pool_client_id}"
     local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
     echo "${api_endpoint}"
-    local streaming_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingServiceLambdaStack |
-        jq -r '.Stacks[0].Outputs[0].OutputValue' |
-        sed -r 's/\//\\\//g'
-    )
+    local streaming_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingServiceCICDStack |
+                                       jq -r '.Stacks[0].Outputs[0].OutputValue' |
+                                       sed -r 's/\//\\\//g'
+          )
     local questions_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsQuestionsServiceStack |
                                        jq -r '.Stacks[0].Outputs[0].OutputValue' |
                                        sed -r 's/\//\\\//g'
@@ -617,11 +618,11 @@ main() {
         module_3_static_site_updates
 
     elif [[ "${args}" == "create-module-4" ]]; then
-        create_user_pool
+        # create_user_pool
         module_4_static_site_updates
 
     elif [[ "${args}" == "create-module-5" ]]; then
-        create_streaming_service_cicd
+        # create_streaming_service_cicd
         module_5_static_site_updates
 
     elif [[ "${args}" == "create-module-6" ]]; then
