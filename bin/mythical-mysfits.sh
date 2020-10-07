@@ -182,9 +182,9 @@ delete_cicd() {
 
 module_2_static_site_updates() {
     echo "Copying index.html to static bucket..."
-    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
+    local nlb_dns_name=$(get_cfn_export MythicalMysfitsECSStack:NLBDNSName)
     local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/modules/module-2/web/index.html" |
-        sed "s/var mysfitsApiEndpoint = 'REPLACE_ME'/var mysfitsApiEndpoint = \'${api_endpoint}\'/g"
+        sed "s/REPLACE_ME/http:\/\/${nlb_dns_name}/g"
     )
 
     mkdir -p "${REPO_ROOT}"/tmp
@@ -252,12 +252,11 @@ module_3_code_updates() {
     cd "${REPO_ROOT}"
 
 }
+
 module_3_s3_updates() {
     echo "Running a state of the art CI/CD to render static content! (not)..."
     local nlb_dns_name=$(get_cfn_export MythicalMysfitsECSStack:NLBDNSName)
-    local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
     local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/modules/module-3/web/index.html" |
-        sed "s/var mysfitsApiEndpoint = 'REPLACE_ME';/var mysfitsApiEndpoint = \'${api_endpoint}\';/g" |
         sed "s/REPLACE_ME/http:\/\/${nlb_dns_name}/g"
     )
 
@@ -278,6 +277,7 @@ module_3_s3_updates() {
 
 export USER_POOL_STACK_NAME="MythicalMysfitsUserPoolStack"
 export USER_POOL_STACK_YML="${REPO_ROOT}/infra/mythical-mysfits/user-pool.yml"
+
 create_user_pool() {
     echo "Creating user pool..."
     aws cloudformation create-stack \
@@ -558,14 +558,6 @@ module_6_static_site_updates() {
     rm -rf "${REPO_ROOT}"/tmp
 }
 
-update_questions_api_enable_xray() {
-    # nah lets do this in cfn
-    aws apigateway update-stage \
-        --rest-api-id REPLACE_ME_QUESTIONS_REST_API_ID \
-        --stage-name prod \
-        --patch-operations op=replace,path=/tracingEnabled,value=true
-}
-
 usage() {
     cat <<EOF
 Creates the Mythical Mysfits core stack.
@@ -620,8 +612,8 @@ main() {
         module_2_static_site_updates
 
     elif [[ "${args}" == "create-module-3" ]]; then
-        create_dynamodb
-        write_dynamodb_items
+        # create_dynamodb
+        # write_dynamodb_items
 
         module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
