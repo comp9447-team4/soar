@@ -514,16 +514,17 @@ module_6_static_site_updates() {
     echo "${cognito_user_pool_client_id}"
     local api_endpoint=$(get_cfn_export MythicalMysfitsUserPoolStack:ApiEndpoint)
     echo "${api_endpoint}"
-    local streaming_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingServiceCICDStack |
-                                       jq -r '.Stacks[0].Outputs[0].OutputValue' |
-                                       sed -r 's/\//\\\//g'
-          )
+    local streaming_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsStreamingServiceStack |
+        jq -r '.Stacks[0].Outputs[0].OutputValue' |
+        sed -r 's/\//\\\//g'
+    )
+    echo "${streaming_api_endpoint}"
     local questions_api_endpoint=$(aws cloudformation describe-stacks --stack-name MythicalMysfitsQuestionsServiceStack |
-                                       jq -r '.Stacks[0].Outputs[0].OutputValue' |
-                                       sed -r 's/\//\\\//g'
+        jq -r '.Stacks[0].Outputs[0].OutputValue' |
+        sed -r 's/\//\\\//g'
     )
 
-    echo "${streaming_api_endpoint}"
+    echo "${questions_api_endpoint}"
 
     local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/modules/module-6/web/index.html" |
         sed "s/var cognitoUserPoolId = 'REPLACE_ME';/var cognitoUserPoolId = \'${cognito_user_pool_id}\';/" |
@@ -556,7 +557,7 @@ module_6_static_site_updates() {
 
     cd "${REPO_ROOT}"
     echo "Cleaning up..."
-    rm -rf "${REPO_ROOT}"/tmp
+    # rm -rf "${REPO_ROOT}"/tmp
 }
 
 usage() {
@@ -594,13 +595,10 @@ main() {
     elif [[ "${args}" == "create-module-2" ]]; then
         create_core
         create_ecr
-
         build_docker_image
         push_image_to_ecr
-
         create_ecs
         create_fargate_service
-
         echo "Did you create the codestar connection? The CI/CD stack might fail otherwise. This is needed to hook up a Github repo with the CI/CD."
         echo "Step 1: Run ./bin/codestar.sh create first!"
         echo "Step 2: Now go to CodePipeline -> Settings -> Connections -> Update Pending connection -> Enable Github Oauth"
@@ -609,7 +607,6 @@ main() {
         echo ""
         echo "Ok, gonna create the cicd stack..."
         create_cicd
-
         module_2_static_site_updates
 
     elif [[ "${args}" == "create-module-3" ]]; then
