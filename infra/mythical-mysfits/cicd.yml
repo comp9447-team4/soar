@@ -1,6 +1,12 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Module 2 CICD https://aws.amazon.com/getting-started/hands-on/build-modern-app-fargate-lambda-dynamodb-python/module-two/
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+
 Parameters:
   AwsProfile:
     Type: String
@@ -117,7 +123,7 @@ Resources:
           - Name: MythicalMysfitsService-SourceArtifact
           Configuration:
             ConnectionArn: !ImportValue GithubRepoCodeStarConnectionArn
-            BranchName: master
+            BranchName: !FindInMap [Branch, !Ref "AWS::Region", !Ref AwsProfile ]
             FullRepositoryId: comp9447-team4/soar
           RunOrder: 1
       - Name: Build

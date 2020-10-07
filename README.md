@@ -92,6 +92,14 @@ sso_account_id = 306967644367
 sso_role_name = DeveloperAccess
 region = us-east-1
 output = json
+
+[profile prod]
+sso_start_url = https://comp9447-team4.awsapps.com/start
+sso_region = ap-southeast-2
+sso_account_id = 389413969684
+sso_role_name = DeveloperAccess
+region = us-east-1
+output = json
 ```
 
 ## Having issues with SSO?
