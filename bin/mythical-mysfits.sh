@@ -253,7 +253,7 @@ module_3_code_updates() {
 
 }
 
-module_3_s3_updates() {
+module_3_static_site_updates() {
     echo "Running a state of the art CI/CD to render static content! (not)..."
     local nlb_dns_name=$(get_cfn_export MythicalMysfitsECSStack:NLBDNSName)
     local new_index_html=$(cat "${REPO_ROOT}/mythical-mysfits/modules/module-3/web/index.html" |
@@ -299,7 +299,7 @@ module_4_code_updates() {
     cd "${REPO_ROOT}"
 }
 
-module_4_s3_updates() {
+module_4_static_site_updates() {
     echo "Running a state of the art CI/CD to render static content! (not)..."
     local cognito_user_pool_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolId)
     local cognito_user_pool_client_id=$(get_cfn_export MythicalMysfitsUserPoolStack:CognitoUserPoolClientId)
@@ -612,38 +612,21 @@ main() {
         module_2_static_site_updates
 
     elif [[ "${args}" == "create-module-3" ]]; then
-        # create_dynamodb
-        # write_dynamodb_items
+        create_dynamodb
+        write_dynamodb_items
+        module_3_static_site_updates
 
-        module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
         create_user_pool
+        module_4_static_site_updates
 
-        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
-        echo "I've actually set it up so that we don't need CodeCommit. All CI/CD is hooked up with Github."
-        # module_4_code_updates
-        module_4_s3_updates
     elif [[ "${args}" == "create-module-5" ]]; then
-        create_streaming_service
-        echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
-        # init_streaming_service_repo
-        # package_streaming_lambda
-        # deploy_streaming_lambda
+        create_streaming_service_cicd
         module_5_static_site_updates
+
     elif [[ "${args}" == "create-module-6" ]]; then
         create_questions_service_cicd
         module_6_static_site_updates
-
-    elif [[ "${args}" == "create-cicd" ]]; then
-        create_cicd
-    elif [[ "${args}" == "delete-cicd" ]]; then
-        delete_cicd
-    elif [[ "${args}" == "create-streaming-service-cicd" ]]; then
-        create_streaming_service_cicd
-    elif [[ "${args}" == "update-streaming-service-cicd" ]]; then
-        update_streaming_service_cicd
-    elif [[ "${args}" == "update-questions-service-cicd" ]]; then
-        update_questions_service_cicd
     elif [[ "${args}" == "update-core" ]]; then
         update_core
     else
