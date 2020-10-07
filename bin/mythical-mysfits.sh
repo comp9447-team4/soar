@@ -24,16 +24,16 @@ create_static_site() {
         --template-body file://"${STATIC_SITE_STACK_YML}" \
         --parameters ParameterKey=BucketName,ParameterValue="${STATIC_SITE_BUCKET_NAME}" \
         --enable-termination-protection
-
-    wait
     echo "Waiting for stack to be created..."
     wait_build "${STATIC_SITE_STACK_NAME}"
-    update_bucket
+}
 
+init_static_site_bucket() {
+    echo "Copying index.html to static bucket..."
+    aws s3 cp "${REPO_ROOT}"/mythical-mysfits/modules/module-1/web/index.html s3://"${STATIC_SITE_BUCKET_NAME}"/index.html
     echo "You should now see this on your browser:"
     local url="http://${STATIC_SITE_BUCKET_NAME}.s3-website.${AWS_REGION}.amazonaws.com"
     echo "${url}"
-    curl "${url}" | head -15
 }
 
 ######################################################################################
@@ -67,6 +67,7 @@ update_core() {
     aws cloudformation update-stack \
         --stack-name "${CORE_STACK_NAME}" \
         --template-body file://"${CORE_STACK_YML}" \
+        --parameters ParameterKey=AwsProfile,ParameterValue="${AWS_PROFILE}" \
         --capabilities CAPABILITY_NAMED_IAM
     aws cloudformation wait stack-update-complete --stack-name "${CORE_STACK_NAME}"
 }
@@ -171,9 +172,9 @@ delete_cicd() {
         --stack-name "${CICD_STACK_NAME}"
 }
 
-update_bucket() {
+module_2_static_site_updates() {
     echo "Copying index.html to static bucket..."
-    aws s3 cp "${REPO_ROOT}"/mythical-mysfits/module-2/web/index.html s3://"${STATIC_SITE_BUCKET_NAME}"/index.html
+    aws s3 cp "${REPO_ROOT}"/mythical-mysfits/modules/module-2/web/index.html s3://"${STATIC_SITE_BUCKET_NAME}"/index.html
 }
 
 init_mystical_mysfits_repo() {
@@ -259,13 +260,6 @@ create_user_pool() {
         --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_PROFILE}" \
         --enable-termination-protection
     wait_build "${USER_POOL_STACK_NAME}"
-
-    # echo "Updating user pool..."
-    # aws cloudformation update-stack \
-    #     --stack-name "${USER_POOL_STACK_NAME}" \
-    #     --template-body file://"${USER_POOL_STACK_YML}" \
-    #     --capabilities CAPABILITY_NAMED_IAM \
-    #     --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_PROFILE}"
 }
 
 module_4_code_updates() {
@@ -568,6 +562,7 @@ main() {
 
     if [[ "${args}" == "create-module-1" ]]; then
         create_static_site
+        init_static_site_bucket
     elif [[ "${args}" == "create-module-2" ]]; then
         create_core
         create_ecr
@@ -576,23 +571,26 @@ main() {
         push_image_to_ecr
 
         create_ecs
-        create_fargate_service
-        echo "Did you create codestar?"
-        create_cicd
+        # create_fargate_service
+        # echo "Did you apply infra/codestar? This step might fail otherwise. This is needed to hook up a Github repo with the CI/CD."
+        # create_cicd
 
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
+        echo "I've actually set it up so that we don't need CodeCommit. All CI/CD is hooked up with Github."
         # init_mystical_mysfits_repo
     elif [[ "${args}" == "create-module-3" ]]; then
         create_dynamodb
         write_dynamodb_items
 
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
+        echo "I've actually set it up so that we don't need CodeCommit. All CI/CD is hooked up with Github."
         # module_3_code_updates
         module_3_s3_updates
     elif [[ "${args}" == "create-module-4" ]]; then
         create_user_pool
 
         echo "There are stateful code updates which are commented out... Uncomment if you need to make these changes for the first time."
+        echo "I've actually set it up so that we don't need CodeCommit. All CI/CD is hooked up with Github."
         # module_4_code_updates
         module_4_s3_updates
     elif [[ "${args}" == "create-module-5" ]]; then

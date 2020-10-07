@@ -2,6 +2,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: This stack deploys the core network infrastructure and IAM resources
              to be used for a service hosted in Amazon ECS using AWS Fargate.
+Parameters:
+  AwsProfile:
+    Type: String
+    Description: The AWS environment. Can be qa or prod. Referenced by other stacks.
+    AllowedValues:
+    - qa
+    - prod
 
 Mappings:
   # Hard values for the subnet masks. These masks define
@@ -519,3 +526,8 @@ Outputs:
     Value: !GetAtt 'MythicalMysfitsServiceCodePipelineServiceRole.Arn'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'MythicalMysfitsServiceCodePipelineServiceRole' ] ]
+  AwsProfile:
+    Description: The name of the AWS environment. Can be qa or prod.
+    Value: !Ref AwsProfile
+    Export:
+      Name: !Join [ ':', [ 'core', 'AwsProfile' ] ]
