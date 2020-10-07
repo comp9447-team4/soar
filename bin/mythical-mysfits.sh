@@ -349,6 +349,7 @@ create_streaming_service_cicd() {
         --stack-name "${STREAMING_SERVICE_CICD_STACK_NAME}" \
         --template-body file://"${STREAMING_SERVICE_CICD_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsProfile,ParameterValue="${AWS_PROFILE}" \
         --enable-termination-protection
     wait_build "${STREAMING_SERVICE_CICD_STACK_NAME}"
 }
@@ -358,6 +359,7 @@ update_streaming_service_cicd() {
     aws cloudformation update-stack \
         --stack-name "${STREAMING_SERVICE_CICD_STACK_NAME}" \
         --template-body file://"${STREAMING_SERVICE_CICD_YML}" \
+        --parameters ParameterKey=AwsProfile,ParameterValue="${AWS_PROFILE}" \
         --capabilities CAPABILITY_NAMED_IAM
     aws cloudformation wait stack-update-complete --stack-name "${STREAMING_SERVICE_CICD_STACK_NAME}"
 }
@@ -491,6 +493,7 @@ create_questions_service_cicd() {
         --template-body file://"${QUESTIONS_SERVICE_CICD_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters ParameterKey=AdministratorEmailAddress,ParameterValue="${DEVELOPER_EMAIL}" \
+                     ParameterKey=AwsProfile,ParameterValue="${AWS_PROFILE}" \
         --enable-termination-protection
     wait_build "${QUESTIONS_SERVICE_CICD_STACK_NAME}"
 }
@@ -501,6 +504,7 @@ update_questions_service_cicd() {
         --stack-name "${QUESTIONS_SERVICE_CICD_STACK_NAME}" \
         --template-body file://"${QUESTIONS_SERVICE_CICD_STACK_YML}" \
         --parameters ParameterKey=AdministratorEmailAddress,ParameterValue="${DEVELOPER_EMAIL}" \
+        ParameterKey=AwsProfile,ParameterValue="${AWS_PROFILE}" \
         --capabilities CAPABILITY_NAMED_IAM
     aws cloudformation wait stack-update-complete --stack-name "${QUESTIONS_SERVICE_CICD_STACK_NAME}"
 }
