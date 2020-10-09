@@ -10,7 +10,157 @@
       {
         "title": "Diagram1",
         "thumbnail": "./public/content/images/thumbnail.jpg",
-        "id": 0
+        "id": 0,
+        "diagramJson": {
+          "cells": [
+            {
+              "type": "tm.Actor",
+              "size": {
+                "width": 160,
+                "height": 80
+              },
+              "position": {
+                "x": 792,
+                "y": 511
+              },
+              "angle": 0,
+              "id": "a1816610-456d-4251-a665-2cf1e02f2790",
+              "z": 1,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "developers"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 391,
+                "y": 295
+              },
+              "angle": 0,
+              "id": "c7799489-ef0e-41e6-a5ca-c0367d855c5e",
+              "z": 2,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "StreamingServi\nce"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Store",
+              "size": {
+                "width": 160,
+                "height": 80
+              },
+              "position": {
+                "x": 577,
+                "y": 239
+              },
+              "angle": 0,
+              "id": "79b1789f-56db-4996-b891-44e00feed6e4",
+              "z": 3,
+              "hasOpenThreats": false,
+              "isALog": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "DynamoDB Tables"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Store",
+              "size": {
+                "width": 160,
+                "height": 80
+              },
+              "position": {
+                "x": 562,
+                "y": 357
+              },
+              "angle": 0,
+              "id": "706f98b9-9f69-4330-a27b-09f44836638c",
+              "z": 4,
+              "hasOpenThreats": false,
+              "outOfScope": false,
+              "storesCredentials": true,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "Cognito"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Actor",
+              "size": {
+                "width": 160,
+                "height": 80
+              },
+              "position": {
+                "x": 202,
+                "y": 443
+              },
+              "angle": 0,
+              "id": "00ac949b-8a33-4105-8915-ee2f7aa1ec46",
+              "z": 5,
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "status": "Open",
+                  "severity": "Medium",
+                  "title": "User data leak",
+                  "description": "",
+                  "type": "Information disclosure"
+                }
+              ],
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "users"
+                },
+                ".element-text": {
+                  "class": "element-text hasOpenThreats isInScope"
+                }
+              }
+            }
+          ]
+        },
+        "size": {
+          "height": 1727,
+          "width": 1398
+        }
       }
     ],
     "reviewer": "jtdv01"
