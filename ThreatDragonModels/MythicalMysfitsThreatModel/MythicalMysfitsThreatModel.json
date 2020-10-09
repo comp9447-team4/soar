@@ -14,32 +14,6 @@
         "diagramJson": {
           "cells": [
             {
-              "type": "tm.Actor",
-              "size": {
-                "width": 160,
-                "height": 80
-              },
-              "position": {
-                "x": 1210,
-                "y": 700
-              },
-              "angle": 0,
-              "id": "a1816610-456d-4251-a665-2cf1e02f2790",
-              "z": 1,
-              "hasOpenThreats": false,
-              "attrs": {
-                ".element-shape": {
-                  "class": "element-shape hasNoOpenThreats isInScope"
-                },
-                "text": {
-                  "text": "Developers"
-                },
-                ".element-text": {
-                  "class": "element-text hasNoOpenThreats isInScope"
-                }
-              }
-            },
-            {
               "type": "tm.Process",
               "size": {
                 "width": 100,
@@ -173,7 +147,10 @@
               "id": "d525dd58-ca8c-454b-b635-a0f0be56989c",
               "labels": [
                 {
-                  "position": 0.5,
+                  "position": {
+                    "distance": 0.540185179872297,
+                    "offset": -43.18088610759639
+                  },
                   "attrs": {
                     "text": {
                       "text": "User Authentication",
@@ -201,8 +178,8 @@
                 "height": 100
               },
               "position": {
-                "x": 940,
-                "y": 600
+                "x": 1081,
+                "y": 756
               },
               "angle": 0,
               "id": "3905c172-2ae8-4f16-a3f0-f2a60656898f",
@@ -217,40 +194,6 @@
                 },
                 ".element-text": {
                   "class": "element-text hasNoOpenThreats isInScope"
-                }
-              }
-            },
-            {
-              "type": "tm.Flow",
-              "smooth": true,
-              "source": {
-                "id": "a1816610-456d-4251-a665-2cf1e02f2790"
-              },
-              "target": {
-                "id": "3905c172-2ae8-4f16-a3f0-f2a60656898f"
-              },
-              "vertices": [],
-              "id": "443b9dff-3e69-4fed-b36a-8b718dc64c90",
-              "labels": [
-                {
-                  "position": 0.5,
-                  "attrs": {
-                    "text": {
-                      "text": "Developer Login",
-                      "font-weight": "400",
-                      "font-size": "small"
-                    }
-                  }
-                }
-              ],
-              "z": 8,
-              "hasOpenThreats": false,
-              "attrs": {
-                ".marker-target": {
-                  "class": "marker-target hasNoOpenThreats isInScope"
-                },
-                ".connection": {
-                  "class": "connection hasNoOpenThreats isInScope"
                 }
               }
             },
@@ -277,8 +220,8 @@
                 "height": 100
               },
               "position": {
-                "x": 830,
-                "y": 360
+                "x": 886,
+                "y": 355
               },
               "angle": 0,
               "id": "51700ce1-5e1c-49f5-bd30-01db16944d43",
@@ -314,7 +257,10 @@
               "id": "e47243f4-4fcc-47df-a91a-9bb56e427558",
               "labels": [
                 {
-                  "position": 0.5,
+                  "position": {
+                    "distance": 0.2339597994959491,
+                    "offset": 8.853123281171676
+                  },
                   "attrs": {
                     "text": {
                       "text": "Post a question",
@@ -409,7 +355,10 @@
               "id": "2b05946f-d74e-40ab-9247-cbfa045bfe7e",
               "labels": [
                 {
-                  "position": 0.5,
+                  "position": {
+                    "distance": 0.10451788579179029,
+                    "offset": -3.160944899174978
+                  },
                   "attrs": {
                     "text": {
                       "text": "Adopt / LIke a Mysfit",
@@ -420,6 +369,118 @@
                 }
               ],
               "z": 14,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 656,
+                "y": 618
+              },
+              "angle": 0,
+              "id": "3ad7cd6e-d823-49b9-b088-6783f0fddd1c",
+              "z": 15,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "Load Balancer"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Actor",
+              "size": {
+                "width": 160,
+                "height": 80
+              },
+              "position": {
+                "x": 1316,
+                "y": 767
+              },
+              "angle": 0,
+              "id": "dd68c33b-f456-4790-bc9e-b42b0df16e4d",
+              "z": 16,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "Developers"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 1165,
+                "y": 573
+              },
+              "angle": 0,
+              "id": "af2f039c-1af3-4876-b8a1-ce3795339efa",
+              "z": 17,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "Github Repo"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "dd68c33b-f456-4790-bc9e-b42b0df16e4d"
+              },
+              "target": {
+                "id": "3905c172-2ae8-4f16-a3f0-f2a60656898f"
+              },
+              "vertices": [],
+              "id": "75e2be4d-06dd-4ab2-9bfa-532b2e3bcbb3",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "Developer Login",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 18,
               "hasOpenThreats": false,
               "attrs": {
                 ".marker-target": {
