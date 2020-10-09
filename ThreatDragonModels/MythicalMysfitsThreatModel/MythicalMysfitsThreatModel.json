@@ -1,9 +1,18 @@
 {
   "summary": {
-    "title": "MythicalMysfitsThreatModel"
+    "title": "MythicalMysfitsThreatModel",
+    "owner": "jtdv01",
+    "description": "Test"
   },
   "detail": {
     "contributors": [],
-    "diagrams": []
+    "diagrams": [
+      {
+        "title": "Diagram1",
+        "thumbnail": "./public/content/images/thumbnail.jpg",
+        "id": 0
+      }
+    ],
+    "reviewer": "jtdv01"
   }
 }
