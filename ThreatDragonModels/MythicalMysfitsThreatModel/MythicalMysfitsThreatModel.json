@@ -20,8 +20,8 @@
                 "height": 80
               },
               "position": {
-                "x": 792,
-                "y": 511
+                "x": 1210,
+                "y": 700
               },
               "angle": 0,
               "id": "a1816610-456d-4251-a665-2cf1e02f2790",
@@ -32,7 +32,7 @@
                   "class": "element-shape hasNoOpenThreats isInScope"
                 },
                 "text": {
-                  "text": "developers"
+                  "text": "Developers"
                 },
                 ".element-text": {
                   "class": "element-text hasNoOpenThreats isInScope"
@@ -46,8 +46,8 @@
                 "height": 100
               },
               "position": {
-                "x": 391,
-                "y": 295
+                "x": 550,
+                "y": 770
               },
               "angle": 0,
               "id": "c7799489-ef0e-41e6-a5ca-c0367d855c5e",
@@ -58,7 +58,7 @@
                   "class": "element-shape hasNoOpenThreats isInScope"
                 },
                 "text": {
-                  "text": "StreamingServi\nce"
+                  "text": "Click Streaming\nService"
                 },
                 ".element-text": {
                   "class": "element-text hasNoOpenThreats isInScope"
@@ -72,8 +72,8 @@
                 "height": 80
               },
               "position": {
-                "x": 577,
-                "y": 239
+                "x": 420,
+                "y": 300
               },
               "angle": 0,
               "id": "79b1789f-56db-4996-b891-44e00feed6e4",
@@ -85,7 +85,7 @@
                   "class": "element-shape hasNoOpenThreats isInScope"
                 },
                 "text": {
-                  "text": "DynamoDB Tables"
+                  "text": "DynamoDB Questions\nTable"
                 },
                 ".element-text": {
                   "class": "element-text hasNoOpenThreats isInScope"
@@ -99,8 +99,8 @@
                 "height": 80
               },
               "position": {
-                "x": 562,
-                "y": 357
+                "x": 980,
+                "y": 170
               },
               "angle": 0,
               "id": "706f98b9-9f69-4330-a27b-09f44836638c",
@@ -113,7 +113,7 @@
                   "class": "element-shape hasNoOpenThreats isInScope"
                 },
                 "text": {
-                  "text": "Cognito"
+                  "text": "AWS Cognito"
                 },
                 ".element-text": {
                   "class": "element-text hasNoOpenThreats isInScope"
@@ -127,8 +127,8 @@
                 "height": 80
               },
               "position": {
-                "x": 202,
-                "y": 443
+                "x": 1270,
+                "y": 340
               },
               "angle": 0,
               "id": "00ac949b-8a33-4105-8915-ee2f7aa1ec46",
@@ -154,12 +154,287 @@
                   "class": "element-text hasOpenThreats isInScope"
                 }
               }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "00ac949b-8a33-4105-8915-ee2f7aa1ec46"
+              },
+              "target": {
+                "id": "51700ce1-5e1c-49f5-bd30-01db16944d43"
+              },
+              "vertices": [
+                {
+                  "x": 1070,
+                  "y": 240
+                }
+              ],
+              "id": "d525dd58-ca8c-454b-b635-a0f0be56989c",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "User Authentication",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 6,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 940,
+                "y": 600
+              },
+              "angle": 0,
+              "id": "3905c172-2ae8-4f16-a3f0-f2a60656898f",
+              "z": 7,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "AWS SSO Auth"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "a1816610-456d-4251-a665-2cf1e02f2790"
+              },
+              "target": {
+                "id": "3905c172-2ae8-4f16-a3f0-f2a60656898f"
+              },
+              "vertices": [],
+              "id": "443b9dff-3e69-4fed-b36a-8b718dc64c90",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "Developer Login",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 8,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Boundary",
+              "smooth": true,
+              "source": {
+                "x": 750,
+                "y": 860
+              },
+              "target": {
+                "x": 750,
+                "y": 180
+              },
+              "vertices": [],
+              "id": "f72bd34b-4545-4a3e-b785-e3f70aef36a4",
+              "z": 9,
+              "attrs": {}
+            },
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 830,
+                "y": 360
+              },
+              "angle": 0,
+              "id": "51700ce1-5e1c-49f5-bd30-01db16944d43",
+              "z": 10,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "Frontend"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "51700ce1-5e1c-49f5-bd30-01db16944d43"
+              },
+              "target": {
+                "id": "79b1789f-56db-4996-b891-44e00feed6e4"
+              },
+              "vertices": [
+                {
+                  "x": 770,
+                  "y": 420
+                }
+              ],
+              "id": "e47243f4-4fcc-47df-a91a-9bb56e427558",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "Post a question",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 11,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Store",
+              "size": {
+                "width": 160,
+                "height": 80
+              },
+              "position": {
+                "x": 430,
+                "y": 440
+              },
+              "angle": 0,
+              "id": "d8b9b6c9-2c42-4321-b60a-1ddff3f32f55",
+              "z": 12,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "DynamoDB Mysfits"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 520,
+                "y": 580
+              },
+              "angle": 0,
+              "id": "f0a3a12c-c9bf-49c8-b070-641679ce7431",
+              "z": 13,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "Mythical\nMysfits Service"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "51700ce1-5e1c-49f5-bd30-01db16944d43"
+              },
+              "target": {
+                "id": "d8b9b6c9-2c42-4321-b60a-1ddff3f32f55"
+              },
+              "vertices": [
+                {
+                  "x": 640,
+                  "y": 780
+                },
+                {
+                  "x": 620,
+                  "y": 640
+                }
+              ],
+              "id": "2b05946f-d74e-40ab-9247-cbfa045bfe7e",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "Adopt / LIke a Mysfit",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 14,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
             }
           ]
         },
         "size": {
-          "height": 1727,
-          "width": 1398
+          "height": 1946.3414306640625,
+          "width": 2278
         }
       }
     ],
