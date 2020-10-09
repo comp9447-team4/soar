@@ -73,8 +73,8 @@
                 "height": 80
               },
               "position": {
-                "x": 980,
-                "y": 170
+                "x": 800,
+                "y": 142
               },
               "angle": 0,
               "id": "706f98b9-9f69-4330-a27b-09f44836638c",
@@ -101,8 +101,8 @@
                 "height": 80
               },
               "position": {
-                "x": 1270,
-                "y": 340
+                "x": 1296,
+                "y": 365
               },
               "angle": 0,
               "id": "00ac949b-8a33-4105-8915-ee2f7aa1ec46",
@@ -140,8 +140,8 @@
               },
               "vertices": [
                 {
-                  "x": 1070,
-                  "y": 240
+                  "x": 924,
+                  "y": 213
                 }
               ],
               "id": "d525dd58-ca8c-454b-b635-a0f0be56989c",
@@ -314,8 +314,8 @@
                 "height": 100
               },
               "position": {
-                "x": 520,
-                "y": 580
+                "x": 512,
+                "y": 603
               },
               "angle": 0,
               "id": "f0a3a12c-c9bf-49c8-b070-641679ce7431",
@@ -348,8 +348,8 @@
                   "y": 780
                 },
                 {
-                  "x": 620,
-                  "y": 640
+                  "x": 613,
+                  "y": 639
                 }
               ],
               "id": "2b05946f-d74e-40ab-9247-cbfa045bfe7e",
@@ -386,8 +386,8 @@
                 "height": 100
               },
               "position": {
-                "x": 656,
-                "y": 618
+                "x": 689,
+                "y": 610
               },
               "angle": 0,
               "id": "3ad7cd6e-d823-49b9-b088-6783f0fddd1c",
@@ -413,7 +413,7 @@
               },
               "position": {
                 "x": 1316,
-                "y": 767
+                "y": 766
               },
               "angle": 0,
               "id": "dd68c33b-f456-4790-bc9e-b42b0df16e4d",
@@ -425,32 +425,6 @@
                 },
                 "text": {
                   "text": "Developers"
-                },
-                ".element-text": {
-                  "class": "element-text hasNoOpenThreats isInScope"
-                }
-              }
-            },
-            {
-              "type": "tm.Process",
-              "size": {
-                "width": 100,
-                "height": 100
-              },
-              "position": {
-                "x": 1165,
-                "y": 573
-              },
-              "angle": 0,
-              "id": "af2f039c-1af3-4876-b8a1-ce3795339efa",
-              "z": 17,
-              "hasOpenThreats": false,
-              "attrs": {
-                ".element-shape": {
-                  "class": "element-shape hasNoOpenThreats isInScope"
-                },
-                "text": {
-                  "text": "Github Repo"
                 },
                 ".element-text": {
                   "class": "element-text hasNoOpenThreats isInScope"
@@ -481,6 +455,166 @@
                 }
               ],
               "z": 18,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 1262,
+                "y": 534
+              },
+              "angle": 0,
+              "id": "a402d41c-59cc-478d-84da-32fe1904a3bc",
+              "z": 19,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "Github Repo"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "dd68c33b-f456-4790-bc9e-b42b0df16e4d"
+              },
+              "target": {
+                "id": "a402d41c-59cc-478d-84da-32fe1904a3bc"
+              },
+              "vertices": [
+                {
+                  "x": 1322,
+                  "y": 723
+                }
+              ],
+              "id": "6b7b7cb3-e4a4-4cba-8fcb-cc276bce0395",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "Commit Code",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 20,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 969,
+                "y": 615
+              },
+              "angle": 0,
+              "id": "e928659e-3e96-470f-867f-d37d6d42f7cd",
+              "z": 21,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "CI/CD Pipeline"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "a402d41c-59cc-478d-84da-32fe1904a3bc"
+              },
+              "target": {
+                "id": "e928659e-3e96-470f-867f-d37d6d42f7cd"
+              },
+              "vertices": [],
+              "id": "f5404731-9005-401c-9580-6940a7b3b96e",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "Merge to master /\nrelease branches",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 22,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "e928659e-3e96-470f-867f-d37d6d42f7cd"
+              },
+              "target": {
+                "x": 753,
+                "y": 773
+              },
+              "vertices": [],
+              "id": "4e818283-41fd-4ceb-970c-6cf49099c5af",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "Deployment",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 24,
               "hasOpenThreats": false,
               "attrs": {
                 ".marker-target": {
