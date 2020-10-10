@@ -306,7 +306,7 @@ Resources:
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
             StackName: SoarHelloWorld
-            TemplatePath: "BuildArtifact::services/hello-world/transformed.yml"
+            TemplatePath: "BuildArtifact::services/hello-world/transformed-hello-world.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
 
