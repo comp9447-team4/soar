@@ -32,7 +32,7 @@ Resources:
             - cloudformation.amazonaws.com
           Action:
           - sts:AssumeRole
-      Path: "/"
+      Path: "/soar"
       Policies:
       - PolicyName: MythicalMysfitsService-codepipeline-service-policy
         PolicyDocument:
@@ -106,6 +106,7 @@ Resources:
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
     Properties:
+      Path: "/soar"
       RoleName:
         Fn::Sub:
           - "${AwsProfile}-comp9447-team4-code-build-service-role"
@@ -166,7 +167,7 @@ Resources:
         - AwsProfile: !Ref AwsProfile
       LifecycleConfiguration:
         Rules:
-          Id: DeleteDataAfter7Days
+        - Id: DeleteDataAfter7Days
           ExpirationInDays: 7
           Status: Enabled
 
@@ -180,7 +181,7 @@ Resources:
         - AwsProfile: !Ref AwsProfile
       LifecycleConfiguration:
         Rules:
-          Id: DeleteDataAfter7Days
+        - Id: DeleteDataAfter7Days
           ExpirationInDays: 7
           Status: Enabled
 
@@ -241,7 +242,7 @@ Resources:
         - Name: AWS_DEFAULT_REGION
           Value: !Sub "${AWS::Region}"
         Type: LINUX_CONTAINER
-      ServiceRole: !ImportValue MythicalMysfitsCoreStack:MythicalMysfitsServiceCodeBuildServiceRole
+      ServiceRole: !Ref CodeBuildServiceRole
       Source:
         Type: GITHUB
         Location: https://github.com/comp9447-team4/soar
@@ -309,7 +310,7 @@ Resources:
             ActionMode: REPLACE_ON_FAILURE
             StackName: MythicalMysfitsQuestionsServiceStack
             TemplatePath: "BuildArtifact::services/hello-world/transformed.yml"
-            RoleArn: !ImportValue CodePipelineServiceRole
+            RoleArn: !Ref CodePipelineServiceRole
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
 
 Outputs:

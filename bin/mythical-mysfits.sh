@@ -592,6 +592,7 @@ main() {
         echo "Unknown AWS_PROFILE. Must be 'qa' or 'prod'. Did you setup your aws cli properly? See README."
         echo "Must be prod or qa"
         usage
+        exit 1
     fi
 
     if [[ "${args}" == "create-module-1" ]]; then
