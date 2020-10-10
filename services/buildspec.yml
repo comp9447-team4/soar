@@ -16,11 +16,11 @@ phases:
     # Get the artifacts bucket for lambdas
     - lambda_artifacts_bucket=$(aws cloudformation list-exports |
         jq -r '.Exports' |
-        jq -c "map(select(.Name==\"${AWS_PROFILE}-SoarCicd:LambdaArtifactsBucket\")| .Value)" |
+        jq -c "map(select(.Name==\"${AWS_ENVIRONMENT}-SoarCicd:LambdaArtifactsBucket\")| .Value)" |
         jq -r '.[0]' |
         sed 's/\//\\\//g')
     # Build Hello World
-    - cd services/questions-service/
+    - cd services/hello-world/
     - >-
       sam package
       --template-file ./template.yml
