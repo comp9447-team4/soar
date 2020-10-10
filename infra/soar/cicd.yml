@@ -9,7 +9,7 @@ Mappings:
       prod: release
 
 Parameters:
-  AwsProfile:
+  AwsEnvironment:
     Type: String
     AllowedValues:
     - qa
@@ -21,8 +21,8 @@ Resources:
     Properties:
       RoleName:
         Fn::Sub:
-        - "${AwsProfile}-comp9447-team4-code-pipeline-service-role"
-        - AwsProfile: !Ref AwsProfile
+        - "${AwsEnvironment}-comp9447-team4-code-pipeline-service-role"
+        - AwsEnvironment: !Ref AwsEnvironment
       AssumeRolePolicyDocument:
         Statement:
         - Effect: Allow
@@ -109,8 +109,8 @@ Resources:
       Path: "/soar/"
       RoleName:
         Fn::Sub:
-          - "${AwsProfile}-comp9447-team4-code-build-service-role"
-          - AwsProfile: !Ref AwsProfile
+          - "${AwsEnvironment}-comp9447-team4-code-build-service-role"
+          - AwsEnvironment: !Ref AwsEnvironment
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -154,8 +154,8 @@ Resources:
     Properties:
       BucketName:
         Fn::Sub:
-        - "${AwsProfile}-comp9447-team4-codebuild-artifacts"
-        - AwsProfile: !Ref AwsProfile
+        - "${AwsEnvironment}-comp9447-team4-codebuild-artifacts"
+        - AwsEnvironment: !Ref AwsEnvironment
       LifecycleConfiguration:
         Rules:
         - Id: DeleteDataAfter7Days
@@ -168,8 +168,8 @@ Resources:
     Properties:
       BucketName:
         Fn::Sub:
-        - "${AwsProfile}-comp9447-team4-lambda-artifacts"
-        - AwsProfile: !Ref AwsProfile
+        - "${AwsEnvironment}-comp9447-team4-lambda-artifacts"
+        - AwsEnvironment: !Ref AwsEnvironment
       LifecycleConfiguration:
         Rules:
         - Id: DeleteDataAfter7Days
@@ -225,18 +225,18 @@ Resources:
         Type: NO_ARTIFACTS
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/python:3.5.2
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
         PrivilegedMode: true
         EnvironmentVariables:
         - Name: AWS_ACCOUNT_ID
           Value: !Sub "${AWS::AccountId}"
         - Name: AWS_DEFAULT_REGION
           Value: !Sub "${AWS::Region}"
-        - Name: AWS_PROFILE
+        - Name: AWS_ENVIRONMENT
           Value:
             Fn::Sub:
-            - "${AwsProfile}"
-            - AwsProfile: !Ref AwsProfile
+            - "${AwsEnvironment}"
+            - AwsEnvironment: !Ref AwsEnvironment
         Type: LINUX_CONTAINER
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Source:
@@ -274,7 +274,7 @@ Resources:
           - Name: SourceArtifact
           Configuration:
             ConnectionArn: !ImportValue GithubRepoCodeStarConnectionArn
-            BranchName: !FindInMap [Branch, !Ref "AWS::Region", !Ref AwsProfile ]
+            BranchName: !FindInMap [Branch, !Ref "AWS::Region", !Ref AwsEnvironment ]
             FullRepositoryId: comp9447-team4/soar
           RunOrder: 1
       # Build the artifacts

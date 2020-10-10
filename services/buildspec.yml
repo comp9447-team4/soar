@@ -20,7 +20,7 @@ phases:
         jq -r '.[0]' |
         sed 's/\//\\\//g')
     # Build Hello World
-    - cd services/questions-service/
+    - cd services/hello-world/
     - >-
       sam package
       --template-file ./template.yml
