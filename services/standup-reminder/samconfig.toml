@@ -1,7 +1,8 @@
 version = 0.1
-[default]
-[default.deploy]
-[default.deploy.parameters]
+
+[qa]
+[qa.deploy]
+[qa.deploy.parameters]
 stack_name = "standup-reminder"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ei1wdt2g2rw4"
 s3_prefix = "standup-reminder"
