@@ -27,7 +27,7 @@ Resources:
         Schedule:
           Type: Schedule
           Properties:
-            Schedule: "cron(0 22 * * ? *)"
+            Schedule: cron(0 22 ? * MON-FRI *)
       Environment:
         Variables:
           DISCORD_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762560716351733770/J6MCoWF8Krmx8izcCG7cD14FSFljJOgm-S5IZy3VbND9dZcGQm88mpWyLGQfcLr7J7ZQ
