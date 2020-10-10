@@ -3,6 +3,7 @@
 set -e
 set -u
 
+export REPO_ROOT=$(git rev-parse --show-toplevel)
 source "${REPO_ROOT}"/bin/_utils.sh
 
 export AWS_PAGER=""
@@ -591,6 +592,7 @@ main() {
         echo "Unknown AWS_PROFILE. Must be 'qa' or 'prod'. Did you setup your aws cli properly? See README."
         echo "Must be prod or qa"
         usage
+        exit 1
     fi
 
     if [[ "${args}" == "create-module-1" ]]; then

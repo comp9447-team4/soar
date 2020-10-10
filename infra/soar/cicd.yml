@@ -1,0 +1,325 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: The CICD for the SOAR services under /services
+
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+
+Parameters:
+  AwsProfile:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Resources:
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Sub:
+        - "${AwsProfile}-comp9447-team4-code-pipeline-service-role"
+        - AwsProfile: !Ref AwsProfile
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codepipeline.amazonaws.com
+            - cloudformation.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/soar/"
+      Policies:
+      - PolicyName: soar-codepipeline-service-policy
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Action:
+            - codecommit:GetBranch
+            - codecommit:GetCommit
+            - codecommit:UploadArchive
+            - codecommit:GetUploadArchiveStatus
+            - codecommit:CancelUploadArchive
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - s3:GetObject
+            - s3:GetObjectVersion
+            - s3:GetBucketVersioning
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - s3:Put*
+            - s3:List*
+            - s3:Get*
+            Resource:
+            - arn:aws:s3:::*
+            Effect: Allow
+          - Action:
+            - elasticloadbalancing:*
+            - autoscaling:*
+            - cloudwatch:*
+            - ecs:*
+            - codebuild:*
+            - codestar-connections:*
+            - iam:PassRole
+            Resource: "*"
+            Effect: Allow
+          # Make any changes to IAM that starts with soar
+          - Action:
+            - "iam:*"
+            Resource:
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/soar"
+              - !Sub "arn:aws:iam::${AWS::AccountId}:policy/soar"
+            Effect: Allow
+          - Action:
+            - "s3:*"
+            Resource: "*"
+            # TODO Resource: "arn:aws:s3::${AWS::AccountId}:bucket/My"
+            Effect: Allow
+          # TODO: make this more concentrated
+          - Action:
+            - "apigateway:*"
+            Resource: "*"
+            Effect: Allow
+          # TODO: make this more concentrated
+          - Action:
+            - "lambda:*"
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - "iam:CreateServiceLinkedRole"
+            Resource: "*"
+            Effect: Allow
+      # TODO: make this less permissive
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
+      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      - arn:aws:iam::aws:policy/AmazonSNSFullAccess
+      - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
+
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: "/soar/"
+      RoleName:
+        Fn::Sub:
+          - "${AwsProfile}-comp9447-team4-code-build-service-role"
+          - AwsProfile: !Ref AwsProfile
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: "CodeBuildServicePolicy"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: Allow
+            Action:
+            - "cloudformation:ListExports"
+            Resource: "*"
+          - Effect: "Allow"
+            Action:
+            - "logs:CreateLogGroup"
+            - "logs:CreateLogStream"
+            - "logs:PutLogEvents"
+            Resource: "*"
+          - Effect: "Allow"
+            Action:
+            - "s3:PutObject"
+            - "s3:GetObject"
+            - "s3:GetObjectVersion"
+            - "s3:ListBucket"
+            Resource: "*"
+          - Effect: "Allow"
+            Action:
+            - "ecr:InitiateLayerUpload"
+            - "ecr:GetAuthorizationToken"
+            Resource: "*"
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+
+  # Where codebuild will place artifacts after builds (zip files)
+  CodeBuildArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub:
+        - "${AwsProfile}-comp9447-team4-codebuild-artifacts"
+        - AwsProfile: !Ref AwsProfile
+      LifecycleConfiguration:
+        Rules:
+        - Id: DeleteDataAfter7Days
+          ExpirationInDays: 7
+          Status: Enabled
+
+  # Lambda artifacts
+  LambdaArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub:
+        - "${AwsProfile}-comp9447-team4-lambda-artifacts"
+        - AwsProfile: !Ref AwsProfile
+      LifecycleConfiguration:
+        Rules:
+        - Id: DeleteDataAfter7Days
+          ExpirationInDays: 7
+          Status: Enabled
+
+  # Allow codebuild and pipeline to access the bucket
+  CodeBuildArtifactsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CodeBuildArtifactsBucket
+      PolicyDocument:
+        Statement:
+        - Sid: WhitelistedGet
+          Effect: Allow
+          Principal:
+            AWS:
+            - !GetAtt CodeBuildServiceRole.Arn
+            - !GetAtt CodePipelineServiceRole.Arn
+          Action:
+          - s3:GetObject
+          - s3:GetObjectVersion
+          - s3:GetBucketVersioning
+          Resource:
+          - Fn::Sub:
+            - 'arn:aws:s3:::${BucketName}/*'
+            - BucketName: !Ref CodeBuildArtifactsBucket
+          - Fn::Sub:
+            - 'arn:aws:s3:::${BucketName}'
+            - BucketName: !Ref CodeBuildArtifactsBucket
+        - Sid: WhitelistedPut
+          Effect: Allow
+          Principal:
+            AWS:
+            - !GetAtt CodeBuildServiceRole.Arn
+            - !GetAtt CodePipelineServiceRole.Arn
+          Action: s3:PutObject
+          Resource:
+          - Fn::Sub:
+            - 'arn:aws:s3:::${BucketName}/*'
+            - BucketName: !Ref CodeBuildArtifactsBucket
+          - Fn::Sub:
+            - 'arn:aws:s3:::${BucketName}'
+            - BucketName: !Ref CodeBuildArtifactsBucket
+
+  # The CodeBuild definition of our soar services
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: SoarCodeBuildProject
+      BadgeEnabled: true
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/python:3.5.2
+        PrivilegedMode: true
+        EnvironmentVariables:
+        - Name: AWS_ACCOUNT_ID
+          Value: !Sub "${AWS::AccountId}"
+        - Name: AWS_DEFAULT_REGION
+          Value: !Sub "${AWS::Region}"
+        - Name: AWS_PROFILE
+          Value:
+            Fn::Sub:
+            - "${AwsProfile}"
+            - AwsProfile: !Ref AwsProfile
+        Type: LINUX_CONTAINER
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        Type: GITHUB
+        Location: https://github.com/comp9447-team4/soar
+        BuildSpec: services/buildspec.yml
+        ReportBuildStatus: true
+        Auth:
+          Type: OAUTH
+
+  # The pipeline that gets triggered on master for qa
+  # or release for prod
+  # Assumes you have created a successful OAUTH connection to Github repo using CodeStar
+  # See ./bin/codestar.sh
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: SoarServiceCICDPipeline
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref CodeBuildArtifactsBucket
+      Stages:
+      # Pull from Github
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: AWS
+            Version: '1'
+            Provider: CodeStarSourceConnection
+          OutputArtifacts:
+          - Name: SourceArtifact
+          Configuration:
+            ConnectionArn: !ImportValue GithubRepoCodeStarConnectionArn
+            BranchName: !FindInMap [Branch, !Ref "AWS::Region", !Ref AwsProfile ]
+            FullRepositoryId: comp9447-team4/soar
+          RunOrder: 1
+      # Build the artifacts
+      - Name: Build
+        Actions:
+        - Name: Build
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Version: '1'
+            Provider: CodeBuild
+          InputArtifacts:
+          - Name: SourceArtifact
+          OutputArtifacts:
+          - Name: BuildArtifact
+          Configuration:
+            ProjectName: SoarCodeBuildProject
+          RunOrder: 1
+      # CFN deployment of Hello World
+      # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CloudFormation.html
+      - Name: Deploy
+        Actions:
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CloudFormation
+          InputArtifacts:
+          - Name: BuildArtifact
+          Configuration:
+            ActionMode: REPLACE_ON_FAILURE
+            StackName: SoarHelloWorld
+            TemplatePath: "BuildArtifact::services/hello-world/transformed.yml"
+            RoleArn: !GetAtt CodePipelineServiceRole.Arn
+            Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+
+Outputs:
+  CodeBuildArtifactsBucket:
+    Value: !Ref CodeBuildArtifactsBucket
+    Description: CodeBuildArtifactsBucket
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CodeBuildArtifactsBucket' ] ]
+  LambdaArtifactsBucket:
+    Value: !Ref LambdaArtifactsBucket
+    Description: Lambda artifacts bucket
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LambdaArtifactsBucket' ] ]

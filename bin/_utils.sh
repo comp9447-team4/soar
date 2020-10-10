@@ -26,9 +26,16 @@ check_environment() {
 
 wait_build() {
     stack_name="$1"
-    echo "Waiting for ${stack_name}..."
+    echo "Waiting create for ${stack_name}..."
     aws cloudformation wait stack-exists --stack-name "${stack_name}" > /dev/null
     aws cloudformation wait stack-create-complete --stack-name "${stack_name}" > /dev/null
+}
+
+wait_update() {
+    stack_name="$1"
+    echo "Waiting update for ${stack_name}..."
+    aws cloudformation wait stack-exists --stack-name "${stack_name}" > /dev/null
+    aws cloudformation wait stack-update-complete --stack-name "${stack_name}" > /dev/null
 }
 
 get_cfn_export() {
