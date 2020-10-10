@@ -39,26 +39,20 @@ Resources:
           Version: "2012-10-17"
           Statement:
           - Action:
-            - codecommit:GetBranch
-            - codecommit:GetCommit
-            - codecommit:UploadArchive
-            - codecommit:GetUploadArchiveStatus
-            - codecommit:CancelUploadArchive
-            Resource: "*"
-            Effect: Allow
-          - Action:
-            - s3:GetObject
-            - s3:GetObjectVersion
-            - s3:GetBucketVersioning
-            Resource: "*"
-            Effect: Allow
-          - Action:
             - s3:Put*
             - s3:List*
             - s3:Get*
             Resource:
-            - arn:aws:s3:::*
+            - !GetAtt CodeBuildArtifactsBucket.Arn
+            - !GetAtt LambdaArtifactsBucket.Arn
+            - Fn::Sub:
+                - "${bucket_arn}/*"
+                - bucket_arn: !GetAtt CodeBuildArtifactsBucket.Arn
+            - Fn::Sub:
+                - "${bucket_arn}/*"
+                - bucket_arn: !GetAtt LambdaArtifactsBucket.Arn
             Effect: Allow
+
           - Action:
             - elasticloadbalancing:*
             - autoscaling:*
@@ -69,35 +63,33 @@ Resources:
             - iam:PassRole
             Resource: "*"
             Effect: Allow
-          # Make any changes to IAM that starts with soar
           - Action:
             - "iam:*"
+            Effect: Allow
             Resource:
-              - !Sub "arn:aws:iam::${AWS::AccountId}:role/soar"
-              - !Sub "arn:aws:iam::${AWS::AccountId}:policy/soar"
-            Effect: Allow
-          - Action:
-            - "s3:*"
-            Resource: "*"
-            # TODO Resource: "arn:aws:s3::${AWS::AccountId}:bucket/My"
-            Effect: Allow
+            - "*"
+            # TODO Make any changes only to IAM that starts with soar
+            #     - !Sub "arn:aws:iam::${AWS::AccountId}:role/soar"
+            #     - !Sub "arn:aws:iam::${AWS::AccountId}:policy/soar"
+
           # TODO: make this more concentrated
           - Action:
             - "apigateway:*"
             Resource: "*"
             Effect: Allow
+
           # TODO: make this more concentrated
           - Action:
             - "lambda:*"
             Resource: "*"
             Effect: Allow
+
           - Action:
             - "iam:CreateServiceLinkedRole"
             Resource: "*"
             Effect: Allow
       # TODO: make this less permissive
       ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
       - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
       - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
       - arn:aws:iam::aws:policy/AmazonSNSFullAccess
@@ -135,7 +127,15 @@ Resources:
             - "s3:GetObject"
             - "s3:GetObjectVersion"
             - "s3:ListBucket"
-            Resource: "*"
+            Resource:
+            - !GetAtt CodeBuildArtifactsBucket.Arn
+            - !GetAtt LambdaArtifactsBucket.Arn
+            - Fn::Sub:
+                - "${bucket_arn}/*"
+                - bucket_arn: !GetAtt CodeBuildArtifactsBucket.Arn
+            - Fn::Sub:
+                - "${bucket_arn}/*"
+                - bucket_arn: !GetAtt LambdaArtifactsBucket.Arn
           - Effect: "Allow"
             Action:
             - "ecr:InitiateLayerUpload"

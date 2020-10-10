@@ -11,25 +11,25 @@ phases:
       - pip --version
       - sam --version
 
+  # AWS SAM defaults to read template.yaml with an A!
   build:
     commands:
-    # Get the artifacts bucket for lambdas
-    - echo "Got the lambda artifacts bucket: ${LAMBDA_ARTIFACTS_BUCKET}"
-    # Build Hello World
-    - cd services/hello-world/
-    - rm *.toml
-    - >-
-      sam package
-      --template-file ./template.yml
-      --output-template-file ./transformed.yml
-      --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
-    - cd -
-    # TODO: Build more artifacts here
+      - cd services/hello-world/
+      - "rm *.toml"
+      - sam build
+      - >-
+        sam package
+        --template-file ./template.yaml
+        --output-template-file ./transformed-hello-world.yaml
+        --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
+      - cd -
+      # TODO: Build more artifacts here
+
 
   post_build:
     commands:
-    - echo "Completed SOAR service build on `date`"
+      - echo "Completed SOAR service build on `date`"
 
 artifacts:
   files:
-  - ./services/hello-world/transformed.yml
+    - ./services/hello-world/transformed-hello-world.yaml
