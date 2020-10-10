@@ -32,9 +32,9 @@ Resources:
             - cloudformation.amazonaws.com
           Action:
           - sts:AssumeRole
-      Path: "/soar"
+      Path: "/soar/"
       Policies:
-      - PolicyName: MythicalMysfitsService-codepipeline-service-policy
+      - PolicyName: soar-codepipeline-service-policy
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -69,12 +69,12 @@ Resources:
             - iam:PassRole
             Resource: "*"
             Effect: Allow
-          # Make any changes to IAM related to Mysfits prefix
+          # Make any changes to IAM that starts with soar
           - Action:
             - "iam:*"
             Resource:
-              - !Sub "arn:aws:iam::${AWS::AccountId}:role/MythicalMysfits*"
-              - !Sub "arn:aws:iam::${AWS::AccountId}:policy/MythicalMysfits*"
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/soar"
+              - !Sub "arn:aws:iam::${AWS::AccountId}:policy/soar"
             Effect: Allow
           - Action:
             - "s3:*"
@@ -106,7 +106,7 @@ Resources:
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
     Properties:
-      Path: "/soar"
+      Path: "/soar/"
       RoleName:
         Fn::Sub:
           - "${AwsProfile}-comp9447-team4-code-build-service-role"
@@ -119,7 +119,7 @@ Resources:
             Service: codebuild.amazonaws.com
           Action: sts:AssumeRole
       Policies:
-      - PolicyName: "MythicalMysfitsService-CodeBuildServicePolicy"
+      - PolicyName: "CodeBuildServicePolicy"
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -127,15 +127,6 @@ Resources:
             Action:
             - "cloudformation:ListExports"
             Resource: "*"
-          - Effect: "Allow"
-            Action:
-            - "codecommit:ListBranches"
-            - "codecommit:ListRepositories"
-            - "codecommit:BatchGetRepositories"
-            - "codecommit:Get*"
-            - "codecommit:GitPull"
-            Resource:
-            - Fn::Sub: arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:MythicalMysfitsServiceRepository
           - Effect: "Allow"
             Action:
             - "logs:CreateLogGroup"
@@ -196,8 +187,8 @@ Resources:
           Effect: Allow
           Principal:
             AWS:
-            - !Ref CodeBuildServiceRole
-            - !Ref CodePipelineServiceRole
+            - !GetAtt CodeBuildServiceRole.Arn
+            - !GetAtt CodePipelineServiceRole.Arn
           Action:
           - s3:GetObject
           - s3:GetObjectVersion
@@ -213,8 +204,8 @@ Resources:
           Effect: Allow
           Principal:
             AWS:
-            - !Ref CodeBuildServiceRole
-            - !Ref CodePipelineServiceRole
+            - !GetAtt CodeBuildServiceRole.Arn
+            - !GetAtt CodePipelineServiceRole.Arn
           Action: s3:PutObject
           Resource:
           - Fn::Sub:
@@ -241,8 +232,13 @@ Resources:
           Value: !Sub "${AWS::AccountId}"
         - Name: AWS_DEFAULT_REGION
           Value: !Sub "${AWS::Region}"
+        - Name: AWS_PROFILE
+          Value:
+            Fn::Sub:
+            - "${AwsProfile}"
+            - AwsProfile: !Ref AwsProfile
         Type: LINUX_CONTAINER
-      ServiceRole: !Ref CodeBuildServiceRole
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Source:
         Type: GITHUB
         Location: https://github.com/comp9447-team4/soar
@@ -258,8 +254,11 @@ Resources:
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: MythicalMysfitsServiceCICDPipeline
-      RoleArn: !Ref CodePipelineServiceRole
+      Name: SoarServiceCICDPipeline
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref CodeBuildArtifactsBucket
       Stages:
       # Pull from Github
       - Name: Source
@@ -308,9 +307,9 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: MythicalMysfitsQuestionsServiceStack
+            StackName: SoarHelloWorld
             TemplatePath: "BuildArtifact::services/hello-world/transformed.yml"
-            RoleArn: !Ref CodePipelineServiceRole
+            RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
 
 Outputs:

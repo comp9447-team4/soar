@@ -32,6 +32,19 @@ update_cicd() {
     wait_update "${CICD_STACK_NAME}"
 }
 
+delete_cicd() {
+    echo "Deleting cicd stack..."
+    aws cloudformation \
+        update-termination-protection \
+        --stack-name "${CICD_STACK_NAME}" \
+        --no-enable-termination-protection
+
+    aws cloudformation \
+        delete-stack \
+        --stack-name "${CICD_STACK_NAME}"
+
+}
+
 # Store Secrets in this stack
 export SECRETS_STACK_NAME="${AWS_PROFILE}-SoarSecrets"
 export SECRETS_STACK_YML="${REPO_ROOT}/infra/soar/secrets.yml"
@@ -78,6 +91,8 @@ main() {
         create_secrets
     elif [[ "${args}" == "update-cicd" ]]; then
         update_cicd
+    elif [[ "${args}" == "delete-cicd" ]]; then
+        delete_cicd
     else
         echo "Not a valid argument..."
         usage
