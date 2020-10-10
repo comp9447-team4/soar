@@ -33,6 +33,10 @@ create() {
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters "${parameters}" \
         --enable-termination-protection
+    aws cloudformation \
+        wait \
+        stack-create-complete \
+        --stack-name "${SSO_STACK_NAME}"
 }
 
 update() {
@@ -42,10 +46,18 @@ update() {
         --template-body file://"${REPO_ROOT}"/infra/sso/sso-stack.yml \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters "${parameters}"
+    aws cloudformation \
+        wait \
+        stack-update-complete \
+        --stack-name "${SSO_STACK_NAME}"
 }
 
 delete() {
     aws cloudformation delete-stack --stack-name "${SSO_STACK_NAME}"
+    aws cloudformation \
+        wait \
+        stack-delete-complete \
+        --stack-name "${SSO_STACK_NAME}"
 }
 
 describe_stack() {
