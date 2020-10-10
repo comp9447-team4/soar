@@ -1,0 +1,38 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+
+  pre_build:
+    commands:
+      - echo "Checking versions of build dependencies"
+      - jq --version
+      - pip --version
+      - sam --version
+
+  build:
+    commands:
+    # Get the artifacts bucket for lambdas
+    - lambda_artifacts_bucket=$(aws cloudformation list-exports |
+        jq -r '.Exports' |
+        jq -c "map(select(.Name==\"SoarCicd:LambdaArtifactsBucket\")| .Value)" |
+        jq -r '.[0]' |
+        sed 's/\//\\\//g')
+    # Build Hello World
+    - cd services/questions-service/
+    - >-
+      sam package
+      --template-file ./template.yml
+      --output-template-file ./transformed.yml
+      --s3-bucket "${lambda_artifacts_bucket}"
+    - cd -
+    # TODO: Build more artifacts here
+
+  post_build:
+    commands:
+    - echo "Completed SOAR service build on `date`"
+
+artifacts:
+  files:
+  - ./services/hello-world/transformed.yml

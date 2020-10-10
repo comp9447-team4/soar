@@ -3,6 +3,7 @@
 set -e
 set -u
 
+export REPO_ROOT=$(git rev-parse --show-toplevel)
 source "${REPO_ROOT}"/bin/_utils.sh
 
 export AWS_PAGER=""
