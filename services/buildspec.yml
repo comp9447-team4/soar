@@ -14,18 +14,15 @@ phases:
   build:
     commands:
     # Get the artifacts bucket for lambdas
-    - lambda_artifacts_bucket=$(aws cloudformation list-exports |
-        jq -r '.Exports' |
-        jq -c "map(select(.Name==\"${AWS_ENVIRONMENT}-SoarCicd:LambdaArtifactsBucket\")| .Value)" |
-        jq -r '.[0]' |
-        sed 's/\//\\\//g')
+    - echo "Got the lambda artifacts bucket: ${LAMBDA_ARTIFACTS_BUCKET}"
     # Build Hello World
     - cd services/hello-world/
+    - rm *.toml
     - >-
       sam package
       --template-file ./template.yml
       --output-template-file ./transformed.yml
-      --s3-bucket "${lambda_artifacts_bucket}"
+      --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
     - cd -
     # TODO: Build more artifacts here
 
