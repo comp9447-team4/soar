@@ -123,10 +123,6 @@ Resources:
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
-          - Effect: Allow
-            Action:
-            - "cloudformation:ListExports"
-            Resource: "*"
           - Effect: "Allow"
             Action:
             - "logs:CreateLogGroup"
@@ -237,6 +233,8 @@ Resources:
             Fn::Sub:
             - "${AwsEnvironment}"
             - AwsEnvironment: !Ref AwsEnvironment
+        - Name: LAMBDA_ARTIFACTS_BUCKET
+          Value: !Ref LambdaArtifactsBucket
         Type: LINUX_CONTAINER
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Source:
