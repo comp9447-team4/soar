@@ -17,6 +17,8 @@ Elton Wong
 Evangeline Endacott
 William Yin
 Dallas Yan
+Chirag Panikkasseril Unni
+Shiyuan Liang
 ```
 
 # Build Status
