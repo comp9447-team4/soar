@@ -29,7 +29,8 @@ phases:
       - cd services/budget-alarms/
       - "rm *.toml"
       - sam build
-      - sed -i "s/AWS_ENVIRONMENT: qa/AWS_ENVIRONMENT: ${AWS_ENVIRONMENT}/g" ./template.yaml
+      - >-
+        sed -i "s/AWS_ENVIRONMENT: qa/AWS_ENVIRONMENT: ${AWS_ENVIRONMENT}/g" ./template.yaml
       - >-
         sam package
         --template-file ./template.yaml
