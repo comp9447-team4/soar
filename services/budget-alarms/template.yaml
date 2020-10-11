@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  budget-alarms
+
+  Sample SAM Template for budget-alarms
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  BudgetAlarmsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: budget_alarms/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Environment:
+        Variables:
+          # TODO: move these to secrets manager
+          DISCORD_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762560716351733770/J6MCoWF8Krmx8izcCG7cD14FSFljJOgm-S5IZy3VbND9dZcGQm88mpWyLGQfcLr7J7ZQ
+          DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762644386009317407/R1qXCsrycsrTx6QFa-dgpyFbMjzFDhK2WnxQiqmQP-N07mID7Hs-bGYU0-ENb61v1d6G
+          AWS_ENVIRONMENT: qa
+
+      Events:
+        SnsBudgetAlarm:
+          Type: SNS
+          Properties:
+            Topic: !BudgetAlarmsSnsTopic
+
+  BudgetAlarmSnsTopic:
+    TopicName: BudgetAlarm
+
+Outputs:
+  BudgetAlarmsFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt BudgetAlarmsFunction.Arn
+  BudgetAlarmsFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt BudgetAlarmsFunctionRole.Arn
