@@ -24,34 +24,11 @@ Resources:
           DISCORD_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762560716351733770/J6MCoWF8Krmx8izcCG7cD14FSFljJOgm-S5IZy3VbND9dZcGQm88mpWyLGQfcLr7J7ZQ
           DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762644386009317407/R1qXCsrycsrTx6QFa-dgpyFbMjzFDhK2WnxQiqmQP-N07mID7Hs-bGYU0-ENb61v1d6G
           AWS_ENVIRONMENT: qa
-
       Events:
         SnsBudgetAlarm:
           Type: SNS
           Properties:
-            Topic: !Ref BudgetAlarmsSnsTopic
-
-  # An SNS topic on Budget Alarms
-  BudgetAlarmsSnsTopic:
-    Type: AWS::SNS::Topic
-    Properties:
-      TopicName: BudgetAlarm
-
-  # Allows aws budgets to publish to the SNS Topic
-  BudgetAlarmsTopicPolicy:
-    Type: AWS::SNS::TopicPolicy
-    Properties:
-      Topics:
-      - !Ref BudgetAlarmsSnsTopic
-      PolicyDocument:
-        Version: 2008-10-17
-        Statement:
-        - Sid: "Allow AWS Budgets to send to this topic"
-          Effect: Allow
-          Principal:
-            Service: budgets.amazonaws.com
-          Action: SNS:Publish
-          Resource: !Ref BudgetAlarmsSnsTopic
+            Topic: !ImportValue budgets:BudgetAlarmsSnsTopic
 
 Outputs:
   BudgetAlarmsFunction:
@@ -64,8 +41,3 @@ Outputs:
     Value: !GetAtt BudgetAlarmsFunctionRole.Arn
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'BudgetAlarmsFunctionIamRole' ] ]
-  BudgetAlarmsSnsTopic:
-    Description: "The SNS topic for the budget alarms"
-    Value: !Ref BudgetAlarmsSnsTopic
-    Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'BudgetAlarmsSnsTopic' ] ]
