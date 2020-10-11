@@ -66,27 +66,47 @@ Resources:
               ]
             },
             {
-              "Sid": "AllowEC2",
-              "Effect": "Allow",
-              "Action": "ec2:*",
-              "Resource": "*",
-              "Condition": {
-                "ForAnyValue:StringEquals": {
-                  "ec2:Region": [
-                    "us-east-1"
-                  ]
-                }
-              }
-            },
-            {
-              "Sid": "AllowCFN",
-              "Effect": "Allow",
-              "Action": "cloudformation:*",
+              "Sid": "DenyOtherRegions",
+              "Effect": "Deny",
+              "Action": [
+                "ec2:*",
+                "cloudformation:*",
+                "lambda:*",
+                "ecs:*",
+                "codepipeline:*",
+                "codedeploy:*",
+                "codebuild:*",
+                "cloudwatch:*",
+                "redshift:*",
+                "sagemaker:*",
+                "ecr:*",
+                "eks:*",
+                "apigateway:*"
+              ],
               "Resource": "*",
               "Condition": {
                 "ForAnyValue:StringEquals": {
                   "aws:RequestedRegion": [
-                    "us-east-1"
+                    "us-east-2",
+                    "us-west-1",
+                    "us-west-2",
+                    "af-south-1",
+                    "ap-east-1",
+                    "ap-south-1",
+                    "ap-northeast-3",
+                    "ap-northeast-2",
+                    "ap-southeast-1",
+                    "ap-southeast-2",
+                    "ap-northeast-1",
+                    "ca-central-1",
+                    "eu-central-1",
+                    "eu-west-1",
+                    "eu-west-2",
+                    "eu-south-1",
+                    "eu-west-3",
+                    "eu-north-1",
+                    "me-south-1",
+                    "sa-east-1"
                   ]
                 }
               }
@@ -99,31 +119,9 @@ Resources:
             }
           ]
         }
-
-  # Read-only for Billing
-  BillingViewAccessPermissionSet:
-    Type: AWS::SSO::PermissionSet
-    Properties:
-      Name: BillingViewAccess
-      Description: BillingViweAccess
-      InstanceArn: !Ref SSOInstanceArn
-      InlinePolicy: |
-        {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Sid": "ViewBilling",
-              "Effect": "Allow",
-              "Action": [
-                "aws-portal:ViewPaymentMethods",
-                "aws-portal:ViewAccount",
-                "aws-portal:ViewBilling",
-                "aws-portal:ViewUsage"
-              ],
-              "Resource": "*"
-            }
-          ]
-        }
+      # TODO: tigten the allow list to specific (regional & global) services by whitelisting
+      # instead of blacklististing.
+      # This will be clearer once we know what services we need.
 
   # For Admins
   AdministratorAccessPermissionSet:
@@ -136,15 +134,6 @@ Resources:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
   # Assignments
-  DevelopersMasterBilling:
-    Type: AWS::SSO::Assignment
-    Properties:
-      InstanceArn: !Ref SSOInstanceArn
-      PermissionSetArn: !GetAtt BillingViewAccessPermissionSet.PermissionSetArn
-      PrincipalId: !Ref SSODevelopersGroupId
-      PrincipalType: GROUP
-      TargetId: !Ref MasterAccountId
-      TargetType: AWS_ACCOUNT
   AdminstratorsMasterAssignment:
     Type: AWS::SSO::Assignment
     Properties:

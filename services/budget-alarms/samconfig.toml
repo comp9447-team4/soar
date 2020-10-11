@@ -1,10 +1,11 @@
 version = 0.1
+
 [qa]
 [qa.deploy]
 [qa.deploy.parameters]
-stack_name = "sam-hello-world"
+stack_name = "budget-alarms"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ei1wdt2g2rw4"
-s3_prefix = "sam-hello-world"
+s3_prefix = "budget-alarms"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"

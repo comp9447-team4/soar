@@ -4,6 +4,8 @@
 set -eu
 
 export REPO_ROOT=$(git rev-parse --show-toplevel)
+export AWS_PAGER=""
+export AWS_REGION="us-east-1"
 
 check_environment() {
     echo "Checking if you have set AWS_PROFILE..."
@@ -25,9 +27,16 @@ check_environment() {
 
 wait_build() {
     stack_name="$1"
-    echo "Waiting for ${stack_name}..."
+    echo "Waiting create for ${stack_name}..."
     aws cloudformation wait stack-exists --stack-name "${stack_name}" > /dev/null
     aws cloudformation wait stack-create-complete --stack-name "${stack_name}" > /dev/null
+}
+
+wait_update() {
+    stack_name="$1"
+    echo "Waiting update for ${stack_name}..."
+    aws cloudformation wait stack-exists --stack-name "${stack_name}" > /dev/null
+    aws cloudformation wait stack-update-complete --stack-name "${stack_name}" > /dev/null
 }
 
 get_cfn_export() {

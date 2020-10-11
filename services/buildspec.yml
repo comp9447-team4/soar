@@ -1,0 +1,50 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+
+  pre_build:
+    commands:
+      - echo "Checking versions of build dependencies"
+      - jq --version
+      - pip --version
+      - sam --version
+
+  # AWS SAM defaults to read template.yaml with an A!
+  build:
+    commands:
+      - pwd
+      # Build Hello world
+      - cd services/hello-world/
+      - "rm *.toml"
+      - sam build
+      - >-
+        sam package
+        --template-file ./template.yaml
+        --output-template-file ./transformed.yaml
+        --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
+      - cd -
+      # Build Budget Alarms
+      - cd services/budget-alarms/
+      - "rm *.toml"
+      - sam build
+      - >-
+        sed -i "s/AWS_ENVIRONMENT: qa/AWS_ENVIRONMENT: ${AWS_ENVIRONMENT}/g" ./template.yaml
+      - >-
+        sam package
+        --template-file ./template.yaml
+        --output-template-file ./transformed.yaml
+        --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
+      - cd -
+      # TODO: Build more artifacts here
+
+
+  post_build:
+    commands:
+      - echo "Completed SOAR service build on `date`"
+
+artifacts:
+  files:
+    - ./services/hello-world/transformed.yaml
+    - ./services/budget-alarms/transformed.yaml
