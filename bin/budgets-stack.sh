@@ -6,9 +6,6 @@ set -u
 export BUDGETS_STACK_NAME="budgets"
 source "${REPO_ROOT}"/bin/_utils.sh
 
-# Budgets stack is in Sydney
-export AWS_REGION="ap-southeast-2"
-
 get_parameters() {
     parameters=$(cat "${REPO_ROOT}"/infra/budgets/budgets-parameters.json |
                      sed "s/{{ NOTIFICATION_EMAIL_1 }}/${DEVELOPER_EMAIL}/g" |

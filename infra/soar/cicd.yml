@@ -291,8 +291,12 @@ Resources:
           Configuration:
             ProjectName: SoarCodeBuildProject
           RunOrder: 1
-      # CFN deployment of Hello World
+      #########################
+      # DEPLOYMENTS
       # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CloudFormation.html
+      #########################
+      # HELLO WORLD
+      #################
       - Name: Deploy
         Actions:
         - Name: Deploy
@@ -306,7 +310,26 @@ Resources:
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
             StackName: SoarHelloWorld
-            TemplatePath: "BuildArtifact::services/hello-world/transformed-hello-world.yaml"
+            TemplatePath: "BuildArtifact::services/hello-world/transformed.yaml"
+            RoleArn: !GetAtt CodePipelineServiceRole.Arn
+            Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+      #################
+      # BUDGET ALARMS
+      #################
+      - Name: Deploy
+        Actions:
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CloudFormation
+          InputArtifacts:
+          - Name: BuildArtifact
+          Configuration:
+            ActionMode: REPLACE_ON_FAILURE
+            StackName: SoarHelloWorld
+            TemplatePath: "BuildArtifact::services/budget-alarms/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
 
