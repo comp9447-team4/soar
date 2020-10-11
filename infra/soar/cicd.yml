@@ -295,11 +295,10 @@ Resources:
       # DEPLOYMENTS
       # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CloudFormation.html
       #########################
-      # HELLO WORLD
-      #################
+        # HELLO WORLD
       - Name: Deploy
         Actions:
-        - Name: Deploy
+        - Name: DeployHelloWorld
           ActionTypeId:
             Category: Deploy
             Owner: AWS
@@ -313,12 +312,8 @@ Resources:
             TemplatePath: "BuildArtifact::services/hello-world/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-      #################
-      # BUDGET ALARMS
-      #################
-      - Name: Deploy
-        Actions:
-        - Name: Deploy
+        # BUDGET ALARMS
+        - Name: DeployBudgetAlarms
           ActionTypeId:
             Category: Deploy
             Owner: AWS
