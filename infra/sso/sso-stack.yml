@@ -123,31 +123,6 @@ Resources:
       # instead of blacklististing.
       # This will be clearer once we know what services we need.
 
-  # Read-only for Billing
-  BillingViewAccessPermissionSet:
-    Type: AWS::SSO::PermissionSet
-    Properties:
-      Name: BillingViewAccess
-      Description: BillingViweAccess
-      InstanceArn: !Ref SSOInstanceArn
-      InlinePolicy: |
-        {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Sid": "ViewBilling",
-              "Effect": "Allow",
-              "Action": [
-                "aws-portal:ViewPaymentMethods",
-                "aws-portal:ViewAccount",
-                "aws-portal:ViewBilling",
-                "aws-portal:ViewUsage"
-              ],
-              "Resource": "*"
-            }
-          ]
-        }
-
   # For Admins
   AdministratorAccessPermissionSet:
     Type: AWS::SSO::PermissionSet
@@ -159,15 +134,6 @@ Resources:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
   # Assignments
-  DevelopersMasterBilling:
-    Type: AWS::SSO::Assignment
-    Properties:
-      InstanceArn: !Ref SSOInstanceArn
-      PermissionSetArn: !GetAtt BillingViewAccessPermissionSet.PermissionSetArn
-      PrincipalId: !Ref SSODevelopersGroupId
-      PrincipalType: GROUP
-      TargetId: !Ref MasterAccountId
-      TargetType: AWS_ACCOUNT
   AdminstratorsMasterAssignment:
     Type: AWS::SSO::Assignment
     Properties:

@@ -5,6 +5,7 @@ set -eu
 
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 export AWS_PAGER=""
+export AWS_REGION="us-east-1"
 
 check_environment() {
     echo "Checking if you have set AWS_PROFILE..."

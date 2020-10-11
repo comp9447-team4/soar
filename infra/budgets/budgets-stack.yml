@@ -28,16 +28,18 @@ Resources:
             Threshold: 10
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
         - Notification:
             NotificationType: FORECASTED
             ComparisonOperator: GREATER_THAN
             Threshold: 10
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         # 20% actual and forecasted
@@ -47,7 +49,8 @@ Resources:
             Threshold: 20
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         - Notification:
@@ -56,7 +59,8 @@ Resources:
             Threshold: 20
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         # 50% actual and forecasted
@@ -66,7 +70,8 @@ Resources:
             Threshold: 50
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         - Notification:
@@ -75,7 +80,8 @@ Resources:
             Threshold: 50
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         # 80% actual and forecasted
@@ -85,7 +91,8 @@ Resources:
             Threshold: 80
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         - Notification:
@@ -94,7 +101,8 @@ Resources:
             Threshold: 80
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         # 100% actual and forecasted
@@ -104,7 +112,8 @@ Resources:
             Threshold: 100
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         - Notification:
@@ -113,7 +122,8 @@ Resources:
             Threshold: 100
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
 
@@ -137,7 +147,8 @@ Resources:
             Threshold: 10
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         - Notification:
@@ -146,7 +157,8 @@ Resources:
             Threshold: 10
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         # 20% actual and forecasted
@@ -156,7 +168,8 @@ Resources:
             Threshold: 20
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         - Notification:
@@ -165,7 +178,8 @@ Resources:
             Threshold: 20
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         # 50% actual and forecasted
@@ -175,7 +189,8 @@ Resources:
             Threshold: 50
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         - Notification:
@@ -184,7 +199,8 @@ Resources:
             Threshold: 50
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         # 80% actual and forecasted
@@ -194,7 +210,8 @@ Resources:
             Threshold: 80
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         - Notification:
@@ -203,7 +220,8 @@ Resources:
             Threshold: 80
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         # 100% actual and forecasted
@@ -213,7 +231,8 @@ Resources:
             Threshold: 100
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
         - Notification:
@@ -222,6 +241,7 @@ Resources:
             Threshold: 100
             ThresholdType: PERCENTAGE
           Subscribers:
-            # TODO: Discord notification via SNS
+            - SubscriptionType: SNS
+              Address: !ImportValue budget-alarms:BudgetAlarmsSnsTopic
             - SubscriptionType: EMAIL
               Address: !Ref NotificationEmail1
