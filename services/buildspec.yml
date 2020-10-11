@@ -14,13 +14,26 @@ phases:
   # AWS SAM defaults to read template.yaml with an A!
   build:
     commands:
+      - pwd
+      # Build Hello world
       - cd services/hello-world/
       - "rm *.toml"
       - sam build
       - >-
         sam package
         --template-file ./template.yaml
-        --output-template-file ./transformed-hello-world.yaml
+        --output-template-file ./transformed.yaml
+        --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
+      - cd -
+      # Build Budget Alarms
+      - cd services/budget-alarms/
+      - "rm *.toml"
+      - sam build
+      - sed -i "s/AWS_ENVIRONMENT: qa/AWS_ENVIRONMENT: ${AWS_ENVIRONMENT}/g" ./template.yaml
+      - >-
+        sam package
+        --template-file ./template.yaml
+        --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
       # TODO: Build more artifacts here
@@ -32,4 +45,5 @@ phases:
 
 artifacts:
   files:
-    - ./services/hello-world/transformed-hello-world.yaml
+    - ./services/hello-world/transformed.yaml
+    - ./services/budget-alarms/transformed.yaml
