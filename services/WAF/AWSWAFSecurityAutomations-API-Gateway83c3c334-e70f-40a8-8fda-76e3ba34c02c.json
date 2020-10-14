@@ -1,0 +1,335 @@
+{
+  "Name": "AWSWAFSecurityAutomations-API-Gateway83c3c334-e70f-40a8-8fda-76e3ba34c02c",
+  "Id": "52d17419-6f0e-46d7-9bbf-7c01bc79129b",
+  "ARN": "arn:aws:wafv2:us-east-1:306967644367:regional/webacl/AWSWAFSecurityAutomations-API-Gateway83c3c334-e70f-40a8-8fda-76e3ba34c02c/52d17419-6f0e-46d7-9bbf-7c01bc79129b",
+  "DefaultAction": {
+    "Allow": {}
+  },
+  "Description": "AWSWAFSecurityAutomationsAPIGateway",
+  "Rules": [
+    {
+      "Name": "AWSWAFSecurityAutomations-API-Gateway-SQLInjectionRule",
+      "Priority": 30,
+      "Statement": {
+        "OrStatement": {
+          "Statements": [
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "QueryString": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "URL_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "Body": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "URL_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "SingleHeader": {
+                    "Name": "cookie"
+                  }
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "HTML_ENTITY_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "SingleHeader": {
+                    "Name": "cookie"
+                  }
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "URL_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "QueryString": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "HTML_ENTITY_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "Body": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "HTML_ENTITY_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "UriPath": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "HTML_ENTITY_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "SingleHeader": {
+                    "Name": "authorization"
+                  }
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "URL_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "UriPath": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "URL_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "SqliMatchStatement": {
+                "FieldToMatch": {
+                  "SingleHeader": {
+                    "Name": "authorization"
+                  }
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "HTML_ENTITY_DECODE"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Action": {
+        "Block": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AWSWAFSecurityAutomationsAPIGatewaySqlInjectionRule"
+      }
+    },
+    {
+      "Name": "AWSWAFSecurityAutomations-API-Gateway-XSSRule",
+      "Priority": 40,
+      "Statement": {
+        "OrStatement": {
+          "Statements": [
+            {
+              "XssMatchStatement": {
+                "FieldToMatch": {
+                  "QueryString": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "URL_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "XssMatchStatement": {
+                "FieldToMatch": {
+                  "Body": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "URL_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "XssMatchStatement": {
+                "FieldToMatch": {
+                  "SingleHeader": {
+                    "Name": "cookie"
+                  }
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "HTML_ENTITY_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "XssMatchStatement": {
+                "FieldToMatch": {
+                  "SingleHeader": {
+                    "Name": "cookie"
+                  }
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "URL_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "XssMatchStatement": {
+                "FieldToMatch": {
+                  "QueryString": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "HTML_ENTITY_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "XssMatchStatement": {
+                "FieldToMatch": {
+                  "Body": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "HTML_ENTITY_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "XssMatchStatement": {
+                "FieldToMatch": {
+                  "UriPath": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "HTML_ENTITY_DECODE"
+                  }
+                ]
+              }
+            },
+            {
+              "XssMatchStatement": {
+                "FieldToMatch": {
+                  "UriPath": {}
+                },
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "URL_DECODE"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Action": {
+        "Block": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AWSWAFSecurityAutomationsAPIGatewayXssRule"
+      }
+    },
+    {
+      "Name": "AWSWAFSecurityAutomations-API-Gateway-HTTPFloodRule",
+      "Priority": 50,
+      "Statement": {
+        "RateBasedStatement": {
+          "Limit": 100,
+          "AggregateKeyType": "IP"
+        }
+      },
+      "Action": {
+        "Block": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AWSWAFSecurityAutomationsAPIGatewayHttpFloodRule"
+      }
+    },
+    {
+      "Name": "AWSWAFSecurityAutomations-API-Gateway-WAFIPReputationListsRule",
+      "Priority": 70,
+      "Statement": {
+        "IPSetReferenceStatement": {
+          "ARN": "arn:aws:wafv2:us-east-1:306967644367:regional/ipset/AWSWAFSecurityAutomations-API-Gateway-IPReputationListsSet_migratedd1a32720-94af-4889-bfd1-380183353643/c064b23e-d53b-4605-a257-4d08c01c7192"
+        }
+      },
+      "Action": {
+        "Block": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AWSWAFSecurityAutomationsAPIGatewayIPReputationListsRule"
+      }
+    }
+  ],
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "AWSWAFSecurityAutomationsAPIGatewayMaliciousRequesters"
+  },
+  "Capacity": 623,
+  "ManagedByFirewallManager": false
+}
