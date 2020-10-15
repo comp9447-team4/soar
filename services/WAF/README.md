@@ -15,16 +15,14 @@ default WAF rate limit is set to 100/5min window
 currently setup with access token after login
 
 # How to deploy
-!!!!Note: need to test the below!!!!
+
 ```
-# Build
-sam build
+# deploy endpoint: ALB(APIGateway)
+sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-api-deploy.toml
 
-# Try to invoke it
-sam local invoke
+# deploy endpoint: Cloufront
+sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-cloudfront-deploy.toml
 
-# Deploy
-sam deploy
 ```
 # stack template for deploying the WAF webACL
 services/WAF/templates/aws-waf-security-automations.template
