@@ -24,6 +24,17 @@ sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IA
 sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-cloudfront-deploy.toml
 
 ```
+
+# How to cleanup
+
+```
+# deploy endpoint: ALB(APIGateway)
+aws cloudformation delete-stack --stack-name waf-apigateway
+
+# deploy endpoint: Cloufront
+aws cloudformation delete-stack --stack-name waf-cloudfront
+
+```
 # stack template for deploying the WAF webACL
 services/WAF/templates/aws-waf-security-automations.template
 # stack template for migrating from WAF classic to AWS WAF2
