@@ -65,7 +65,10 @@ create-waf-stack()  {
     echo "Do you wish to deploy to endpoint CloudFront?"
     select yn in "Yes" "No"; do
     case $yn in
-        Yes ) sam deploy -t services/WAF/templates/aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file services/WAF/templates/waf-cloudfront-deploy.toml; break;;
+        Yes ) sam deploy \
+        -t services/WAF/templates/aws-waf-security-automations.template \
+        --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+        --config-file services/WAF/templates/waf-cloudfront-deploy.toml; break;;
         No ) continue;;
     esac
     done
@@ -73,7 +76,10 @@ create-waf-stack()  {
     echo "Do you wish to deploy to endpoint ALB?"
     select yn in "Yes" "No"; do
     case $yn in
-        Yes ) sam deploy -t services/WAF/templates/aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file services/WAF/templates/waf-api-deploy.toml; break;;
+        Yes ) sam deploy \
+        -t services/WAF/templates/aws-waf-security-automations.template \
+        --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+        --config-file services/WAF/templates/waf-api-deploy.toml; break;;
         No ) continue;;
     esac
     done
