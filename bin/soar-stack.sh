@@ -61,6 +61,26 @@ create_secrets() {
     wait_build "${SECRETS_STACK_NAME}"
 }
 
+create-waf-stack()  {
+    echo "Do you wish to deploy to endpoint CloudFront?"
+    select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) sam deploy -t services/WAF/templates/aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file services/WAF/templates/waf-cloudfront-deploy.toml; break;;
+        No ) continue;;
+    esac
+    done
+
+    echo "Do you wish to deploy to endpoint ALB?"
+    select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) sam deploy -t services/WAF/templates/aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file services/WAF/templates/waf-api-deploy.toml; break;;
+        No ) continue;;
+    esac
+    done
+
+}
+
+
 usage() {
     cat <<EOF
 Manages CFN stacks for the SOAR solution
@@ -71,6 +91,7 @@ Where arg is:
 create-cicd
 update-cicd
 create-secrets
+create-waf-stack
 EOF
 }
 main() {
@@ -95,6 +116,8 @@ main() {
         update_cicd
     elif [[ "${args}" == "delete-cicd" ]]; then
         delete_cicd
+    elif [[ "${args}" == "create-waf-stack" ]]; then
+        create-waf-stack
     else
         echo "Not a valid argument..."
         usage
