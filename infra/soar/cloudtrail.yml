@@ -1,0 +1,129 @@
+---
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudtrail-trail.html#cfn-cloudtrail-trail-trailname
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cloudtrail
+
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Resources:
+  ###########################################
+  # CLOUDTRAIL for monitoring API calls
+  ###########################################
+  CloudTrailBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub:
+        - "${AwsEnvironment}-comp9447-team4-cloudtrail"
+        - AwsEnvironment: !Ref AwsEnvironment
+
+  BucketPolicy: 
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: !Ref CloudTrailBucket
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Sid: "AWSCloudTrailAclCheck"
+            Effect: "Allow"
+            Principal: 
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:GetBucketAcl"
+            Resource: 
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}
+          - Sid: "AWSCloudTrailWrite"
+            Effect: "Allow"
+            Principal: 
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:PutObject"
+            Resource:
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}/AWSLogs/${AWS::AccountId}/*
+            Condition: 
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
+
+  AllTrail:
+    DependsOn:
+    - BucketPolicy
+    - CloudTrailBucket
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: all-trail
+      IsLogging: true
+      S3BucketName: !Ref CloudTrailBucket
+      S3Prefix: all
+      # TODO(JT) Add a topic subscription, eg a lambda that alerts on cloudformation events
+      # SnsTopicName:
+
+  ####################################################3
+  # AWS GLUE for crawling the cloudtrail logs...
+  ####################################################3
+  GlueRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "glue.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                - "s3:Get*"
+                - "s3:List*"
+                Resource:
+                - Fn::Sub:
+                    - "${bucket_arn}/*"
+                    - bucket_arn: !GetAtt CloudTrailBucket.Arn
+                - Fn::Sub:
+                    - "${bucket_arn}"
+                    - bucket_arn: !GetAtt CloudTrailBucket.Arn
+ 
+  GlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: "dbCrawler"
+        LocationUri: "TestLocationUri"
+        Parameters:
+          key1 : "value1"
+          key2 : "value2"
+ 
+  CloudTrailCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: "cloudtrail-crawler"
+      Role: !GetAtt GlueRole.Arn
+      DatabaseName: !Ref GlueDatabase
+      Targets:
+        S3Targets:
+          - Path: !Ref CloudTrailBucket
+      SchemaChangePolicy:
+        UpdateBehavior: "UPDATE_IN_DATABASE"
+        DeleteBehavior: "LOG"
+      Schedule:
+        ScheduleExpression: "cron(0/10 * ? * MON-FRI *)"
+

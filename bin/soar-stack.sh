@@ -61,6 +61,29 @@ create_secrets() {
     wait_build "${SECRETS_STACK_NAME}"
 }
 
+export CLOUDTRAIL_STACK_NAME="${AWS_ENVIRONMENT}-CloudTrail"
+export CLOUDTRAIL_STACK_YML="${REPO_ROOT}/infra/soar/cloudtrail.yml"
+create_cloudtrail() {
+    echo "Creating cloudtrail stack..."
+    aws cloudformation create-stack \
+        --stack-name "${CLOUDTRAIL_STACK_NAME}" \
+        --template-body file://"${CLOUDTRAIL_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}" \
+        --enable-termination-protection
+    wait_build "${CLOUDTRAIL_STACK_NAME}"
+}
+
+update_cloudtrail() {
+    echo "Creating cloudtrail stack..."
+    aws cloudformation update-stack \
+        --stack-name "${CLOUDTRAIL_STACK_NAME}" \
+        --template-body file://"${CLOUDTRAIL_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
+    wait_build "${CLOUDTRAIL_STACK_NAME}"
+}
+
 usage() {
     cat <<EOF
 Manages CFN stacks for the SOAR solution
@@ -95,6 +118,10 @@ main() {
         update_cicd
     elif [[ "${args}" == "delete-cicd" ]]; then
         delete_cicd
+    elif [[ "${args}" == "create-cloudtrail" ]]; then
+        create_cloudtrail
+    elif [[ "${args}" == "update-cloudtrail" ]]; then
+        update_cloudtrail
     else
         echo "Not a valid argument..."
         usage
