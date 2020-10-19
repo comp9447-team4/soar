@@ -104,7 +104,6 @@ update_athena() {
         --template-body file://"${ATHENA_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
-    wait_build "${ATHENA_STACK_NAME}"
 }
 
 usage() {

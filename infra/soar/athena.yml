@@ -33,25 +33,40 @@ Resources:
           - "sts:AssumeRole"
       Path: "/"
       Policies:
-      - PolicyName: "root"
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: "Allow"
-              Action:
-              - "s3:Get*"
-              - "s3:List*"
-              Resource:
-              - Fn::Sub:
-                  - "${bucket}/*"
-                  - bucket:
-                      Fn::ImportValue:
-                        !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
-              - Fn::Sub:
-                  - "${bucket}"
-                  - bucket:
-                      Fn::ImportValue:
-                        !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+        - PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "*"
+                Resource: "*"
+      # YOLO!
+      # - PolicyName: "root"
+      #   PolicyDocument:
+      #     Version: "2012-10-17"
+      #     Statement:
+      #       - Effect: "Allow"
+      #         Action:
+      #         - "s3:Get*"
+      #         - "s3:List*"
+      #         Resource:
+      #         - Fn::Sub:
+      #             - "${bucket}/*"
+      #             - bucket:
+      #                 Fn::ImportValue:
+      #                   !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+      #         - Fn::Sub:
+      #             - "${bucket}"
+      #             - bucket:
+      #                 Fn::ImportValue:
+      #                   !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+      #       - Effect: Allow
+      #         Action:
+      #         - "logs:Put*"
+      #         Resource:
+      #         - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+
  
   GlueDatabase:
     Type: AWS::Glue::Database
@@ -85,15 +100,40 @@ Resources:
   ####################################################3
   # Athena for analysis
   ####################################################3
-  # AthenaWorkGroup:
-  #   Type: AWS::Athena::WorkGroup
-  #   Properties:
-  #     Name: "cloudtrail-workgroup"
-  #     State: ENABLED
-  #     WorkGroupConfiguration:
-  #       BytesScannedCutoffPerQuery: 200000000
-  #       EnforceWorkGroupConfiguration: false
-  #       PublishCloudWatchMetricsEnabled: false
-  #       RequesterPaysEnabled: true
-  #       ResultConfiguration:
-  #         OutputLocation: !Ref AthenaBucket
+  AthenaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub:
+        - "${AwsEnvironment}-comp9447-team4-athena"
+        - AwsEnvironment: !Ref AwsEnvironment
+
+  BucketPolicy: 
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: !Ref AthenaBucket
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Principal: 
+              Service: "athena.amazonaws.com"
+            Action:
+            - "s3:Get*"
+            - "s3:List*"
+            Resource:
+            - !Sub arn:aws:s3:::${AthenaBucket}
+            - !Sub arn:aws:s3:::${AthenaBucket}/*
+
+  AthenaWorkGroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: "cloudtrail-workgroup"
+      State: ENABLED
+      WorkGroupConfiguration:
+        BytesScannedCutoffPerQuery: 200000000
+        EnforceWorkGroupConfiguration: false
+        PublishCloudWatchMetricsEnabled: false
+        RequesterPaysEnabled: true
+        ResultConfiguration:
+          OutputLocation: !Sub s3://${AthenaBucket}/
