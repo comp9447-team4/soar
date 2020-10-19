@@ -84,6 +84,29 @@ update_cloudtrail() {
     wait_build "${CLOUDTRAIL_STACK_NAME}"
 }
 
+export ATHENA_STACK_NAME="${AWS_ENVIRONMENT}-Athena"
+export ATHENA_STACK_YML="${REPO_ROOT}/infra/soar/athena.yml"
+create_athena() {
+    echo "Creating athena stack..."
+    aws cloudformation create-stack \
+        --stack-name "${ATHENA_STACK_NAME}" \
+        --template-body file://"${ATHENA_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}" \
+        --enable-termination-protection
+    wait_build "${ATHENA_STACK_NAME}"
+}
+
+update_athena() {
+    echo "Creating athena stack..."
+    aws cloudformation update-stack \
+        --stack-name "${ATHENA_STACK_NAME}" \
+        --template-body file://"${ATHENA_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
+    wait_build "${ATHENA_STACK_NAME}"
+}
+
 usage() {
     cat <<EOF
 Manages CFN stacks for the SOAR solution
@@ -122,6 +145,10 @@ main() {
         create_cloudtrail
     elif [[ "${args}" == "update-cloudtrail" ]]; then
         update_cloudtrail
+    elif [[ "${args}" == "create-athena" ]]; then
+        create_athena
+    elif [[ "${args}" == "update-athena" ]]; then
+        update_athena
     else
         echo "Not a valid argument..."
         usage

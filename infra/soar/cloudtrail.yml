@@ -1,7 +1,7 @@
 ---
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudtrail-trail.html#cfn-cloudtrail-trail-trailname
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Cloudtrail
+Description: CloudTrail
 
 Mappings:
   Branch:
@@ -50,7 +50,7 @@ Resources:
             Action: "s3:PutObject"
             Resource:
               !Sub |-
-                arn:aws:s3:::${CloudTrailBucket}/AWSLogs/${AWS::AccountId}/*
+                arn:aws:s3:::${CloudTrailBucket}/*
             Condition: 
               StringEquals:
                 s3:x-amz-acl: "bucket-owner-full-control"
@@ -64,66 +64,19 @@ Resources:
       TrailName: all-trail
       IsLogging: true
       S3BucketName: !Ref CloudTrailBucket
-      S3Prefix: all
+      S3KeyPrefix: all
       # TODO(JT) Add a topic subscription, eg a lambda that alerts on cloudformation events
       # SnsTopicName:
 
-  ####################################################3
-  # AWS GLUE for crawling the cloudtrail logs...
-  ####################################################3
-  GlueRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - "glue.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        - PolicyName: "root"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action:
-                - "s3:Get*"
-                - "s3:List*"
-                Resource:
-                - Fn::Sub:
-                    - "${bucket_arn}/*"
-                    - bucket_arn: !GetAtt CloudTrailBucket.Arn
-                - Fn::Sub:
-                    - "${bucket_arn}"
-                    - bucket_arn: !GetAtt CloudTrailBucket.Arn
- 
-  GlueDatabase:
-    Type: AWS::Glue::Database
-    Properties:
-      CatalogId: !Ref AWS::AccountId
-      DatabaseInput:
-        Name: "dbCrawler"
-        LocationUri: "TestLocationUri"
-        Parameters:
-          key1 : "value1"
-          key2 : "value2"
- 
-  CloudTrailCrawler:
-    Type: AWS::Glue::Crawler
-    Properties:
-      Name: "cloudtrail-crawler"
-      Role: !GetAtt GlueRole.Arn
-      DatabaseName: !Ref GlueDatabase
-      Targets:
-        S3Targets:
-          - Path: !Ref CloudTrailBucket
-      SchemaChangePolicy:
-        UpdateBehavior: "UPDATE_IN_DATABASE"
-        DeleteBehavior: "LOG"
-      Schedule:
-        ScheduleExpression: "cron(0/10 * ? * MON-FRI *)"
+Outputs:
+  CloudTrailBucket:
+    Value: !Ref CloudTrailBucket
+    Description: CloudTrailBucket
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CloudTrailBucket' ] ]
+  CloudTrailBucketArn:
+    Value: !GetAtt CloudTrailBucket.Arn
+    Description: CloudTrailBucketArn
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CloudTrailBucketArn' ] ]
 
