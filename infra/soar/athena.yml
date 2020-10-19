@@ -1,0 +1,139 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Athena for analysis
+
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Resources:
+  ####################################################3
+  # AWS GLUE for crawling the cloudtrail logs...
+  ####################################################3
+  GlueRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Principal:
+            Service:
+            - "glue.amazonaws.com"
+          Action:
+          - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "*"
+                Resource: "*"
+      # YOLO!
+      # - PolicyName: "root"
+      #   PolicyDocument:
+      #     Version: "2012-10-17"
+      #     Statement:
+      #       - Effect: "Allow"
+      #         Action:
+      #         - "s3:Get*"
+      #         - "s3:List*"
+      #         Resource:
+      #         - Fn::Sub:
+      #             - "${bucket}/*"
+      #             - bucket:
+      #                 Fn::ImportValue:
+      #                   !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+      #         - Fn::Sub:
+      #             - "${bucket}"
+      #             - bucket:
+      #                 Fn::ImportValue:
+      #                   !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+      #       - Effect: Allow
+      #         Action:
+      #         - "logs:Put*"
+      #         Resource:
+      #         - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+
+ 
+  GlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: "cloudtraildb"
+        Parameters:
+          key1 : "value1"
+          key2 : "value2"
+ 
+  CloudTrailCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: "cloudtrail-crawler"
+      Role: !GetAtt GlueRole.Arn
+      DatabaseName:
+        Fn::ImportValue:
+          !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucket"
+      Targets:
+        S3Targets:
+          - Path:
+              Fn::ImportValue:
+                !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucket"
+      SchemaChangePolicy:
+        UpdateBehavior: "UPDATE_IN_DATABASE"
+        DeleteBehavior: "LOG"
+      Schedule:
+        ScheduleExpression: "cron(0/10 * ? * MON-FRI *)"
+
+  ####################################################3
+  # Athena for analysis
+  ####################################################3
+  AthenaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub:
+        - "${AwsEnvironment}-comp9447-team4-athena"
+        - AwsEnvironment: !Ref AwsEnvironment
+
+  BucketPolicy: 
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: !Ref AthenaBucket
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Principal: 
+              Service: "athena.amazonaws.com"
+            Action:
+            - "s3:Get*"
+            - "s3:List*"
+            Resource:
+            - !Sub arn:aws:s3:::${AthenaBucket}
+            - !Sub arn:aws:s3:::${AthenaBucket}/*
+
+  AthenaWorkGroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: "cloudtrail-workgroup"
+      State: ENABLED
+      WorkGroupConfiguration:
+        BytesScannedCutoffPerQuery: 200000000
+        EnforceWorkGroupConfiguration: false
+        PublishCloudWatchMetricsEnabled: false
+        RequesterPaysEnabled: true
+        ResultConfiguration:
+          OutputLocation: !Sub s3://${AthenaBucket}/
