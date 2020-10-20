@@ -84,6 +84,7 @@ update_cloudtrail() {
     wait_build "${CLOUDTRAIL_STACK_NAME}"
 }
 
+# Athena and ES for analytics
 export ATHENA_STACK_NAME="${AWS_ENVIRONMENT}-Athena"
 export ATHENA_STACK_YML="${REPO_ROOT}/infra/soar/athena.yml"
 create_athena() {
@@ -106,16 +107,40 @@ update_athena() {
         --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
 }
 
+export ES_STACK_NAME="${AWS_ENVIRONMENT}-es"
+export ES_STACK_YML="${REPO_ROOT}/infra/soar/es.yml"
+create_es() {
+    echo "Creating es stack..."
+    aws cloudformation create-stack \
+        --stack-name "${ES_STACK_NAME}" \
+        --template-body file://"${ES_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}" \
+        --enable-termination-protection
+    wait_build "${ES_STACK_NAME}"
+}
+
+update_es() {
+    echo "Creating es stack..."
+    aws cloudformation update-stack \
+        --stack-name "${ES_STACK_NAME}" \
+        --template-body file://"${ES_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
+}
+
 usage() {
     cat <<EOF
 Manages CFN stacks for the SOAR solution
 Reference: https://github.com/aws-samples/aws-modern-application-workshop/tree/python
 
-Usage: AWS_ENVIRONMENT=qa ./bin/soar.sh <arg>
+Usage: AWS_PROFILE=qa ./bin/soar.sh <arg>
 Where arg is:
 create-cicd
 update-cicd
 create-secrets
+create-athena
+create-es
 EOF
 }
 main() {
@@ -148,6 +173,10 @@ main() {
         create_athena
     elif [[ "${args}" == "update-athena" ]]; then
         update_athena
+    elif [[ "${args}" == "create-es" ]]; then
+        create_es
+    elif [[ "${args}" == "update-es" ]]; then
+        update_es
     else
         echo "Not a valid argument..."
         usage

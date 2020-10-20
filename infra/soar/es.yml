@@ -1,0 +1,69 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ElasticSearch
+
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Resources:
+  ElasticsearchDomain:
+    Type: AWS::Elasticsearch::Domain
+    Properties:
+      DomainName: !Sub "${AwsEnvironment}-comp9447-team4-es"
+      ElasticsearchClusterConfig:
+        DedicatedMasterEnabled: "true"
+        InstanceCount: "2"
+        ZoneAwarenessEnabled: "true"
+        # Free tier
+        InstanceType: "t2.small.elasticsearch"
+        DedicatedMasterType: "t2.small.elasticsearch"
+        DedicatedMasterCount: "3"
+      EBSOptions:
+        EBSEnabled: true
+        Iops: 0
+        VolumeSize: 10
+        VolumeType: "gp2"
+      SnapshotOptions:
+        AutomatedSnapshotStartHour: "0"
+      # TODO: Define access policy with cognito?
+      # AccessPolicies:
+      #   Version: "2012-10-17"
+      #   Statement:
+      #   - Effect: "Allow"
+      #     Sid: "AllowDevRole"
+      #     Principal:
+      #       AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-reserved/sso.amazonaws.com/ap-southeast-2/AWSReservedSSO_DeveloperAccess_*"
+      #     Action:
+      #     - "es:Get*"
+      #     - "es:List*"
+      #     - "es:Describe*"
+      #     - "es:HttpGet*"
+      #     - "es:ESHttpGet"
+      #     - "es:ESHttpPost"
+      #     - "es:ESHttpPut"
+      #     - "es:ESHttpHead"
+      #     - "es:ESHttpPatch"
+      #     Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AwsEnvironment}-comp9447-team4-es/*"
+      AdvancedOptions:
+        rest.action.multi.allow_explicit_index: "true"
+
+Outputs:
+  DomainArn:
+    Value: !GetAtt ElasticsearchDomain.DomainArn
+    Export:
+      Name: !Join [ ':', [ !Ref 'AwS::StackName', 'Arn' ] ]
+  DomainEndpoint:
+    Value: !GetAtt ElasticsearchDomain.DomainEndpoint
+    Export:
+      Name: !Join [ ':', [ !Ref 'AwS::StackName', 'DomainEndpoint' ] ]
+
