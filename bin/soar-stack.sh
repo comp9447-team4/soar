@@ -127,6 +127,7 @@ update_es() {
         --template-body file://"${ES_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
+    wait_update "${ES_STACK_NAME}"
 }
 
 usage() {

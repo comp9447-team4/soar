@@ -20,6 +20,7 @@ Resources:
     Type: AWS::Elasticsearch::Domain
     Properties:
       DomainName: !Sub "${AwsEnvironment}-comp9447-team4-es"
+      ElasticSearchVersion: 5.1
       ElasticsearchClusterConfig:
         DedicatedMasterEnabled: "true"
         InstanceCount: "2"
@@ -35,35 +36,45 @@ Resources:
         VolumeType: "gp2"
       SnapshotOptions:
         AutomatedSnapshotStartHour: "0"
-      # TODO: Define access policy with cognito?
-      # AccessPolicies:
-      #   Version: "2012-10-17"
-      #   Statement:
-      #   - Effect: "Allow"
-      #     Sid: "AllowDevRole"
-      #     Principal:
-      #       AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-reserved/sso.amazonaws.com/ap-southeast-2/AWSReservedSSO_DeveloperAccess_*"
-      #     Action:
-      #     - "es:Get*"
-      #     - "es:List*"
-      #     - "es:Describe*"
-      #     - "es:HttpGet*"
-      #     - "es:ESHttpGet"
-      #     - "es:ESHttpPost"
-      #     - "es:ESHttpPut"
-      #     - "es:ESHttpHead"
-      #     - "es:ESHttpPatch"
-      #     Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AwsEnvironment}-comp9447-team4-es/*"
-      AdvancedOptions:
-        rest.action.multi.allow_explicit_index: "true"
+      CognitoOptions:
+        Enabled: true
+        IdentityPoolId: !Ref CognitoIdentityPool
 
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${AwsEnvironment}_es_user_pool"
+
+  CognitoIdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: !Sub "qa_es_identity_pool"
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html
+      # you must allow unauthenticated then ES unsets it for you
+      AllowUnauthenticatedIdentities: true
 Outputs:
-  DomainArn:
-    Value: !GetAtt ElasticsearchDomain.DomainArn
+  UserPoolUrl:
+    Value: !GetAtt CognitoUserPool.ProviderURL
     Export:
-      Name: !Join [ ':', [ !Ref 'AwS::StackName', 'Arn' ] ]
-  DomainEndpoint:
-    Value: !GetAtt ElasticsearchDomain.DomainEndpoint
-    Export:
-      Name: !Join [ ':', [ !Ref 'AwS::StackName', 'DomainEndpoint' ] ]
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'UserPoolUrl' ] ]
 
+#AccessPolicies:
+#  Version: "2012-10-17"
+#  Statement:
+#  - Effect: "Allow"
+#    Sid: "AllowDevRole"
+#    Principal:
+#      # AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-reserved/sso.amazonaws.com/ap-southeast-2/AWSReservedSSO_DeveloperAccess*"
+#      AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/*"
+#    Action: "es:*"
+#    # - "es:Get*"
+#    # - "es:List*"
+#    # - "es:Describe*"
+#    # - "es:HttpGet*"
+#    # - "es:ESHttpGet"
+#    # - "es:ESHttpPost"
+#    # - "es:ESHttpPut"
+#    # - "es:ESHttpHead"
+#    # - "es:ESHttpPatch"
+#    # # Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AwsEnvironment}-comp9447-team4-es/*"
+#    Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/*"
