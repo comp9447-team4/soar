@@ -20,7 +20,7 @@ Resources:
     Type: AWS::Elasticsearch::Domain
     Properties:
       DomainName: !Sub "${AwsEnvironment}-comp9447-team4-es"
-      ElasticSearchVersion: 5.1
+      ElasticsearchVersion: 7.1
       ElasticsearchClusterConfig:
         DedicatedMasterEnabled: "true"
         InstanceCount: "2"
@@ -39,6 +39,52 @@ Resources:
       CognitoOptions:
         Enabled: true
         IdentityPoolId: !Ref CognitoIdentityPool
+        UserPoolId: !Ref CognitoUserPool
+        RoleArn: !GetAtt CognitoAccessForAmazonES.Arn
+      AccessPolicies:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Sid: "AllowDevRole"
+          Principal:
+            AWS:
+              Fn::Sub:
+                - "arn:aws:iam::${AWS::AccountId}:role/Cognito_${idpool_name}Auth_Role"
+                - idpool_name:
+                    Fn::Select:
+                      - 1
+                      - !Split [ ":", !Ref CognitoIdentityPool ]
+          Action:
+          - "es:Get*"
+          - "es:List*"
+          - "es:Describe*"
+          - "es:HttpGet*"
+          - "es:ESHttpGet"
+          - "es:ESHttpPost"
+          - "es:ESHttpPut"
+          - "es:ESHttpHead"
+          - "es:ESHttpPatch"
+          Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AwsEnvironment}-comp9447-team4-es/*"
+
+  CognitoAccessForAmazonES:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CognitoAccessForAmazonES
+      AssumeRolePolicyDocument: >-
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "es.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonESCognitoAccess
 
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
@@ -52,29 +98,16 @@ Resources:
       # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html
       # you must allow unauthenticated then ES unsets it for you
       AllowUnauthenticatedIdentities: true
+
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties: 
+      Domain: !Sub ${AwsEnvironment}-comp9447-team4-es
+      UserPoolId: !Ref CognitoUserPool
+
 Outputs:
   UserPoolUrl:
     Value: !GetAtt CognitoUserPool.ProviderURL
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'UserPoolUrl' ] ]
 
-#AccessPolicies:
-#  Version: "2012-10-17"
-#  Statement:
-#  - Effect: "Allow"
-#    Sid: "AllowDevRole"
-#    Principal:
-#      # AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-reserved/sso.amazonaws.com/ap-southeast-2/AWSReservedSSO_DeveloperAccess*"
-#      AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/*"
-#    Action: "es:*"
-#    # - "es:Get*"
-#    # - "es:List*"
-#    # - "es:Describe*"
-#    # - "es:HttpGet*"
-#    # - "es:ESHttpGet"
-#    # - "es:ESHttpPost"
-#    # - "es:ESHttpPut"
-#    # - "es:ESHttpHead"
-#    # - "es:ESHttpPatch"
-#    # # Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AwsEnvironment}-comp9447-team4-es/*"
-#    Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/*"
