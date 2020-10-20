@@ -36,6 +36,7 @@ Resources:
         VolumeType: "gp2"
       SnapshotOptions:
         AutomatedSnapshotStartHour: "0"
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html
       CognitoOptions:
         Enabled: true
         IdentityPoolId: !Ref CognitoIdentityPool
@@ -47,13 +48,7 @@ Resources:
         - Effect: "Allow"
           Sid: "AllowDevRole"
           Principal:
-            AWS:
-              Fn::Sub:
-                - "arn:aws:iam::${AWS::AccountId}:role/Cognito_${idpool_name}Auth_Role"
-                - idpool_name:
-                    Fn::Select:
-                      - 1
-                      - !Split [ ":", !Ref CognitoIdentityPool ]
+            AWS: !GetAtt CognitoAccessForAmazonES.Arn
           Action:
           - "es:Get*"
           - "es:List*"

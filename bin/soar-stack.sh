@@ -116,6 +116,7 @@ create_es() {
         --template-body file://"${ES_STACK_YML}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}" \
+        --disable-rollback \
         --enable-termination-protection
     wait_build "${ES_STACK_NAME}"
 }
