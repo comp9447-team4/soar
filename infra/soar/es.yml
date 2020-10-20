@@ -1,0 +1,176 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ElasticSearch
+
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Resources:
+  ElasticsearchDomain:
+    Type: AWS::Elasticsearch::Domain
+    Properties:
+      DomainName: !Sub "${AwsEnvironment}-comp9447-team4-es"
+      ElasticsearchVersion: 7.1
+      ElasticsearchClusterConfig:
+        DedicatedMasterEnabled: "true"
+        InstanceCount: "2"
+        ZoneAwarenessEnabled: "true"
+        # Free tier
+        InstanceType: "t2.small.elasticsearch"
+        DedicatedMasterType: "t2.small.elasticsearch"
+        DedicatedMasterCount: "3"
+      EBSOptions:
+        EBSEnabled: true
+        Iops: 0
+        VolumeSize: 10
+        VolumeType: "gp2"
+      SnapshotOptions:
+        AutomatedSnapshotStartHour: "0"
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html
+      CognitoOptions:
+        Enabled: true
+        IdentityPoolId: !Ref CognitoIdentityPool
+        UserPoolId: !Ref CognitoUserPool
+        RoleArn: !GetAtt CognitoAccessForAmazonES.Arn
+      AccessPolicies:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Sid: "AllowDevRole"
+          Principal:
+            AWS: !GetAtt CognitoAccessForAmazonES.Arn
+          Action:
+          - "es:*"
+          Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AwsEnvironment}-comp9447-team4-es/*"
+
+  CognitoAccessForAmazonES:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CognitoAccessForAmazonES
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html#es-cognito-auth-troubleshooting
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonESCognitoAccess
+      Policies:
+      - PolicyName: AllowAllES
+        PolicyDocument: >-
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "iam:GetRole",
+                  "iam:PassRole",
+                  "iam:CreateRole",
+                  "iam:AttachRolePolicy",
+                  "ec2:DescribeVpcs",
+                  "cognito-identity:ListIdentityPools",
+                  "cognito-idp:ListUserPools"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }
+      AssumeRolePolicyDocument: !Sub >-
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "es.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+
+  AuthenticatedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AuthenticatedRoleForESCognito
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html#es-cognito-auth-troubleshooting
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonESCognitoAccess
+      Policies:
+      - PolicyName: AllowAllES
+        PolicyDocument: >-
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "es:*"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }
+      AssumeRolePolicyDocument: !Sub >-
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": "${CognitoIdentityPool}"
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        }
+
+
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${AwsEnvironment}_es_user_pool"
+
+  CognitoIdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: !Sub "qa_es_identity_pool"
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html
+      # you must allow unauthenticated then ES unsets it for you
+      AllowUnauthenticatedIdentities: true
+
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties: 
+      Domain: !Sub ${AwsEnvironment}-comp9447-team4-es
+      UserPoolId: !Ref CognitoUserPool
+
+  # Must give cognito identity pool a role once authenticated
+  # I don't know WHY THE FK it cant do it via here, it must be done via the UI
+  # CognitoIdentityPoolAttachment:
+  #   Type: AWS::Cognito::IdentityPoolRoleAttachment
+  #   Properties: 
+  #     IdentityPoolId: !Ref CognitoIdentityPool
+  #     Roles:
+  #       authenticated: !Ref AuthenticatedRole
+
+Outputs:
+  UserPoolUrl:
+    Value: !GetAtt CognitoUserPool.ProviderURL
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'UserPoolUrl' ] ]
+
