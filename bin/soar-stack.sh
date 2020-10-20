@@ -61,6 +61,51 @@ create_secrets() {
     wait_build "${SECRETS_STACK_NAME}"
 }
 
+export CLOUDTRAIL_STACK_NAME="${AWS_ENVIRONMENT}-CloudTrail"
+export CLOUDTRAIL_STACK_YML="${REPO_ROOT}/infra/soar/cloudtrail.yml"
+create_cloudtrail() {
+    echo "Creating cloudtrail stack..."
+    aws cloudformation create-stack \
+        --stack-name "${CLOUDTRAIL_STACK_NAME}" \
+        --template-body file://"${CLOUDTRAIL_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}" \
+        --enable-termination-protection
+    wait_build "${CLOUDTRAIL_STACK_NAME}"
+}
+
+update_cloudtrail() {
+    echo "Creating cloudtrail stack..."
+    aws cloudformation update-stack \
+        --stack-name "${CLOUDTRAIL_STACK_NAME}" \
+        --template-body file://"${CLOUDTRAIL_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
+    wait_build "${CLOUDTRAIL_STACK_NAME}"
+}
+
+export ATHENA_STACK_NAME="${AWS_ENVIRONMENT}-Athena"
+export ATHENA_STACK_YML="${REPO_ROOT}/infra/soar/athena.yml"
+create_athena() {
+    echo "Creating athena stack..."
+    aws cloudformation create-stack \
+        --stack-name "${ATHENA_STACK_NAME}" \
+        --template-body file://"${ATHENA_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}" \
+        --enable-termination-protection
+    wait_build "${ATHENA_STACK_NAME}"
+}
+
+update_athena() {
+    echo "Creating athena stack..."
+    aws cloudformation update-stack \
+        --stack-name "${ATHENA_STACK_NAME}" \
+        --template-body file://"${ATHENA_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
+}
+
 usage() {
     cat <<EOF
 Manages CFN stacks for the SOAR solution
@@ -95,6 +140,14 @@ main() {
         update_cicd
     elif [[ "${args}" == "delete-cicd" ]]; then
         delete_cicd
+    elif [[ "${args}" == "create-cloudtrail" ]]; then
+        create_cloudtrail
+    elif [[ "${args}" == "update-cloudtrail" ]]; then
+        update_cloudtrail
+    elif [[ "${args}" == "create-athena" ]]; then
+        create_athena
+    elif [[ "${args}" == "update-athena" ]]; then
+        update_athena
     else
         echo "Not a valid argument..."
         usage
