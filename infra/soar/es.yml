@@ -50,22 +50,38 @@ Resources:
           Principal:
             AWS: !GetAtt CognitoAccessForAmazonES.Arn
           Action:
-          - "es:Get*"
-          - "es:List*"
-          - "es:Describe*"
-          - "es:HttpGet*"
-          - "es:ESHttpGet"
-          - "es:ESHttpPost"
-          - "es:ESHttpPut"
-          - "es:ESHttpHead"
-          - "es:ESHttpPatch"
+          - "es:*"
           Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AwsEnvironment}-comp9447-team4-es/*"
 
   CognitoAccessForAmazonES:
     Type: AWS::IAM::Role
     Properties:
       RoleName: CognitoAccessForAmazonES
-      AssumeRolePolicyDocument: >-
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html#es-cognito-auth-troubleshooting
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonESCognitoAccess
+      Policies:
+      - PolicyName: AllowAllES
+        PolicyDocument: >-
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "iam:GetRole",
+                  "iam:PassRole",
+                  "iam:CreateRole",
+                  "iam:AttachRolePolicy",
+                  "ec2:DescribeVpcs",
+                  "cognito-identity:ListIdentityPools",
+                  "cognito-idp:ListUserPools"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }
+      AssumeRolePolicyDocument: !Sub >-
         {
           "Version": "2012-10-17",
           "Statement": [
@@ -78,8 +94,51 @@ Resources:
             }
           ]
         }
+
+  AuthenticatedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AuthenticatedRoleForESCognito
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html#es-cognito-auth-troubleshooting
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AmazonESCognitoAccess
+      Policies:
+      - PolicyName: AllowAllES
+        PolicyDocument: >-
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "es:*"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }
+      AssumeRolePolicyDocument: !Sub >-
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": "${CognitoIdentityPool}"
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        }
+
 
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
@@ -99,6 +158,16 @@ Resources:
     Properties: 
       Domain: !Sub ${AwsEnvironment}-comp9447-team4-es
       UserPoolId: !Ref CognitoUserPool
+
+  # Must give cognito identity pool a role once authenticated
+  CognitoIdentityPoolAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties: 
+      IdentityPoolId: !Ref CognitoIdentityPool
+      RoleMappings: !GetAtt CognitoUserPool.ProviderName
+      # RoleMappings: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${CognitoIdentityPool}
+      Roles:
+        authenticated: !Ref AuthenticatedRole
 
 Outputs:
   UserPoolUrl:
