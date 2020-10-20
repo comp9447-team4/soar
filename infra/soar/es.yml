@@ -160,14 +160,13 @@ Resources:
       UserPoolId: !Ref CognitoUserPool
 
   # Must give cognito identity pool a role once authenticated
-  CognitoIdentityPoolAttachment:
-    Type: AWS::Cognito::IdentityPoolRoleAttachment
-    Properties: 
-      IdentityPoolId: !Ref CognitoIdentityPool
-      RoleMappings: !GetAtt CognitoUserPool.ProviderName
-      # RoleMappings: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${CognitoIdentityPool}
-      Roles:
-        authenticated: !Ref AuthenticatedRole
+  # I don't know WHY THE FK it cant do it via here, it must be done via the UI
+  # CognitoIdentityPoolAttachment:
+  #   Type: AWS::Cognito::IdentityPoolRoleAttachment
+  #   Properties: 
+  #     IdentityPoolId: !Ref CognitoIdentityPool
+  #     Roles:
+  #       authenticated: !Ref AuthenticatedRole
 
 Outputs:
   UserPoolUrl:
