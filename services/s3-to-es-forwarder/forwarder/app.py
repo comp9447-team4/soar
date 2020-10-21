@@ -16,7 +16,7 @@ def lambda_handler(event, context):
     awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
 
     host = f"https://{os.environ['ES_DOMAIN']}" # the Amazon ES domain, including https://
-    index = f"{os.environ['ES_INDEX']}_{datetime.utcnow().strftime('%Y%m%d')}"
+    index = f"{os.environ['ES_INDEX']}_{datetime.datetime.utcnow().strftime('%Y%m%d')}"
     type = 'lambda-type'
     url = host + '/' + index + '/' + type
     headers = { "Content-Type": "application/json" }
