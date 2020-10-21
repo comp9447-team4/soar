@@ -4,7 +4,7 @@ This is a lambda that listens for S3 Put events and forwards it to ES.
 ## Local test
 ```
 make build
-sam local invoke -e events/s3_put.json
+make invoke
 ```
 
 ## Deploy to QA

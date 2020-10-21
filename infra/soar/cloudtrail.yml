@@ -42,6 +42,14 @@ Resources:
       PolicyDocument: 
         Version: "2012-10-17"
         Statement: 
+          - Sid: "AWSLambdaToRead"
+            Effect: "Allow"
+            Principal: 
+              Service: "lambda.amazonaws.com"
+            Action: "s3:Get*"
+            Resource:
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}/*
           - Sid: "AWSCloudTrailAclCheck"
             Effect: "Allow"
             Principal: 

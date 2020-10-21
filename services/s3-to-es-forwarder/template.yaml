@@ -23,11 +23,45 @@ Resources:
       CodeUri: forwarder/
       Handler: app.lambda_handler
       Runtime: python3.8
+      Role: !GetAtt AllCloudTrailEsForwarderRole.Arn
       Environment:
         Variables:
           ES_DOMAIN:
             Fn::ImportValue: !Sub "${AwsEnvironment}-es:DomainEndpoint"
           ES_INDEX: "all_cloud_trail"
+
+  AllCloudTrailEsForwarderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Policies:
+      - PolicyName: AllowReadCloudtrail
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:Get*
+            - s3:List*
+            Resource:
+            - Fn::ImportValue: !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+            - Fn::Join:
+              - ""
+              - - Fn::ImportValue: !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+                - "/*"
+      AssumeRolePolicyDocument: !Sub >-
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+
 
   S3Permission:
     Type: AWS::Lambda::Permission
@@ -40,7 +74,6 @@ Resources:
         Fn::ImportValue:
           !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
 
-      
 
 Outputs:
   AllCloudTrailEsForwarder:

@@ -2,6 +2,7 @@ import boto3
 import re
 import requests
 import json
+import gzip
 from requests_aws4auth import AWS4Auth
 import os
 
@@ -19,14 +20,17 @@ def lambda_handler(event, context):
     headers = { "Content-Type": "application/json" }
     s3 = boto3.client('s3')
 
+
     for record in event['Records']:
         # Get the bucket name and key for the new file
         bucket = record['s3']['bucket']['name']
         key = record['s3']['object']['key']
 
         # Get, read, and split the file into lines
-        obj = s3.get_object(Bucket=bucket, Key=key)
-        body = obj['Body'].read()
+        response = s3.get_object(Bucket=bucket, Key=key)
+        content = response['Body'].read()
+        with gzip.GzipFile(fileobj=io.BytesIO(content), mode='rb') as fh:
+            yourJson = json.load(fh)
         lines = body.splitlines()
 
         for line in lines:
