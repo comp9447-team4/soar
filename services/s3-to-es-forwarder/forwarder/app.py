@@ -31,5 +31,4 @@ def lambda_handler(event, context):
 
         for line in lines:
             document = json.loads(str(line))
-            print(document)
-            # r = requests.post(url, auth=awsauth, json=document, headers=headers)
+            r = requests.post(url, auth=awsauth, json=document, headers=headers)

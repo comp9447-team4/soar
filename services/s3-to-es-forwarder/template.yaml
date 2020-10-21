@@ -5,19 +5,6 @@ Description: >
 
   Sample SAM Template for s3_to_es
 
-Mappings:
-  ES_DOMAIN:
-    us-east-1:
-      qa: https://
-      prod: TODO
-
-Parameters:
-  AwsEnvironment:
-    Type: String
-    AllowedValues:
-    - qa
-    - prod
-
 Globals:
   Function:
     Timeout: 3
@@ -32,7 +19,7 @@ Resources:
       Environment:
         Variables:
           AWS_REGION: !Ref AWS::Region
-          ES_DOMAIN: !FindInMap [ES_DOMAIN, !Ref AWS::Region, !Ref AwsEnvironment ]
+          ES_DOMAIN: "https://search-qa-comp9447-team4-es-vtotgxu23zd6ok2sjurrexojqu.us-east-1.es.amazonaws.com"
           ES_INDEX: "all_cloud_trail"
 
 
@@ -40,4 +27,5 @@ Outputs:
   AllCloudTrailEsForwarder:
     Description: "Hello World Lambda Function ARN"
     Value: !GetAtt AllCloudTrailEsForwarder.Arn
-    Name: !Sub "${AWS::StackName}:AllCloudTrailEsForwarder"
+    Export:
+      Name: !Sub "${AWS::StackName}:AllCloudTrailEsForwarder"
