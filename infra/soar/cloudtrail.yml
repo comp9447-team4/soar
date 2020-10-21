@@ -27,14 +27,29 @@ Resources:
         Fn::Sub:
         - "${AwsEnvironment}-comp9447-team4-cloudtrail"
         - AwsEnvironment: !Ref AwsEnvironment
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-aws-integrations.html
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Function:
+              Fn::ImportValue:
+                !Sub "${AwsEnvironment}-S3ToEsForwarder:AllCloudTrailEsForwarder"
 
-  BucketPolicy: 
+  BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties: 
       Bucket: !Ref CloudTrailBucket
       PolicyDocument: 
         Version: "2012-10-17"
         Statement: 
+          - Sid: "AWSLambdaToRead"
+            Effect: "Allow"
+            Principal: 
+              Service: "lambda.amazonaws.com"
+            Action: "s3:Get*"
+            Resource:
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}/*
           - Sid: "AWSCloudTrailAclCheck"
             Effect: "Allow"
             Principal: 
