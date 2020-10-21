@@ -48,6 +48,14 @@ Resources:
               - ""
               - - Fn::ImportValue: !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
                 - "/*"
+      - PolicyName: AllowToPost
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - "es:ESHttpPost"
+            Resource: "*"
       AssumeRolePolicyDocument: !Sub >-
         {
           "Version": "2012-10-17",
