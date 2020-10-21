@@ -175,4 +175,7 @@ Outputs:
     Value: !GetAtt CognitoUserPool.ProviderURL
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'UserPoolUrl' ] ]
-
+  DomainEndpoint:
+    Value: !GetAtt ElasticsearchDomain.DomainEndpoint
+    Export:
+      Name: !Sub "${AWS::StackName}:DomainEndpoint"

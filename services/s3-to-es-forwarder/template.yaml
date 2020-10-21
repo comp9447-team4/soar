@@ -5,6 +5,13 @@ Description: >
 
   Sample SAM Template for s3_to_es
 
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
 Globals:
   Function:
     Timeout: 3
@@ -19,7 +26,8 @@ Resources:
       Environment:
         Variables:
           AWS_REGION: !Ref AWS::Region
-          ES_DOMAIN: "https://search-qa-comp9447-team4-es-vtotgxu23zd6ok2sjurrexojqu.us-east-1.es.amazonaws.com"
+          ES_DOMAIN:
+            Fn::ImportValue: !Sub "${AwsEnvironment}-es:DomainEndpoint"
           ES_INDEX: "all_cloud_trail"
 
 
