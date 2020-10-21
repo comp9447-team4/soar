@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  s3_to_es
+
+  Sample SAM Template for s3_to_es
+
+Mappings:
+  ES_DOMAIN:
+    us-east-1:
+      qa: https://
+      prod: TODO
+
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  AllCloudTrailEsForwarder:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: forwarder/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Environment:
+        Variables:
+          AWS_REGION: !Ref AWS::Region
+          ES_DOMAIN: !FindInMap [ES_DOMAIN, !Ref AWS::Region, !Ref AwsEnvironment ]
+          ES_INDEX: "all_cloud_trail"
+
+
+Outputs:
+  AllCloudTrailEsForwarder:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt AllCloudTrailEsForwarder.Arn
+    Name: !Sub "${AWS::StackName}:AllCloudTrailEsForwarder"

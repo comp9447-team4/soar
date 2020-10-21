@@ -27,8 +27,16 @@ Resources:
         Fn::Sub:
         - "${AwsEnvironment}-comp9447-team4-cloudtrail"
         - AwsEnvironment: !Ref AwsEnvironment
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-aws-integrations.html
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Function:
+              Fn::ImportValue:
+                - # TODO!
+                # - !Sub "${AwsEnvironment}-es:S3ToEsForwarderLambda"
 
-  BucketPolicy: 
+  BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties: 
       Bucket: !Ref CloudTrailBucket

@@ -168,6 +168,8 @@ Resources:
   #     Roles:
   #       authenticated: !Ref AuthenticatedRole
 
+
+
 Outputs:
   UserPoolUrl:
     Value: !GetAtt CognitoUserPool.ProviderURL
