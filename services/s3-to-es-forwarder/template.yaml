@@ -25,11 +25,22 @@ Resources:
       Runtime: python3.8
       Environment:
         Variables:
-          AWS_REGION: !Ref AWS::Region
           ES_DOMAIN:
             Fn::ImportValue: !Sub "${AwsEnvironment}-es:DomainEndpoint"
           ES_INDEX: "all_cloud_trail"
 
+  S3Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt AllCloudTrailEsForwarder.Arn
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref 'AWS::AccountId'
+      SourceArn:
+        Fn::ImportValue:
+          !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+
+      
 
 Outputs:
   AllCloudTrailEsForwarder:

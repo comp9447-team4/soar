@@ -122,7 +122,7 @@ create_es() {
 }
 
 update_es() {
-    echo "Creating es stack..."
+    echo "Updating es stack..."
     aws cloudformation update-stack \
         --stack-name "${ES_STACK_NAME}" \
         --template-body file://"${ES_STACK_YML}" \
