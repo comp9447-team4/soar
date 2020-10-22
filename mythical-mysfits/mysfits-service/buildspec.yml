@@ -24,7 +24,7 @@ phases:
             --region "${AWS_DEFAULT_REGION}" \
             | docker login \
               --username AWS \
-              --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com
+              --password-stdin "${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com
   build:
     commands:
       - cd mythical-mysfits/mysfits-service/
