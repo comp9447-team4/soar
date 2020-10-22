@@ -99,8 +99,19 @@ update_ecr() {
 start_image_scan() {
     echo "Scanning image... This can only be done once a day."
     aws ecr start-image-scan \
-        --repository-name 	mythicalmysfits/service \
-        --image-id imageDigest=sha256:74b2c688c700ec95a93e478cdb959737c148df3fbf5ea706abe0318726e885e6
+        --repository-name mythicalmysfits/service \
+        --image-id imageDigest="${IMAGE_DIGEST}"
+}
+
+describe_images() {
+    aws ecr wait image-scan-complete \
+        --repository-name mythicalmysfits/service \
+        --image-id imageTag=latest
+
+    aws ecr describe-images \
+        --repository-name mythicalmysfits/service \
+        --image-id imageTag=latest \
+        | jq -r ".imageDetails[0].imageScanFindingsSummary"
 }
 
 build_docker_image() {
@@ -652,6 +663,10 @@ main() {
         update_core
     elif [[ "${args}" == "update-ecr" ]]; then
         update_ecr
+    elif [[ "${args}" == "start-image-scan" ]]; then
+        start_image_scan
+    elif [[ "${args}" == "describe-images" ]]; then
+        describe_images
     else
         echo "No command run :("
         usage
