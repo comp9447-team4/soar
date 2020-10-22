@@ -13,6 +13,7 @@ phases:
       # authorized. Authentication is performed automatically by the AWS CLI
       # using the AWS credentials associated with the IAM role assigned to the
       # instances in your AWS CodeBuild project.
+      - apt update -y
       - apt install -y jq
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
