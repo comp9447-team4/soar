@@ -1,0 +1,11 @@
+ DnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: "DomainName"
+      Comment: DNS alias for s3 bucket
+      Name: "DomainName"
+      Type: CNAME
+      TTL: '900'
+      ResourceRecords:
+      - "S3Record"
+  
