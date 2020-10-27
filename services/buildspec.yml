@@ -37,7 +37,14 @@ phases:
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
-      # TODO: Build more artifacts here
+      # CodePipeline notifier
+      - cd services/codepipeline-notifier
+      - >-
+        sam package
+        --template-file ./template.yaml
+        --output-template-file ./transformed.yaml
+        --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
+      - cd -
 
 
   post_build:
