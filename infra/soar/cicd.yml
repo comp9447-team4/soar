@@ -327,6 +327,21 @@ Resources:
             TemplatePath: "BuildArtifact::services/budget-alarms/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+        # BUDGET ALARMS
+        - Name: DeployCodePipelineBot
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CloudFormation
+          InputArtifacts:
+          - Name: BuildArtifact
+          Configuration:
+            ActionMode: REPLACE_ON_FAILURE
+            StackName: BudgetAlarms
+            TemplatePath: "BuildArtifact::services/codepipeline-notifier/transformed.yaml"
+            RoleArn: !GetAtt CodePipelineServiceRole.Arn
+            Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
 
 Outputs:
   CodeBuildArtifactsBucket:

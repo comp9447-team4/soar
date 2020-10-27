@@ -17,7 +17,6 @@ phases:
       - pwd
       # Build Hello world
       - cd services/hello-world/
-      - "rm *.toml"
       - sam build
       - >-
         sam package
@@ -27,7 +26,6 @@ phases:
       - cd -
       # Build Budget Alarms
       - cd services/budget-alarms/
-      - "rm *.toml"
       - sam build
       - >-
         sed -i "s/AWS_ENVIRONMENT: qa/AWS_ENVIRONMENT: ${AWS_ENVIRONMENT}/g" ./template.yaml
@@ -39,6 +37,7 @@ phases:
       - cd -
       # CodePipeline notifier
       - cd services/codepipeline-notifier
+      - sam build
       - >-
         sam package
         --template-file ./template.yaml
@@ -55,3 +54,4 @@ artifacts:
   files:
     - ./services/hello-world/transformed.yaml
     - ./services/budget-alarms/transformed.yaml
+    - ./services/codepipeline-notifier/transformed.yaml
