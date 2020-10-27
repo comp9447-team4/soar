@@ -34,10 +34,9 @@ def lambda_handler(event, context):
     else:
         raise ValueError(f"Unknown AWS_ENVIRONMENT: {AWS_ENVIRONMENT}. Must be qa or prod.")
 
-    message = event['Records'][0]['Sns']['Message']
+    message = json.dumps(event['Records'][0]['Sns']['Message'], indent=2)
     logger.info(f"Got a message: {message}")
 
-    details = json.dumps(message['detail'], indent=2)
-    content = f"I am the CodePipeline bot. :robot:\n\n{details}"
+    content = f"I am the CodePipeline bot. :robot:\n```{message}```"
     response = requests.post(webhook_url, data={"content": content})
     return 0

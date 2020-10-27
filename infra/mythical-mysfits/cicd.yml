@@ -183,15 +183,15 @@ Resources:
       - codepipeline-pipeline-pipeline-execution-resumed
       - codepipeline-pipeline-pipeline-execution-succeeded
       - codepipeline-pipeline-pipeline-execution-superseded
-      - codepipeline-pipeline-stage-execution-started
-      - codepipeline-pipeline-stage-execution-succeeded
-      - codepipeline-pipeline-stage-execution-resumed
-      - codepipeline-pipeline-stage-execution-canceled
-      - codepipeline-pipeline-stage-execution-failed
-      - codepipeline-pipeline-action-execution-succeeded
-      - codepipeline-pipeline-action-execution-failed
-      - codepipeline-pipeline-action-execution-canceled
-      - codepipeline-pipeline-action-execution-started
+      # - codepipeline-pipeline-stage-execution-started
+      # - codepipeline-pipeline-stage-execution-succeeded
+      # - codepipeline-pipeline-stage-execution-resumed
+      # - codepipeline-pipeline-stage-execution-canceled
+      # - codepipeline-pipeline-stage-execution-failed
+      # - codepipeline-pipeline-action-execution-succeeded
+      # - codepipeline-pipeline-action-execution-failed
+      # - codepipeline-pipeline-action-execution-canceled
+      # - codepipeline-pipeline-action-execution-started
 
   # Export this SNS topic.
   # Get a lambda to subscribe to it which would forward alerts to Discord.
