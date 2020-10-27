@@ -161,6 +161,36 @@ Resources:
         Type: S3
         Location: !Ref CodeBuildArtifactsBucket
 
+  # This can fail on the first try, give it a few mins for AWS to create a service role and retry
+  # AWS CodeStar Notifications could not create the AWS CloudWatch Events managed rule in your AWS account. If this is your first time creating a notification rule, the service-linked role for AWS CodeStar Notifications might not yet exist. Creation of this role might take up to 15 minutes. Until it exists, notification rule creation will fail. Wait 15 minutes, and then try again.
+  # If this is is not the first time you are creating a notification rule, there might be a problem with a network connection, or one or more AWS services might be experiencing issues.
+  # Verify your network connection and check to see if there are any issues with AWS services in your AWS Region before trying again. (Service: CodeStarNotifications; Status Code: 400; Error Code: ConfigurationException;
+  PipelineNotificationRule:
+    Type: AWS::CodeStarNotifications::NotificationRule
+    Properties:
+      Name: MythicalMysfitsServiceCICDPipeline
+      DetailType: FULL
+      Status: ENABLED
+      Resource: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:MythicalMysfitsServiceCICDPipeline"
+      Targets:
+      - TargetAddress: !Ref PipelineSnsTopic
+        TargetType: SNS
+      # https://docs.aws.amazon.com/dtconsole/latest/userguide/concepts.html#concepts-api
+      EventTypeIds:
+      - codepipeline-pipeline-pipeline-execution-failed
+      - codepipeline-pipeline-pipeline-execution-canceled
+      - codepipeline-pipeline-pipeline-execution-started
+      - codepipeline-pipeline-pipeline-execution-resumed
+      - codepipeline-pipeline-pipeline-execution-succeeded
+      - codepipeline-pipeline-pipeline-execution-superseded
+
+  # Export this SNS topic.
+  # Get a lambda to subscribe to it which would forward alerts to Discord.
+  PipelineSnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: MythicalMysfitsServicePipelineEvents
+
 Outputs:
   CodeBuildArtifactsBucket:
     Value: !Ref CodeBuildArtifactsBucket
@@ -172,3 +202,7 @@ Outputs:
     Description: Lambda artifacts bucket
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LambdaArtifactsBucket' ] ]
+  PipelineSnsTopic:
+    Value: !Ref PipelineSnsTopic
+    Export:
+      Name: !Sub "${AWS::StackName}:PipelineSnsTopic"

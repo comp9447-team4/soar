@@ -328,31 +328,6 @@ Resources:
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
 
-    NotificationRule:
-      Type: AWS::CodeStarNotifications::NotificationRule
-      Properties:
-        Name: MythicalMysfitsServiceCICDPipeline
-        Status: Enabled
-        Resource: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:MythicalMysfitsServiceCICDPipeline"
-        Targets:
-        - TargetAddress: !Ref PipelineSnsTopic
-          TargetType: SNS
-        # https://docs.aws.amazon.com/dtconsole/latest/userguide/concepts.html#concepts-api
-        EventTypeIds:
-        - codepipeline-pipeline-pipeline-execution-failed
-        - codepipeline-pipeline-pipeline-execution-canceled
-        - codepipeline-pipeline-pipeline-execution-started
-        - codepipeline-pipeline-pipeline-execution-resumed
-        - codepipeline-pipeline-pipeline-execution-succeeded
-        - codepipeline-pipeline-pipeline-execution-superseded
-
-    # Export this SNS topic.
-    # Get a lambda to subscribe to it which would forward alerts to Discord.
-    PipelineSnsTopic:
-      Type: AWS::SNS::Topic
-      Properties:
-        TopicName: MythicalMysfitsServicePipelineEvents
-
 Outputs:
   CodeBuildArtifactsBucket:
     Value: !Ref CodeBuildArtifactsBucket
@@ -364,6 +339,3 @@ Outputs:
     Description: Lambda artifacts bucket
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LambdaArtifactsBucket' ] ]
-  PipelineSnsTopic:
-    Value: !Ref PipelineSnsTopic
-    Export: !Sub "${AWS::StackName}:PipelineSnsTopic"
