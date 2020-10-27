@@ -66,28 +66,24 @@ create_secrets() {
 # WAF stack deployment
 export WAF_TEMPLATE="${REPO_ROOT}/services/WAF/templates/aws-waf-security-automations.template"
 export WAF_ALB_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-api-deploy.toml"
-export WAF_CLOUDFRONT_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-api-deploy.toml"
+export WAF_CLOUDFRONT_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-cloudfront-deploy.toml"
 
 create-waf-stack()  {
     echo "Do you wish to deploy to endpoint ALB?"
     select yn in "Yes" "No"; do
     case $yn in
-        Yes ) sam deploy \
-        --template-file file://"${WAF_TEMPLATE}" \
-        --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
-        --config-file file://"${WAF_ALB_CONFIG}"; break;;
-        No ) continue;;
+        Yes ) sam deploy -t "${WAF_TEMPLATE}" --config-file "${WAF_ALB_CONFIG}"; break;;
+        No ) echo "Deployment skipped"; break;;
+        *)  echo "That is not a valid choice, try a number 1 or 2";;
     esac
     done
 
     echo "Do you wish to deploy to endpoint CloudFront?"
     select yn in "Yes" "No"; do
     case $yn in
-        Yes ) sam deploy \
-        --template-file file://"${WAF_TEMPLATE}" \
-        --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
-        --config-file file://"${WAF_CLOUDFRONT_CONFIG}"; break;;
-        No ) continue;;
+        Yes ) sam deploy -t "${WAF_TEMPLATE}" --config-file "${WAF_CLOUDFRONT_CONFIG}"; break;;
+        No ) echo "Deployment skipped"; break;;
+        *)  echo "That is not a valid choice, try a number 1 or 2";;
     esac
     done
 
