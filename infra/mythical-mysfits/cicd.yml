@@ -165,10 +165,10 @@ Resources:
   # AWS CodeStar Notifications could not create the AWS CloudWatch Events managed rule in your AWS account. If this is your first time creating a notification rule, the service-linked role for AWS CodeStar Notifications might not yet exist. Creation of this role might take up to 15 minutes. Until it exists, notification rule creation will fail. Wait 15 minutes, and then try again.
   # If this is is not the first time you are creating a notification rule, there might be a problem with a network connection, or one or more AWS services might be experiencing issues.
   # Verify your network connection and check to see if there are any issues with AWS services in your AWS Region before trying again. (Service: CodeStarNotifications; Status Code: 400; Error Code: ConfigurationException;
-  PipelineNotificationRule:
+  PipelineNotificationRule2:
     Type: AWS::CodeStarNotifications::NotificationRule
     Properties:
-      Name: MythicalMysfitsServiceCICDPipeline
+      Name: MythicalMysfitsServiceCICDPipeline2
       DetailType: FULL
       Status: ENABLED
       Resource: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:MythicalMysfitsServiceCICDPipeline"
@@ -183,6 +183,15 @@ Resources:
       - codepipeline-pipeline-pipeline-execution-resumed
       - codepipeline-pipeline-pipeline-execution-succeeded
       - codepipeline-pipeline-pipeline-execution-superseded
+      - codepipeline-pipeline-stage-execution-started
+      - codepipeline-pipeline-stage-execution-succeeded
+      - codepipeline-pipeline-stage-execution-resumed
+      - codepipeline-pipeline-stage-execution-canceled
+      - codepipeline-pipeline-stage-execution-failed
+      - codepipeline-pipeline-action-execution-succeeded
+      - codepipeline-pipeline-action-execution-failed
+      - codepipeline-pipeline-action-execution-canceled
+      - codepipeline-pipeline-action-execution-started
 
   # Export this SNS topic.
   # Get a lambda to subscribe to it which would forward alerts to Discord.
@@ -190,6 +199,43 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: MythicalMysfitsServicePipelineEvents
+
+  # Give a policy to allow codestar to publish messages to sns
+  TopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      # https://docs.aws.amazon.com/dtconsole/latest/userguide/set-up-sns.html
+      PolicyDocument:
+        Version: '2008-10-17'
+        Id: __default_policy_ID
+        Statement:
+        - Sid: __default_statement_ID
+          Effect: Allow
+          Principal:
+            AWS: "*"
+          Action:
+          - SNS:GetTopicAttributes
+          - SNS:SetTopicAttributes
+          - SNS:AddPermission
+          - SNS:RemovePermission
+          - SNS:DeleteTopic
+          - SNS:Subscribe
+          - SNS:ListSubscriptionsByTopic
+          - SNS:Publish
+          - SNS:Receive
+          Resource: !Ref PipelineNotificationRule2
+          Condition:
+            StringEquals:
+              AWS:SourceOwner: !Sub "${AWS::AccountId}"
+        - Sid: AWSCodeStarNotifications_publish
+          Effect: Allow
+          Principal:
+            Service:
+            - codestar-notifications.amazonaws.com
+          Action: SNS:Publish
+          Resource: !Ref PipelineNotificationRule2
+      Topics:
+      - !Ref PipelineSnsTopic
 
 Outputs:
   CodeBuildArtifactsBucket:

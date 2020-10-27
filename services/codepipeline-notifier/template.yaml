@@ -22,8 +22,8 @@ Resources:
           DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762644386009317407/R1qXCsrycsrTx6QFa-dgpyFbMjzFDhK2WnxQiqmQP-N07mID7Hs-bGYU0-ENb61v1d6G
           AWS_ENVIRONMENT: qa
       Events:
-        SnsBudgetAlarm:
+        # Subscribe to a SNS topics from other stacks
+        MythicalMysfitsServicePipelineSnsTopic:
           Type: SNS
           Properties:
-            Topic: !ImportValue budgets:BudgetAlarmsSnsTopic
-
+            Topic: !ImportValue MythicalMysfitsCICDStack:PipelineSnsTopic
