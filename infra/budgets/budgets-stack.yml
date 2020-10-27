@@ -34,7 +34,7 @@ Resources:
     Type: "AWS::Budgets::Budget"
     Properties:
       Budget:
-        BudgetName: "$100 Budget (exc) Credits"
+        BudgetName: "Including Credits and Free Tier"
         BudgetLimit:
           Amount: 100
           Unit: USD
@@ -153,7 +153,7 @@ Resources:
     Type: "AWS::Budgets::Budget"
     Properties:
       Budget:
-        BudgetName: "$100 Budget (inc) Credits"
+        BudgetName: "WARNING! Excluding Credits."
         BudgetLimit:
           Amount: 100
           Unit: USD
