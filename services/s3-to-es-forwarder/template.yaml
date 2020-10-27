@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  s3_to_es
+
+  Sample SAM Template for s3_to_es
+
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  AllCloudTrailEsForwarder:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: forwarder/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Role: !GetAtt AllCloudTrailEsForwarderRole.Arn
+      Environment:
+        Variables:
+          ES_DOMAIN:
+            Fn::ImportValue: !Sub "${AwsEnvironment}-es:DomainEndpoint"
+          ES_INDEX: "all_cloud_trail"
+
+  AllCloudTrailEsForwarderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Policies:
+      - PolicyName: AllowReadCloudtrail
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:Get*
+            - s3:List*
+            Resource:
+            - Fn::ImportValue: !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+            - Fn::Join:
+              - ""
+              - - Fn::ImportValue: !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+                - "/*"
+      - PolicyName: AllowToPost
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - "es:ESHttpPost"
+            Resource: "*"
+      AssumeRolePolicyDocument: !Sub >-
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+
+
+  S3Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt AllCloudTrailEsForwarder.Arn
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref 'AWS::AccountId'
+      SourceArn:
+        Fn::ImportValue:
+          !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+
+
+Outputs:
+  AllCloudTrailEsForwarder:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt AllCloudTrailEsForwarder.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}:AllCloudTrailEsForwarder"

@@ -1,0 +1,97 @@
+---
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudtrail-trail.html#cfn-cloudtrail-trail-trailname
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudTrail
+
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Resources:
+  ###########################################
+  # CLOUDTRAIL for monitoring API calls
+  ###########################################
+  CloudTrailBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub:
+        - "${AwsEnvironment}-comp9447-team4-cloudtrail"
+        - AwsEnvironment: !Ref AwsEnvironment
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-aws-integrations.html
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Function:
+              Fn::ImportValue:
+                !Sub "${AwsEnvironment}-S3ToEsForwarder:AllCloudTrailEsForwarder"
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: !Ref CloudTrailBucket
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Sid: "AWSLambdaToRead"
+            Effect: "Allow"
+            Principal: 
+              Service: "lambda.amazonaws.com"
+            Action: "s3:Get*"
+            Resource:
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}/*
+          - Sid: "AWSCloudTrailAclCheck"
+            Effect: "Allow"
+            Principal: 
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:GetBucketAcl"
+            Resource: 
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}
+          - Sid: "AWSCloudTrailWrite"
+            Effect: "Allow"
+            Principal: 
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:PutObject"
+            Resource:
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}/*
+            Condition: 
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
+
+  AllTrail:
+    DependsOn:
+    - BucketPolicy
+    - CloudTrailBucket
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: all-trail
+      IsLogging: true
+      S3BucketName: !Ref CloudTrailBucket
+      S3KeyPrefix: all
+      # TODO(JT) Add a topic subscription, eg a lambda that alerts on cloudformation events
+      # SnsTopicName:
+
+Outputs:
+  CloudTrailBucket:
+    Value: !Ref CloudTrailBucket
+    Description: CloudTrailBucket
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CloudTrailBucket' ] ]
+  CloudTrailBucketArn:
+    Value: !GetAtt CloudTrailBucket.Arn
+    Description: CloudTrailBucketArn
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CloudTrailBucketArn' ] ]
+
