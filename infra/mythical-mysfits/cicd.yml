@@ -165,10 +165,10 @@ Resources:
   # AWS CodeStar Notifications could not create the AWS CloudWatch Events managed rule in your AWS account. If this is your first time creating a notification rule, the service-linked role for AWS CodeStar Notifications might not yet exist. Creation of this role might take up to 15 minutes. Until it exists, notification rule creation will fail. Wait 15 minutes, and then try again.
   # If this is is not the first time you are creating a notification rule, there might be a problem with a network connection, or one or more AWS services might be experiencing issues.
   # Verify your network connection and check to see if there are any issues with AWS services in your AWS Region before trying again. (Service: CodeStarNotifications; Status Code: 400; Error Code: ConfigurationException;
-  PipelineNotificationRule2:
+  PipelineNotificationRule3:
     Type: AWS::CodeStarNotifications::NotificationRule
     Properties:
-      Name: MythicalMysfitsServiceCICDPipeline2
+      Name: MythicalMysfitsServiceCICDPipeline3
       DetailType: FULL
       Status: ENABLED
       Resource: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:MythicalMysfitsServiceCICDPipeline"
@@ -223,17 +223,19 @@ Resources:
           - SNS:ListSubscriptionsByTopic
           - SNS:Publish
           - SNS:Receive
-          Resource: !Ref PipelineNotificationRule2
-          Condition:
-            StringEquals:
-              AWS:SourceOwner: !Sub "${AWS::AccountId}"
+          # Resource: !Ref PipelineNotificationRule3
+          Resource: "*"
+          #  Condition:
+          #    StringEquals:
+          #      AWS:SourceOwner: !Sub "${AWS::AccountId}"
         - Sid: AWSCodeStarNotifications_publish
           Effect: Allow
           Principal:
             Service:
             - codestar-notifications.amazonaws.com
           Action: SNS:Publish
-          Resource: !Ref PipelineNotificationRule2
+          Resource: "*"
+          # Resource: !Ref PipelineNotificationRule3
       Topics:
       - !Ref PipelineSnsTopic
 
