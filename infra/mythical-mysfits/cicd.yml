@@ -169,7 +169,7 @@ Resources:
     Type: AWS::CodeStarNotifications::NotificationRule
     Properties:
       Name: MythicalMysfitsServiceCICDPipeline3
-      DetailType: FULL
+      DetailType: BASIC
       Status: ENABLED
       Resource: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:MythicalMysfitsServiceCICDPipeline"
       Targets:
@@ -223,19 +223,17 @@ Resources:
           - SNS:ListSubscriptionsByTopic
           - SNS:Publish
           - SNS:Receive
-          # Resource: !Ref PipelineNotificationRule3
-          Resource: "*"
-          #  Condition:
-          #    StringEquals:
-          #      AWS:SourceOwner: !Sub "${AWS::AccountId}"
+          Resource: !Ref PipelineSnsTopic
+          Condition:
+            StringEquals:
+              AWS:SourceOwner: !Sub "${AWS::AccountId}"
         - Sid: AWSCodeStarNotifications_publish
           Effect: Allow
           Principal:
             Service:
             - codestar-notifications.amazonaws.com
           Action: SNS:Publish
-          Resource: "*"
-          # Resource: !Ref PipelineNotificationRule3
+          Resource: !Ref PipelineSnsTopic
       Topics:
       - !Ref PipelineSnsTopic
 

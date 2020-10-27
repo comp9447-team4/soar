@@ -37,6 +37,7 @@ def lambda_handler(event, context):
     message = event['Records'][0]['Sns']['Message']
     logger.info(f"Got a message: {message}")
 
-    content = f"{message}. I am the CodePipeline bot. :robot:"
+    details = json.dumps(message['detail'], indent=2)
+    content = f"I am the CodePipeline bot. :robot:\n\n{details}"
     response = requests.post(webhook_url, data={"content": content})
     return 0
