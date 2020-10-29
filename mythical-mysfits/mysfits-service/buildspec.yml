@@ -13,7 +13,18 @@ phases:
       # authorized. Authentication is performed automatically by the AWS CLI
       # using the AWS credentials associated with the IAM role assigned to the
       # instances in your AWS CodeBuild project.
-      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+      - apt update -y
+      - apt install -y jq
+      - |-
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install
+      - |-
+        aws ecr get-login-password \
+            --region "${AWS_DEFAULT_REGION}" \
+            | docker login \
+              --username AWS \
+              --password-stdin "${AWS_ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com
   build:
     commands:
       - cd mythical-mysfits/mysfits-service/
@@ -34,6 +45,10 @@ phases:
       # Push the image to ECR.
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mythicalmysfits/service:latest
       - echo Completed pushing Docker image. Deploying Docker image to AWS Fargate on `date`
+      - echo "Waiting for image scan results"
+      - aws ecr wait image-scan-complete --repository-name mythicalmysfits/service --image-id imageTag=latest
+      - scan_results=$(aws ecr describe-images --repository-name mythicalmysfits/service --image-id imageTag=latest | jq -r ".imageDetails[0].imageScanFindingsSummary")
+      - echo "${scan_results}"
       # Create a artifacts file that contains the name and location of the image
       # pushed to ECR. This will be used by AWS CodePipeline to automate
       # deployment of this specific container to Amazon ECS.

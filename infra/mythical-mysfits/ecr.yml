@@ -5,6 +5,8 @@ Resources:
   ECR:
     Type: AWS::ECR::Repository
     Properties:
+      ImageScanningConfiguration:
+        scanOnPush: true
       RepositoryName: mythicalmysfits/service
       Tags:
         - Key: Project

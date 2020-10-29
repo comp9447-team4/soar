@@ -86,6 +86,34 @@ create_ecr() {
 
 }
 
+update_ecr() {
+    echo "Creating ECR..."
+    aws cloudformation update-stack \
+        --stack-name "${ECR_STACK_NAME}" \
+        --template-body file://"${ECR_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM
+    wait_update "${ECR_STACK_NAME}"
+
+}
+
+start_image_scan() {
+    echo "Scanning image... This can only be done once a day."
+    aws ecr start-image-scan \
+        --repository-name mythicalmysfits/service \
+        --image-id imageDigest="${IMAGE_DIGEST}"
+}
+
+describe_images() {
+    aws ecr wait image-scan-complete \
+        --repository-name mythicalmysfits/service \
+        --image-id imageTag=latest
+
+    aws ecr describe-images \
+        --repository-name mythicalmysfits/service \
+        --image-id imageTag=latest \
+        | jq -r ".imageDetails[0].imageScanFindingsSummary"
+}
+
 build_docker_image() {
     cd "${REPO_ROOT}/mythical-mysfits/modules/module-2/app"
     # I'd prefer using immutable tags but latest will do for now...
@@ -169,16 +197,14 @@ create_cicd() {
     wait_build "${CICD_STACK_NAME}"
 }
 
-delete_cicd() {
-    echo "Deleting cicd stack..."
-    aws cloudformation \
-        update-termination-protection \
+update_cicd() {
+    aws cloudformation update-stack \
         --stack-name "${CICD_STACK_NAME}" \
-        --no-enable-termination-protection
+        --template-body file://"${CICD_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsProfile,ParameterValue="${AWS_PROFILE}"
 
-    aws cloudformation \
-        delete-stack \
-        --stack-name "${CICD_STACK_NAME}"
+    wait_update "${CICD_STACK_NAME}"
 }
 
 module_2_static_site_updates() {
@@ -633,6 +659,14 @@ main() {
         module_6_static_site_updates
     elif [[ "${args}" == "update-core" ]]; then
         update_core
+    elif [[ "${args}" == "update-ecr" ]]; then
+        update_ecr
+    elif [[ "${args}" == "start-image-scan" ]]; then
+        start_image_scan
+    elif [[ "${args}" == "describe-images" ]]; then
+        describe_images
+    elif [[ "${args}" == "update-cicd" ]]; then
+      update_cicd
     else
         echo "No command run :("
         usage

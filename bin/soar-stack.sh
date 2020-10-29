@@ -61,6 +61,34 @@ create_secrets() {
     wait_build "${SECRETS_STACK_NAME}"
 }
 
+
+# WAF stack deployment
+export WAF_TEMPLATE="${REPO_ROOT}/services/WAF/templates/aws-waf-security-automations.template"
+export WAF_ALB_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-api-deploy.toml"
+export WAF_CLOUDFRONT_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-cloudfront-deploy.toml"
+
+create-waf-stack()  {
+    echo "Do you wish to deploy to endpoint ALB?"
+    select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) sam deploy -t "${WAF_TEMPLATE}" --config-file "${WAF_ALB_CONFIG}"; break;;
+        No ) echo "Deployment skipped"; break;;
+        *)  echo "That is not a valid choice, try a number 1 or 2";;
+    esac
+    done
+
+    echo "Do you wish to deploy to endpoint CloudFront?"
+    select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) sam deploy -t "${WAF_TEMPLATE}" --config-file "${WAF_CLOUDFRONT_CONFIG}"; break;;
+        No ) echo "Deployment skipped"; break;;
+        *)  echo "That is not a valid choice, try a number 1 or 2";;
+    esac
+    done
+
+}
+
+
 export CLOUDTRAIL_STACK_NAME="${AWS_ENVIRONMENT}-CloudTrail"
 export CLOUDTRAIL_STACK_YML="${REPO_ROOT}/infra/soar/cloudtrail.yml"
 create_cloudtrail() {
@@ -84,6 +112,7 @@ update_cloudtrail() {
     wait_build "${CLOUDTRAIL_STACK_NAME}"
 }
 
+# Athena and ES for analytics
 export ATHENA_STACK_NAME="${AWS_ENVIRONMENT}-Athena"
 export ATHENA_STACK_YML="${REPO_ROOT}/infra/soar/athena.yml"
 create_athena() {
@@ -106,16 +135,42 @@ update_athena() {
         --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
 }
 
+export ES_STACK_NAME="${AWS_ENVIRONMENT}-es"
+export ES_STACK_YML="${REPO_ROOT}/infra/soar/es.yml"
+create_es() {
+    echo "Creating es stack..."
+    aws cloudformation create-stack \
+        --stack-name "${ES_STACK_NAME}" \
+        --template-body file://"${ES_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}" \
+        --disable-rollback \
+        --enable-termination-protection
+    wait_build "${ES_STACK_NAME}"
+}
+
+update_es() {
+    echo "Updating es stack..."
+    aws cloudformation update-stack \
+        --stack-name "${ES_STACK_NAME}" \
+        --template-body file://"${ES_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
+    wait_update "${ES_STACK_NAME}"
+}
+
 usage() {
     cat <<EOF
 Manages CFN stacks for the SOAR solution
 Reference: https://github.com/aws-samples/aws-modern-application-workshop/tree/python
-
-Usage: AWS_ENVIRONMENT=qa ./bin/soar.sh <arg>
+Usage: AWS_PROFILE=qa ./bin/soar.sh <arg>
 Where arg is:
 create-cicd
 update-cicd
 create-secrets
+create-waf-stack
+create-athena
+create-es
 EOF
 }
 main() {
@@ -140,6 +195,8 @@ main() {
         update_cicd
     elif [[ "${args}" == "delete-cicd" ]]; then
         delete_cicd
+    elif [[ "${args}" == "create-waf-stack" ]]; then
+        create-waf-stack
     elif [[ "${args}" == "create-cloudtrail" ]]; then
         create_cloudtrail
     elif [[ "${args}" == "update-cloudtrail" ]]; then
@@ -148,6 +205,10 @@ main() {
         create_athena
     elif [[ "${args}" == "update-athena" ]]; then
         update_athena
+    elif [[ "${args}" == "create-es" ]]; then
+        create_es
+    elif [[ "${args}" == "update-es" ]]; then
+        update_es
     else
         echo "Not a valid argument..."
         usage
