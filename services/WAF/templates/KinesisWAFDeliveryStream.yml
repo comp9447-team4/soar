@@ -1,0 +1,183 @@
+AWSTemplateFormatVersion:  2010-09-09
+
+Description: 'This template creates a Kinesis Firehose Delivery Stream that uses Lambda to filter out Default Action records'
+
+Parameters: 
+  KinesisBufferIntervalSeconds: 
+    Default: 900
+    Description: The frequency of data delivery to Amazon S3 is determined by the Amazon S3 Buffer size and Buffer interval value that you configured for your delivery stream. Kinesis Data Firehose buffers incoming data before delivering it to Amazon S3. You can configure the values for Amazon S3 Buffer size (1-128 MB) or Buffer interval (60 – 900 seconds), and the condition satisfied first triggers data delivery to Amazon S3    
+    Type: Number
+    MinValue: 60
+    MaxValue: 900
+  KinesisBufferSizeMB: 
+    Default: 3
+    Description: The frequency of data delivery to Amazon S3 is determined by the Amazon S3 Buffer size and Buffer interval value that you configured for your delivery stream. Kinesis Data Firehose buffers incoming data before delivering it to Amazon S3. You can configure the values for Amazon S3 Buffer size (1-128 MB) or Buffer interval (60 – 900 seconds), and the condition satisfied first triggers data delivery to Amazon S3    
+    Type: Number
+    MinValue: 1
+    MaxValue: 128
+Resources:
+  lambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties: 
+        AssumeRolePolicyDocument: 
+          Version: "2012-10-17"
+          Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+                Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+        Path: /
+        Policies: 
+          - 
+            PolicyName: !Join
+                - ''
+                - - 'lambda_basic_execution_'
+                  - !Ref AWS::StackName
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - 
+                      Effect: Allow
+                      Action:
+                          - logs:CreateLogGroup
+                          - logs:CreateLogStream
+                          - logs:PutLogEvents
+                      Resource: 
+                          - arn:aws:logs:*:*:*
+  lambdaFunction: 
+    Type: "AWS::Lambda::Function"
+    Properties: 
+        Handler: "index.handler"
+        Role: 
+            Fn::GetAtt: 
+              - "lambdaExecutionRole"
+              - "Arn"
+        Code: 
+            ZipFile: "
+              'use strict';
+
+              exports.handler = (event, context, callback) => {
+                  /* Process the list of records and drop those containing Default_Action */
+                  const output = event.records.map((record) => {
+                      
+                      const entry = (new Buffer(record.data, 'base64')).toString('utf8');
+                      if (!entry.match(/Default_Action/g))
+                      {
+                          return {
+                            
+                              recordId: record.recordId,
+                              result: 'Ok',
+                              data: record.data,
+                          };
+                      }
+                      else {
+                          return {
+                              recordId: record.recordId,
+                              result: 'Dropped',
+                              data: record.data,
+                          };
+                      }
+                  });
+                
+                  console.log(`Processing completed.  Successful records ${output.length}.`);
+                  callback(null, { records: output });
+              };"
+        Runtime: "nodejs12.x"
+        Timeout: 60
+  s3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+  deliveryRole:
+    Type: AWS::IAM::Role
+    Properties:
+        AssumeRolePolicyDocument:
+            Version: 2012-10-17
+            Statement:
+            -
+                Effect: Allow
+                Principal:
+                    Service: firehose.amazonaws.com
+                Action: 'sts:AssumeRole'
+                Condition:
+                    StringEquals:
+                     'sts:ExternalId': !Ref 'AWS::AccountId'
+        Policies:
+          -
+            PolicyName: !Join
+                - ''
+                - - 'kinesis_delivery_'
+                  - !Ref AWS::StackName
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                - 
+                    Effect: Allow
+                    Action:
+                        - 's3:AbortMultipartUpload'
+                        - 's3:GetBucketLocation'
+                        - 's3:GetObject'
+                        - 's3:ListBucket'
+                        - 's3:ListBucketMultipartUploads'
+                        - 's3:PutObject'
+                        - 'lambda:InvokeFunction' 
+                        - 'lambda:GetFunctionConfiguration'  
+                    Resource:
+                    - !Join 
+                        - ''
+                        - - 'arn:aws:s3:::'
+                          - !Ref s3Bucket
+                    - !Join 
+                        - ''
+                        - - 'arn:aws:s3:::'
+                          - !Ref s3Bucket
+                          - '*'
+                    - !GetAtt lambdaFunction.Arn
+                    - !Join
+                      - ''
+                      - - !GetAtt lambdaFunction.Arn
+                        - ':*'
+  firehoseDeliveryStream: 
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: 
+        !Join
+          - ''
+          - - 'aws-waf-logs-'
+            - !Ref AWS::StackName
+      ExtendedS3DestinationConfiguration:
+        BucketARN: !Join 
+          - ''
+          - - 'arn:aws:s3:::'
+            - !Ref s3Bucket
+        BufferingHints:
+          IntervalInSeconds: !Ref KinesisBufferIntervalSeconds
+          SizeInMBs: !Ref KinesisBufferSizeMB
+        CompressionFormat: UNCOMPRESSED
+        Prefix: firehose/
+        RoleARN: !GetAtt deliveryRole.Arn
+        ProcessingConfiguration:
+          Enabled: 'true'
+          Processors:
+            - Parameters:
+                - ParameterName: LambdaArn
+                  ParameterValue: !GetAtt lambdaFunction.Arn 
+                - ParameterName: BufferSizeInMBs
+                  ParameterValue: '3'
+                - ParameterName: BufferIntervalInSeconds
+                  ParameterValue: '900'
+              Type: Lambda 
+
+Outputs:
+  S3BucketDomainName:
+    Description: 'S3 bucket domain name'
+    Value: !GetAtt s3Bucket.DomainName
+  KinesisFireHoseDeliveryStream:
+    Description: 'Kinesis Delivery Stream'
+    Value: !GetAtt firehoseDeliveryStream.Arn
+  LambdaFunction:
+    Description: 'Lambda function for Waf log filtering'
+    Value: !GetAtt lambdaFunction.Arn
+    
