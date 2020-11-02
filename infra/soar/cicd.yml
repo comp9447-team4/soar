@@ -152,11 +152,16 @@ Resources:
         Fn::Sub:
         - "${AwsEnvironment}-comp9447-team4-codebuild-artifacts"
         - AwsEnvironment: !Ref AwsEnvironment
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls : true
+        BlockPublicPolicy : true
+        IgnorePublicAcls : true
+        RestrictPublicBuckets : true
       LifecycleConfiguration:
         Rules:
-        - Id: DeleteDataAfter7Days
+        - Id: DeleteContentAfter7Days
+          Status: 'Enabled'
           ExpirationInDays: 7
-          Status: Enabled
 
   # Lambda artifacts
   LambdaArtifactsBucket:
@@ -166,11 +171,16 @@ Resources:
         Fn::Sub:
         - "${AwsEnvironment}-comp9447-team4-lambda-artifacts"
         - AwsEnvironment: !Ref AwsEnvironment
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls : true
+        BlockPublicPolicy : true
+        IgnorePublicAcls : true
+        RestrictPublicBuckets : true
       LifecycleConfiguration:
         Rules:
-        - Id: DeleteDataAfter7Days
+        - Id: DeleteContentAfter7Days
+          Status: 'Enabled'
           ExpirationInDays: 7
-          Status: Enabled
 
   # Allow codebuild and pipeline to access the bucket
   CodeBuildArtifactsBucketPolicy:
