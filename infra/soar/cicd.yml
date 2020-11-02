@@ -159,9 +159,9 @@ Resources:
         RestrictPublicBuckets : true
       LifecycleConfiguration:
         Rules:
-          - Id: DeleteContentAfter7Days
-            Status: 'Enabled'
-            ExpirationInDays: 7
+        - Id: DeleteContentAfter7Days
+          Status: 'Enabled'
+          ExpirationInDays: 7
 
   # Lambda artifacts
   LambdaArtifactsBucket:
@@ -178,9 +178,9 @@ Resources:
         RestrictPublicBuckets : true
       LifecycleConfiguration:
         Rules:
-          - Id: DeleteContentAfter7Days
-            Status: 'Enabled'
-            ExpirationInDays: 7
+        - Id: DeleteContentAfter7Days
+          Status: 'Enabled'
+          ExpirationInDays: 7
 
   # Allow codebuild and pipeline to access the bucket
   CodeBuildArtifactsBucketPolicy:
