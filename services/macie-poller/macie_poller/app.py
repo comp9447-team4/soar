@@ -1,5 +1,6 @@
 import json
 import boto3
+import os
 # import requests
 
 
@@ -33,11 +34,15 @@ def lambda_handler(event, context):
 
     #     raise e
 
-    # boto3.macie.get_findings()
-    return {
-        "statusCode": 200,
-        "body": json.dumps({
-            "message": "hello world",
-            # "location": ip.text.replace("\n", "")
-        }),
-    }
+    # client = boto3.client('macie')
+    # finding_ids = client.list_findings()
+    # for i in finding_ids:
+    # some_json = client.get_findings(id)
+
+
+    if is_dev == "1":
+        webhook_url = os.environ["DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK"]
+    else:
+        webhook_url = os.environ["DISCORD_ALERTS_CHANNEL_WEBHOOK"]
+
+    # return requests.post(webhook_url, content)

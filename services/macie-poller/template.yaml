@@ -15,6 +15,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: macie_poller/
+      Role: !Ref MaciePollerRole
       Handler: app.lambda_handler
       Runtime: python3.8
       Events:
@@ -27,4 +28,48 @@ Resources:
           DISCORD_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762560716351733770/J6MCoWF8Krmx8izcCG7cD14FSFljJOgm-S5IZy3VbND9dZcGQm88mpWyLGQfcLr7J7ZQ
           DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762644386009317407/R1qXCsrycsrTx6QFa-dgpyFbMjzFDhK2WnxQiqmQP-N07mID7Hs-bGYU0-ENb61v1d6G
           IS_DEV: 0
+
+
+  MaciePollerRole:
+    Type: AWS::IAM::Role
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-policy.html
+    AssumeRolePolicyDocument: >-
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      }
+    Policies:
+      PolicyName: AllowMacie
+      PolicyDocument: >-
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Resource": "*",
+                    "Action": [
+                        "macie:*",
+                        "macie2:*"
+                    ]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": "iam:CreateServiceLinkedRole",
+                    "Resource": "*",
+                    "Condition": {
+                        "StringLike": {
+                            "iam:AWSServiceName": "macie.amazonaws.com"
+                        }
+                    }
+                }
+            ]
+        }
 
