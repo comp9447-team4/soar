@@ -159,6 +159,30 @@ update_es() {
     wait_update "${ES_STACK_NAME}"
 }
 
+export MACIE_STACK_NAME="${AWS_ENVIRONMENT}-macie"
+export MACIE_STACK_YML="${REPO_ROOT}/infra/soar/macie.yml"
+create_macie() {
+    echo "Creating macie stack..."
+    aws cloudformation create-stack \
+        --stack-name "${MACIE_STACK_NAME}" \
+        --template-body file://"${MACIE_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}" \
+        --disable-rollback \
+        --enable-termination-protection
+    wait_build "${MACIE_STACK_NAME}"
+}
+
+update_macie() {
+    echo "Updating macie stack..."
+    aws cloudformation update-stack \
+        --stack-name "${MACIE_STACK_NAME}" \
+        --template-body file://"${MACIE_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsEnvironment,ParameterValue="${AWS_ENVIRONMENT}"
+    wait_update "${MACIE_STACK_NAME}"
+}
+
 usage() {
     cat <<EOF
 Manages CFN stacks for the SOAR solution
@@ -209,6 +233,10 @@ main() {
         create_es
     elif [[ "${args}" == "update-es" ]]; then
         update_es
+    elif [[ "${args}" == "create-macie" ]]; then
+        create_macie
+    elif [[ "${args}" == "update-macie" ]]; then
+        update_macie
     else
         echo "Not a valid argument..."
         usage

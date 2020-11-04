@@ -1,0 +1,49 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Macie
+
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Resources:
+  MacieSession:
+    Type: AWS::Macie::Session
+    Properties:
+      FindingPublishingFrequency: SIX_HOURS
+      Status: ENABLED
+
+  # # CustomDataIdentifier
+  # # Enables to tailor analysis to meet your organisations specific needs, and supplement
+  # # the built-in identifiers that Amazon Macie provides.
+  # Type: AWS::Macie::CustomDataIdentifier
+  # DependsOn: "Session"
+  # Properties:
+  #     Description: # String
+  #     IgnoreWords:
+  #         - # String
+  #     Keywords:
+  #         - # String
+  #     MaximumMatchDistance: # Integer (Default is 50, Max is 300 characteres)
+  #     Name: # String (Required)
+  #     Regex: # String (Required)
+
+  # # FindingsFilter
+  # Type: AWS::Macie::FindingsFilter
+  # DependsOn:
+  # Properties: 
+  #     Action: # String - ARCHIVE or NOOP
+  #     Description: # String
+  #     FindingCriteria:
+  #         # FindingCriteria (Required)
+  #     Name: # String (Required)
+  #     Position: # Integer - position in the list of saved filters & the order in which the filter is applied to the findings
