@@ -7,6 +7,8 @@ Parameters:
     Type: String
   S3Hosting:
     Type: String
+  S3Region:
+    Type: String
 
 Description: CDN stack that ties domain name and acm together
 
@@ -38,7 +40,7 @@ Resources:
         Enabled: True
         Origins:
           #hardcoding the region bucket url, need to use regrex for subsitution later
-          - DomainName: !Sub "${BucketName}.s3.us-east-1.amazonaws.com"
+          - DomainName: !Sub "${BucketName}.s3.${S3Region}.amazonaws.com"
             Id: !Sub "S3-${BucketName}"
             S3OriginConfig:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CDNOriginIdentity}"
@@ -48,17 +50,17 @@ Resources:
           MinimumProtocolVersion: TLSv1.2_2018
           SslSupportMethod: sni-only
       
-      #this may not work, need to confirm tomorrow
-      S3HostingBucketPolicy:
-        Type: AWS::S3::BucketPolicy
-        Properties:
-          Bucket: !Ref S3Hosting
-          PolicyDocument:
-            Statement:
-              - Action:
-                  - "s3:GetObject"
-                Effect: Allow
-                Principal:
-                  AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CDNOriginIdentity}"
-                Resource: !Sub "arn:aws:s3:::${S3Hosting}/*"
-  
+  #this may not work, need to confirm tomorrow
+  S3HostingBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketName
+      PolicyDocument:
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CDNOriginIdentity}
+            Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+    Version: "2012-10-17"

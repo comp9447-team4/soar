@@ -6,7 +6,7 @@ export CDN_TEMPLATE_YML="./cdn.yml"
 
 
 echo "Creating cdn..."
-aws cloudformation update-stack \
+aws cloudformation create-stack \
     --stack-name "${CDN_NAME}" \
     --region us-east-1 \
     --template-body file://"${CDN_TEMPLATE_YML}" \
@@ -14,4 +14,5 @@ aws cloudformation update-stack \
     --parameters ParameterKey="DomainName",ParameterValue="9447.me"\
      ParameterKey="CertificateArn",ParameterValue="arn:aws:acm:us-east-1:306967644367:certificate/80c8b98e-ce6f-49a7-908c-86131e18fb30"\
      ParameterKey="BucketName",ParameterValue="qa-comp9447-team4-mythical-mysfits"\
-     ParameterKey="S3Hosting",ParameterValue="qa-comp9447-team4-mythical-mysfits.s3-website-us-east-1.amazonaws.com"
+     ParameterKey="S3Hosting",ParameterValue="qa-comp9447-team4-mythical-mysfits.s3-website-us-east-1.amazonaws.com"\
+     ParameterKey="S3Region",ParameterValue="us-east-1"
