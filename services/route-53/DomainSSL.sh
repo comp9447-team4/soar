@@ -2,7 +2,7 @@
 export AWS_ENVIRONMENT="qa"
 export AWS_DEFAULT_REGION=us-east-1
 export Route53_NAME="${AWS_ENVIRONMENT}-53-SSL-Stack"
-export Route_Config_YML="./route53.yml"
+export Route_Config_YML="./ssl.yml"
 
 
 echo "Creating route 53 host zone..."

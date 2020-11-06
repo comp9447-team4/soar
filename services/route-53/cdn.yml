@@ -73,7 +73,7 @@ Resources:
       HostedZoneName: !Sub "${DomainName}."
       RecordSets:
         - AliasTarget:
-            HostedZoneId: !Sub CDN
+            HostedZoneId: Z2FDTNDATAQYW2
             DNSName: !Sub CDN.DomainName
           Name: !Sub "qa.${DomainName}"
           Type: A
