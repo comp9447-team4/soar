@@ -30,10 +30,8 @@ Resources:
       RecordSets:
         - AliasTarget:
             HostedZoneId: !Ref HostedZoneIdS3
-            #need to reference the cloud front record here, to patch up tomorrow
-            #DNSName: !GetAtt CDN.DomainName
             DNSName: !Ref S3Record
-          Name: !Sub "app.${DomainName}"
+          Name: !Sub "qa.${DomainName}"
           Type: A
   
   #create a ssl cert

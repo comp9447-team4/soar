@@ -5,26 +5,26 @@ Parameters:
     Type: String
   DomainName:
     Type: String
-  S3Hosting:
-    Type: String
   S3Region:
     Type: String
 
 Description: CDN stack that ties domain name and acm together
 
 Resources:
+  #Create a CDN origin identity to be referenced later by the S3 bucket
   CDNOriginIdentity:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
       CloudFrontOriginAccessIdentityConfig:
         Comment: !Sub "Cloudfront Origin identity for ${DomainName}"
 
+  #Deploy a cdn for the s3 serveless bucket
   CDN:
     Type: "AWS::CloudFront::Distribution"
     Properties:
       DistributionConfig:
         Aliases:
-          - !Sub "app.${DomainName}"
+          - !Sub "qa.${DomainName}"
         DefaultCacheBehavior:
           AllowedMethods:
               - GET
@@ -39,7 +39,7 @@ Resources:
         DefaultRootObject: index.html
         Enabled: True
         Origins:
-          #hardcoding the region bucket url, need to use regrex for subsitution later
+        #sub to get the correct region
           - DomainName: !Sub "${BucketName}.s3.${S3Region}.amazonaws.com"
             Id: !Sub "S3-${BucketName}"
             S3OriginConfig:
@@ -50,7 +50,7 @@ Resources:
           MinimumProtocolVersion: TLSv1.2_2018
           SslSupportMethod: sni-only
       
-  #this may not work, need to confirm tomorrow
+  #Create a origin policy to restrict the origin from only the cloudfront distribution
   S3HostingBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -63,4 +63,19 @@ Resources:
             Principal:
               AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CDNOriginIdentity}
             Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+    DependsOn: CDNOriginIdentity
     Version: "2012-10-17"
+  
+  #Create new DNS entry for the newly deployed CDN
+  CloudFrontDNSEntries:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: !Sub "${DomainName}."
+      RecordSets:
+        - AliasTarget:
+            HostedZoneId: !Sub CDN
+            DNSName: !Sub CDN.DomainName
+          Name: !Sub "qa.${DomainName}"
+          Type: A
+    DependsOn: CDN
+  
