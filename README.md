@@ -3,7 +3,7 @@
 The main repo for the SOAR project (COMP9447 Team4)
 
 ```
-Team 4 (Drupal)
+Team 4 (Mythical Mysfits)
 Mentor: Paul Hawkins
 Tutor: Chong Yew Chang
 
@@ -16,7 +16,6 @@ Keung Lee
 Elton Wong
 Evangeline Endacott
 William Yin
-Dallas Yan
 Chirag Panikkasseril Unni
 Shiyuan Liang
 ```
