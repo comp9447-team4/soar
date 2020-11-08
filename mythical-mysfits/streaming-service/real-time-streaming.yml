@@ -45,6 +45,11 @@ Resources:
     Properties:
       VersioningConfiguration:
         Status: Enabled
+      LifecycleConfiguration: 
+        Rules:
+          - Id: Clicksteam7DayLifecycle
+            Status: Enabled
+            ExpirationInDays: 7
 
   # The IAM role for the above Firehose Delivery Stream.
   FirehoseDeliveryRole:
