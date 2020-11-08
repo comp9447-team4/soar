@@ -44,7 +44,7 @@ phases:
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
-      # S3ToESForwarder
+      # # S3ToESForwarder
       - cd services/s3-to-es-forwarder
       - sam build
       - >-
@@ -53,7 +53,7 @@ phases:
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
-      # TODO: Add ES
+      # # TODO: Add ES
 
 
   post_build:
