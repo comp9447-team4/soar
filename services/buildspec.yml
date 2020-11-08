@@ -53,6 +53,7 @@ phases:
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
+      # TODO: Add ES
 
 
   post_build:
@@ -64,3 +65,4 @@ artifacts:
     - ./services/hello-world/transformed.yaml
     - ./services/budget-alarms/transformed.yaml
     - ./services/codepipeline-notifier/transformed.yaml
+    # TODO: Add ES

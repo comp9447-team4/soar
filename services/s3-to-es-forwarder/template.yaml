@@ -17,6 +17,69 @@ Globals:
     Timeout: 3
 
 Resources:
+  ###########################################
+  # CLOUDTRAIL for monitoring API calls
+  ###########################################
+  CloudTrailBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub:
+        - "${AwsEnvironment}-comp9447-team4-cloudtrail"
+        - AwsEnvironment: !Ref AwsEnvironment
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-aws-integrations.html
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Function: !Ref AllCloudTrailEsForwarder
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: !Ref CloudTrailBucket
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Sid: "AWSLambdaToRead"
+            Effect: "Allow"
+            Principal: 
+              Service: "lambda.amazonaws.com"
+            Action: "s3:Get*"
+            Resource:
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}/*
+          - Sid: "AWSCloudTrailAclCheck"
+            Effect: "Allow"
+            Principal: 
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:GetBucketAcl"
+            Resource: 
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}
+          - Sid: "AWSCloudTrailWrite"
+            Effect: "Allow"
+            Principal: 
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:PutObject"
+            Resource:
+              !Sub |-
+                arn:aws:s3:::${CloudTrailBucket}/*
+            Condition: 
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
+
+  AllTrail:
+    DependsOn:
+    - BucketPolicy
+    - CloudTrailBucket
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: all-trail
+      IsLogging: true
+      S3BucketName: !Ref CloudTrailBucket
+      S3KeyPrefix: all
+
+  # The lambda that forwards cloudtrail from S3 to ES
   AllCloudTrailEsForwarder:
     Type: AWS::Serverless::Function
     Properties:
@@ -43,10 +106,10 @@ Resources:
             - s3:Get*
             - s3:List*
             Resource:
-            - Fn::ImportValue: !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+            - !Ref CloudTrailBucket
             - Fn::Join:
               - ""
-              - - Fn::ImportValue: !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+              - - !GetAtt CloudTrailBucket.Arn
                 - "/*"
       - PolicyName: AllowToPost
         PolicyDocument:
@@ -78,9 +141,7 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
       SourceAccount: !Ref 'AWS::AccountId'
-      SourceArn:
-        Fn::ImportValue:
-          !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+      SourceArn: !GetAtt CloudTrailBucket.Arn
 
 
 Outputs:
