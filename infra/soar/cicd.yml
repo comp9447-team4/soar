@@ -318,7 +318,7 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: "${AwsEnvironment}:HelloWorld"
+            StackName: !Sub "${AwsEnvironment}-HelloWorld"
             TemplatePath: "BuildArtifact::services/hello-world/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
@@ -333,7 +333,7 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: !Sub "${AwsEnvironment}:BudgetAlarms"
+            StackName: !Sub "${AwsEnvironment}-BudgetAlarms"
             TemplatePath: "BuildArtifact::services/budget-alarms/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
@@ -348,7 +348,7 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: !Sub "${AwsEnvironment}:CodePipelineBot"
+            StackName: !Sub "${AwsEnvironment}-CodePipelineBot"
             TemplatePath: "BuildArtifact::services/codepipeline-notifier/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
@@ -363,7 +363,7 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: !Sub "${AwsEnvironment}:S3ToEsForwarder"
+            StackName: !Sub "${AwsEnvironment}-S3ToEsForwarder"
             TemplatePath: "BuildArtifact::services/s3-to-es-forwarder/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
