@@ -63,7 +63,7 @@ Resources:
           # Allow cloudtrail bucket
           - Action:
             - s3:Create*
-            - s3:Delete:*
+            - s3:Delete*
             - s3:Put*
             Resource:
             - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
