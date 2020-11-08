@@ -23,8 +23,7 @@ Resources:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:Put
             Function: 
-              Fn::Import:
-              - !Sub "${AwsEnvironment}-S3ToEsForwarder:AllCloudTrailEsForwarder"
+              Fn::ImportValue: !Sub "${AwsEnvironment}-S3ToEsForwarder:AllCloudTrailEsForwarder"
 
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
