@@ -318,7 +318,7 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: SoarHelloWorld
+            StackName: "${AwsEnvironment}:HelloWorld"
             TemplatePath: "BuildArtifact::services/hello-world/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
@@ -333,11 +333,11 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: BudgetAlarms
+            StackName: !Sub "${AwsEnvironment}:BudgetAlarms"
             TemplatePath: "BuildArtifact::services/budget-alarms/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-        # BUDGET ALARMS
+        #  Code Pipeline Bot
         - Name: DeployCodePipelineBot
           ActionTypeId:
             Category: Deploy
@@ -348,8 +348,23 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: BudgetAlarms
+            StackName: !Sub "${AwsEnvironment}:CodePipelineBot"
             TemplatePath: "BuildArtifact::services/codepipeline-notifier/transformed.yaml"
+            RoleArn: !GetAtt CodePipelineServiceRole.Arn
+            Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+        #  S3ToEsForwarder
+        - Name: S3ToEsForwarder
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CloudFormation
+          InputArtifacts:
+          - Name: BuildArtifact
+          Configuration:
+            ActionMode: REPLACE_ON_FAILURE
+            StackName: !Sub "${AwsEnvironment}:S3ToEsForwarder"
+            TemplatePath: "BuildArtifact::services/s3-to-es-forwarder/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
 
