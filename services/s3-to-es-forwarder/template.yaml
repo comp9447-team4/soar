@@ -28,7 +28,7 @@ Resources:
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:Put
-            Function: !Ref AllCloudTrailEsForwarder
+            Function: !GetAtt AllCloudTrailEsForwarder.Arn
 
   BucketPolicy:
     Type: AWS::S3::BucketPolicy

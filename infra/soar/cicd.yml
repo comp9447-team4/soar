@@ -54,10 +54,19 @@ Resources:
                 - bucket_arn: !GetAtt LambdaArtifactsBucket.Arn
             Effect: Allow
 
+          # Allow cloudtrail
           - Action:
-            - s3:Create*
             - cloudtrail:*
             Resource: "*"
+            Effect: Allow
+
+          # Allow cloudtrail bucket
+          - Action:
+            - s3:Create*
+            - s3:Delete:*
+            - s3:Put*
+            Resource:
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
             Effect: Allow
 
           - Action:
