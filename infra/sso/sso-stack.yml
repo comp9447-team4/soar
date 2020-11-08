@@ -170,15 +170,14 @@ Resources:
       PrincipalType: GROUP
       TargetId: !Ref ProdAccountId
       TargetType: AWS_ACCOUNT
-  # Disabled for now
-  # DevelopersProdAssignment:
-  #   Type: AWS::SSO::Assignment
-  #   Properties:
-  #     InstanceArn: !Ref SSOInstanceArn
-  #     PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
-  #     PrincipalId: !Ref SSODevelopersGroupId
-  #     PrincipalType: GROUP
-  #     TargetId: !Ref ProdAccountId
-  #     TargetType: AWS_ACCOUNT
+  DevelopersProdAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      PermissionSetArn: !GetAtt DeveloperAccessPermissionSet.PermissionSetArn
+      PrincipalId: !Ref SSODevelopersGroupId
+      PrincipalType: GROUP
+      TargetId: !Ref ProdAccountId
+      TargetType: AWS_ACCOUNT
 
 

@@ -15,7 +15,7 @@ phases:
   build:
     commands:
       - pwd
-      # Build Hello world
+      # HelloWorld
       - cd services/hello-world/
       - sam build
       - >-
@@ -24,7 +24,7 @@ phases:
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
-      # Build Budget Alarms
+      # BudgetAlarms
       - cd services/budget-alarms/
       - sam build
       - >-
@@ -35,8 +35,17 @@ phases:
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
-      # CodePipeline notifier
+      # CodePipelineBotNotifier
       - cd services/codepipeline-notifier
+      - sam build
+      - >-
+        sam package
+        --template-file ./template.yaml
+        --output-template-file ./transformed.yaml
+        --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
+      - cd -
+      # S3ToESForwarder
+      - cd services/s3-to-es-forwarder
       - sam build
       - >-
         sam package
