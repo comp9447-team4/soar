@@ -1,6 +1,7 @@
 import sys
 import click 
 from os import path
+import boto3
 
 #Parses class which parses the user import and deploy AWS security stack. 
 class SOAR_PARSER():
@@ -43,7 +44,5 @@ def dir_check(targetDir):
         return False
 
 if __name__ == '__main__':
-    #
-    
     args = prompt_user()
     soar_obj = SOAR_PARSER(args)
