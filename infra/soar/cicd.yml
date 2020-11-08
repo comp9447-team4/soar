@@ -353,7 +353,7 @@ Resources:
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
         #  S3ToEsForwarder
-        - Name: S3ToEsForwarder
+        - Name: DeployS3ToEsForwarder
           ActionTypeId:
             Category: Deploy
             Owner: AWS
@@ -367,7 +367,10 @@ Resources:
             TemplatePath: "BuildArtifact::services/s3-to-es-forwarder/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-
+            ParameterOverrides: !Sub >-
+              {
+                "AwsEnvironment":"${AwsEnvironment}"
+              }
 Outputs:
   CodeBuildArtifactsBucket:
     Value: !Ref CodeBuildArtifactsBucket
