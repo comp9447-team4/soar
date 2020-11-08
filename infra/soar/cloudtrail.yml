@@ -1,0 +1,82 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cloudtrail
+
+Mappings:
+  Branch:
+    us-east-1:
+      qa: master
+      prod: release
+  # So I don't get ciruclar dependencies
+  FunctionArn:
+    us-east-1:
+      qa: arn:aws:lambda:us-east-1:306967644367:function:qa-HelloWorld-HelloWorldFunction-56I71SZROMDW
+      prod: arn:aws:lambda:us-east-1:306967644367:function:qa-HelloWorld-HelloWorldFunction-56I71SZROMDW
+
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+
+Resources:
+  CloudTrailBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${AwsEnvironment}-comp9447-team4-cloudtrail"
+      # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-aws-integrations.html
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Event: s3:ObjectCreated:Put
+      #       Function:  
+      #         Fn::FindInMap:
+      #         - FunctionArn
+      #         - !Sub "${AWS:Region}"
+      #         - !Sub "${AwsEnvironment}"
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: !Ref CloudTrailBucket
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Sid: "AWSLambdaToRead"
+            Effect: "Allow"
+            Principal: 
+              Service: "lambda.amazonaws.com"
+            Action: "s3:Get*"
+            Resource:
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail/*"
+          - Sid: "AWSCloudTrailAclCheck"
+            Effect: "Allow"
+            Principal: 
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:GetBucketAcl"
+            Resource: 
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail/*"
+          - Sid: "AWSCloudTrailWrite"
+            Effect: "Allow"
+            Principal: 
+              Service: "cloudtrail.amazonaws.com"
+            Action: "s3:PutObject"
+            Resource:
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail/*"
+            Condition: 
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
+
+  AllTrail:
+    DependsOn:
+    - BucketPolicy
+    - CloudTrailBucket
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: all-trail
+      IsLogging: true
+      S3BucketName: !Sub ${AwsEnvironment}-comp9447-team4-cloudtrail
+      S3KeyPrefix: all
