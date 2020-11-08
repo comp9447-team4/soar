@@ -1,0 +1,34 @@
+Parameters:
+  DomainName:
+    Type: String
+  
+  S3Record:
+    Type: String
+
+  HostedZoneId:
+    Type: String
+  
+  HostedZoneIdS3:
+    Type: String
+
+
+Description: Deploy ssl 
+Resources:
+  #creates a dns host zone 
+  DNS: 
+      Type: "AWS::Route53::HostedZone"
+      Properties: 
+        HostedZoneConfig: 
+          Comment: 'Route 53 for web app'
+        Name: !Ref DomainName
+  
+  #create a ssl cert
+  ACMCertificate: 
+    Type: "AWS::CertificateManager::Certificate"
+    Properties: 
+      DomainName: !Sub "*.${DomainName}"
+      DomainValidationOptions:
+            - DomainName: !Ref DomainName
+              HostedZoneId: !Ref HostedZoneId
+      ValidationMethod: DNS 
+    DependsOn: DNSEntries
