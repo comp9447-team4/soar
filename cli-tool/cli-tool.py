@@ -5,6 +5,7 @@ import boto3
 import subprocess
 import sys
 import configparser
+import os
 
 '''
 SOAR CLI tool 
@@ -40,8 +41,9 @@ def setup():
     if len(aws_installed) > 0:
         #check the install creditentials are valid
         config = configparser.ConfigParser()
-        config.read(config_path)
+        config.read(os.path.expanduser(config_path))
 
+        print(config.sections())
         if len(config.sections()) > 0:
             #TO-DO: add prompts for user to choose configure block
             print(prompt_options(config.sections()))
@@ -63,4 +65,4 @@ if __name__ == "__main__":
     heading()
     setup()
     #parser_object = SOAR_PARSER()
-    parser_object.execute_play()
+    #parser_object.execute_play()
