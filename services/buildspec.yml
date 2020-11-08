@@ -20,7 +20,7 @@ phases:
       - sam build
       - >-
         sam package
-        --template-file ./template.yaml
+        --template-file  ./.aws-sam/build/template.yaml
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
@@ -31,7 +31,7 @@ phases:
         sed -i "s/AWS_ENVIRONMENT: qa/AWS_ENVIRONMENT: ${AWS_ENVIRONMENT}/g" ./template.yaml
       - >-
         sam package
-        --template-file ./template.yaml
+        --template-file  ./.aws-sam/build/template.yaml
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
@@ -40,7 +40,7 @@ phases:
       - sam build
       - >-
         sam package
-        --template-file ./template.yaml
+        --template-file  ./.aws-sam/build/template.yaml
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
@@ -49,7 +49,7 @@ phases:
       - sam build
       - >-
         sam package
-        --template-file ./template.yaml
+        --template-file  ./.aws-sam/build/template.yaml
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
