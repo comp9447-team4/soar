@@ -62,9 +62,9 @@ Resources:
 
           # Allow cloudtrail bucket
           - Action:
-            - s3:Create*
-            - s3:Delete*
-            - s3:Put*
+            - s3:*
+            - s3:*
+            - s3:*
             Resource:
             - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
             Effect: Allow
@@ -378,7 +378,7 @@ Resources:
           InputArtifacts:
           - Name: BuildArtifact
           Configuration:
-            ActionMode: REPLACE_ON_FAILURE
+            ActionMode: CREATE_UPDATE
             StackName: !Sub "${AwsEnvironment}-S3ToEsForwarder"
             TemplatePath: "BuildArtifact::services/s3-to-es-forwarder/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
