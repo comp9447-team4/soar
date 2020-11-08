@@ -398,7 +398,7 @@ Resources:
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
             StackName: !Sub "${AwsEnvironment}-EsToDiscordNotifier"
-            TemplatePath: "BuildArtifact::services/s3-to-es-notifier/transformed.yaml"
+            TemplatePath: "BuildArtifact::services/es-to-discord-notifier/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
             ParameterOverrides: !Sub >-
