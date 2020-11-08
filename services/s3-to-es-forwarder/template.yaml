@@ -23,10 +23,7 @@ Resources:
   CloudTrailBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName:
-        Fn::Sub:
-        - "${AwsEnvironment}-comp9447-team4-cloudtrail"
-        - AwsEnvironment: !Ref AwsEnvironment
+      BucketName: !Sub "${AwsEnvironment}-comp9447-team4-cloudtrail"
       # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-aws-integrations.html
       NotificationConfiguration:
         LambdaConfigurations:
@@ -46,24 +43,24 @@ Resources:
               Service: "lambda.amazonaws.com"
             Action: "s3:Get*"
             Resource:
-              !Sub |-
-                arn:aws:s3:::${CloudTrailBucket}/*
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail/*"
           - Sid: "AWSCloudTrailAclCheck"
             Effect: "Allow"
             Principal: 
               Service: "cloudtrail.amazonaws.com"
             Action: "s3:GetBucketAcl"
             Resource: 
-              !Sub |-
-                arn:aws:s3:::${CloudTrailBucket}
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail/*"
           - Sid: "AWSCloudTrailWrite"
             Effect: "Allow"
             Principal: 
               Service: "cloudtrail.amazonaws.com"
             Action: "s3:PutObject"
             Resource:
-              !Sub |-
-                arn:aws:s3:::${CloudTrailBucket}/*
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail/*"
             Condition: 
               StringEquals:
                 s3:x-amz-acl: "bucket-owner-full-control"
@@ -76,7 +73,7 @@ Resources:
     Properties:
       TrailName: all-trail
       IsLogging: true
-      S3BucketName: !Ref CloudTrailBucket
+      S3BucketName: !Sub ${AwsEnvironment}-comp9447-team4-cloudtrail
       S3KeyPrefix: all
 
   # The lambda that forwards cloudtrail from S3 to ES
@@ -106,11 +103,8 @@ Resources:
             - s3:Get*
             - s3:List*
             Resource:
-            - !Ref CloudTrailBucket
-            - Fn::Join:
-              - ""
-              - - !GetAtt CloudTrailBucket.Arn
-                - "/*"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail/*"
       - PolicyName: AllowToPost
         PolicyDocument:
           Version: '2012-10-17'
@@ -141,7 +135,7 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
       SourceAccount: !Ref 'AWS::AccountId'
-      SourceArn: !GetAtt CloudTrailBucket.Arn
+      SourceArn: !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
 
 
 Outputs:
