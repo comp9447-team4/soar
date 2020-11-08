@@ -66,5 +66,8 @@ artifacts:
     - ./services/hello-world/transformed.yaml
     - ./services/budget-alarms/transformed.yaml
     - ./services/codepipeline-notifier/transformed.yaml
+<<<<<<< HEAD
     # TODO: Add ES
+=======
+>>>>>>> 34cae284b6ca85ff1d293151dd4960ea0f9cd4f3
     - ./services/s3-to-es-forwarder/transformed.yaml
