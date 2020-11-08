@@ -23,9 +23,12 @@ config_path = "~/.aws/config"
 
 def prompt_options(option_arr):
     user_input = None
-    arr_bound = leng
-    while user_input < 0 or user_input > len(option_arr)-1: 
+    arr_bound = len(option_arr)-1
+    while user_input < 0 or user_input > arr_bound: 
         #print out the options
+        print("Profile options:")
+        for i in range(option_arr):
+            print(f"{i}. {option_arr[i]}")
         user_input = input(f"Enter select [0-{arr_bound}]: ")
     
     return option_arr[user_input]
@@ -41,9 +44,9 @@ def setup():
 
         if len(config.sections()) > 0:
             #TO-DO: add prompts for user to choose configure block
-            print("")
+            print(prompt_options(config.sections()))
         else:
-           return user_configure     
+           return None     
     else:
         print("Please install aws")
         sys.exit(1)
