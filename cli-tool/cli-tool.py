@@ -23,7 +23,7 @@ team_name = "Team 04"
 config_path = "~/.aws/config"
 
 def prompt_options(option_arr):
-    user_input = None
+    user_input = -1
     arr_bound = len(option_arr)-1
     while user_input < 0 or user_input > arr_bound: 
         #print out the options
