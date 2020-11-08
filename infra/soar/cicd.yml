@@ -42,6 +42,7 @@ Resources:
             - s3:Put*
             - s3:List*
             - s3:Get*
+            - s3:Create*
             Resource:
             - !GetAtt CodeBuildArtifactsBucket.Arn
             - !GetAtt LambdaArtifactsBucket.Arn
@@ -51,6 +52,21 @@ Resources:
             - Fn::Sub:
                 - "${bucket_arn}/*"
                 - bucket_arn: !GetAtt LambdaArtifactsBucket.Arn
+            Effect: Allow
+
+          # Allow cloudtrail
+          - Action:
+            - cloudtrail:*
+            Resource: "*"
+            Effect: Allow
+
+          # Allow cloudtrail bucket
+          - Action:
+            - s3:Create*
+            - s3:Delete*
+            - s3:Put*
+            Resource:
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
             Effect: Allow
 
           - Action:
