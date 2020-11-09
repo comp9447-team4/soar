@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Notifies our Discord channel on codepipeline events
+Globals:
+  Function:
+    Timeout: 3
+Parameters:
+  AwsEnvironment:
+    Type: String
+    AllowedValues:
+    - qa
+    - prod
+Resources:
+  EsToDiscordNotifierFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: EsToDiscordNotifierFunction
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Environment:
+        Variables:
+          DISCORD_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762560716351733770/J6MCoWF8Krmx8izcCG7cD14FSFljJOgm-S5IZy3VbND9dZcGQm88mpWyLGQfcLr7J7ZQ
+          DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762644386009317407/R1qXCsrycsrTx6QFa-dgpyFbMjzFDhK2WnxQiqmQP-N07mID7Hs-bGYU0-ENb61v1d6G
+          AWS_ENVIRONMENT: qa
+      Events:
+        EsAlerts:
+          Type: SNS
+          Properties:
+            Topic:
+              Fn::ImportValue:
+                Fn::Sub: ${AwsEnvironment}-es:EsAlertsToDiscordTopic

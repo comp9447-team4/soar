@@ -17,6 +17,7 @@ Globals:
     Timeout: 3
 
 Resources:
+  # The lambda that forwards cloudtrail from S3 to ES
   AllCloudTrailEsForwarder:
     Type: AWS::Serverless::Function
     Properties:
@@ -43,11 +44,8 @@ Resources:
             - s3:Get*
             - s3:List*
             Resource:
-            - Fn::ImportValue: !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
-            - Fn::Join:
-              - ""
-              - - Fn::ImportValue: !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
-                - "/*"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail/*"
       - PolicyName: AllowToPost
         PolicyDocument:
           Version: '2012-10-17'
@@ -78,9 +76,7 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
       SourceAccount: !Ref 'AWS::AccountId'
-      SourceArn:
-        Fn::ImportValue:
-          !Sub "${AwsEnvironment}-CloudTrail:CloudTrailBucketArn"
+      SourceArn: !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
 
 
 Outputs:

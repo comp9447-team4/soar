@@ -168,6 +168,77 @@ Resources:
   #     Roles:
   #       authenticated: !Ref AuthenticatedRole
 
+  # Export this SNS topic.
+  # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/alerting.html
+  # Get a lambda to subscribe to it which would forward alerts to Discord.
+  EsAlertsToDiscordTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: EsAlertsToDiscordTopic
+
+
+  # Give a policy to allow codestar to publish messages to sns
+  EsToSnsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: >-
+        {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "es.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }]
+        }
+      Description: Allows ES to publish to an SNS which is forwarded to Discord
+      Policies:
+      - PolicyName: AllowEsToPublishToSns
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: sns:Publish
+              Resource: !Ref EsAlertsToDiscordTopic
+      RoleName: !Sub "${AwsEnvironment}-es-alerts-to-discord-topic"
+
+  TopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      # https://docs.aws.amazon.com/dtconsole/latest/userguide/set-up-sns.html
+      PolicyDocument:
+        Version: '2008-10-17'
+        Id: __default_policy_ID
+        Statement:
+        - Sid: __default_statement_ID
+          Effect: Allow
+          Principal:
+            Service:
+            - es.amazonaws.com
+          Action:
+          - SNS:GetTopicAttributes
+          - SNS:SetTopicAttributes
+          - SNS:AddPermission
+          - SNS:RemovePermission
+          - SNS:DeleteTopic
+          - SNS:Subscribe
+          - SNS:ListSubscriptionsByTopic
+          - SNS:Publish
+          - SNS:Receive
+          Resource: !Ref EsAlertsToDiscordTopic
+          Condition:
+            StringEquals:
+              AWS:SourceOwner: !Sub "${AWS::AccountId}"
+        - Sid: AWSCodeStarNotifications_publish
+          Effect: Allow
+          Principal:
+            Service:
+            - es.amazonaws.com
+          Action: SNS:Publish
+          Resource: !Ref EsAlertsToDiscordTopic
+      Topics:
+      - !Ref EsAlertsToDiscordTopic
 
 
 Outputs:
@@ -179,3 +250,11 @@ Outputs:
     Value: !GetAtt ElasticsearchDomain.DomainEndpoint
     Export:
       Name: !Sub "${AWS::StackName}:DomainEndpoint"
+  EsAlertsToDiscordTopic:
+    Value: !Ref EsAlertsToDiscordTopic
+    Export:
+      Name: !Sub "${AWS::StackName}:EsAlertsToDiscordTopic"
+  EsToSnsRole:
+    Value: !Ref EsToSnsRole
+    Export:
+      Name: !Sub "${AWS::StackName}:EsToSnsRole"

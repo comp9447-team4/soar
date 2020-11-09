@@ -42,6 +42,7 @@ Resources:
             - s3:Put*
             - s3:List*
             - s3:Get*
+            - s3:Create*
             Resource:
             - !GetAtt CodeBuildArtifactsBucket.Arn
             - !GetAtt LambdaArtifactsBucket.Arn
@@ -51,6 +52,21 @@ Resources:
             - Fn::Sub:
                 - "${bucket_arn}/*"
                 - bucket_arn: !GetAtt LambdaArtifactsBucket.Arn
+            Effect: Allow
+
+          # Allow cloudtrail
+          - Action:
+            - cloudtrail:*
+            Resource: "*"
+            Effect: Allow
+
+          # Allow cloudtrail bucket
+          - Action:
+            - s3:*
+            - s3:*
+            - s3:*
+            Resource:
+            - !Sub "arn:aws:s3:::${AwsEnvironment}-comp9447-team4-cloudtrail"
             Effect: Allow
 
           - Action:
@@ -91,7 +107,6 @@ Resources:
       # TODO: make this less permissive
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
-      - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
       - arn:aws:iam::aws:policy/AmazonSNSFullAccess
       - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
 
@@ -152,11 +167,16 @@ Resources:
         Fn::Sub:
         - "${AwsEnvironment}-comp9447-team4-codebuild-artifacts"
         - AwsEnvironment: !Ref AwsEnvironment
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls : true
+        BlockPublicPolicy : true
+        IgnorePublicAcls : true
+        RestrictPublicBuckets : true
       LifecycleConfiguration:
         Rules:
-        - Id: DeleteDataAfter7Days
+        - Id: DeleteContentAfter7Days
+          Status: 'Enabled'
           ExpirationInDays: 7
-          Status: Enabled
 
   # Lambda artifacts
   LambdaArtifactsBucket:
@@ -166,11 +186,16 @@ Resources:
         Fn::Sub:
         - "${AwsEnvironment}-comp9447-team4-lambda-artifacts"
         - AwsEnvironment: !Ref AwsEnvironment
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls : true
+        BlockPublicPolicy : true
+        IgnorePublicAcls : true
+        RestrictPublicBuckets : true
       LifecycleConfiguration:
         Rules:
-        - Id: DeleteDataAfter7Days
+        - Id: DeleteContentAfter7Days
+          Status: 'Enabled'
           ExpirationInDays: 7
-          Status: Enabled
 
   # Allow codebuild and pipeline to access the bucket
   CodeBuildArtifactsBucketPolicy:
@@ -295,7 +320,7 @@ Resources:
       # DEPLOYMENTS
       # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CloudFormation.html
       #########################
-        # HELLO WORLD
+      # HELLO WORLD
       - Name: Deploy
         Actions:
         - Name: DeployHelloWorld
@@ -308,7 +333,7 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: SoarHelloWorld
+            StackName: !Sub "${AwsEnvironment}-HelloWorld"
             TemplatePath: "BuildArtifact::services/hello-world/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
@@ -323,11 +348,11 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: BudgetAlarms
+            StackName: !Sub "${AwsEnvironment}-BudgetAlarms"
             TemplatePath: "BuildArtifact::services/budget-alarms/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-        # BUDGET ALARMS
+        #  Code Pipeline Bot
         - Name: DeployCodePipelineBot
           ActionTypeId:
             Category: Deploy
@@ -338,11 +363,48 @@ Resources:
           - Name: BuildArtifact
           Configuration:
             ActionMode: REPLACE_ON_FAILURE
-            StackName: BudgetAlarms
+            StackName: !Sub "${AwsEnvironment}-CodePipelineBot"
             TemplatePath: "BuildArtifact::services/codepipeline-notifier/transformed.yaml"
             RoleArn: !GetAtt CodePipelineServiceRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-
+        #  S3ToEsForwarder
+        - Name: DeployS3ToEsForwarder
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CloudFormation
+          InputArtifacts:
+          - Name: BuildArtifact
+          Configuration:
+            ActionMode: REPLACE_ON_FAILURE
+            StackName: !Sub "${AwsEnvironment}-S3ToEsForwarder"
+            TemplatePath: "BuildArtifact::services/s3-to-es-forwarder/transformed.yaml"
+            RoleArn: !GetAtt CodePipelineServiceRole.Arn
+            Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+            ParameterOverrides: !Sub >-
+              {
+                "AwsEnvironment":"${AwsEnvironment}"
+              }
+       # ESToDiscordNotifier
+        - Name: DeployEsToDiscordNotifier
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CloudFormation
+          InputArtifacts:
+          - Name: BuildArtifact
+          Configuration:
+            ActionMode: REPLACE_ON_FAILURE
+            StackName: !Sub "${AwsEnvironment}-EsToDiscordNotifier"
+            TemplatePath: "BuildArtifact::services/es-to-discord-notifier/transformed.yaml"
+            RoleArn: !GetAtt CodePipelineServiceRole.Arn
+            Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+            ParameterOverrides: !Sub >-
+              {
+                "AwsEnvironment":"${AwsEnvironment}"
+              }
 Outputs:
   CodeBuildArtifactsBucket:
     Value: !Ref CodeBuildArtifactsBucket
