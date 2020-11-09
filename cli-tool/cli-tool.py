@@ -27,11 +27,12 @@ def prompt_options(option_arr):
     arr_bound = len(option_arr)-1
     while user_input < 0 or user_input > arr_bound: 
         #print out the options
-        print("Profile options:")
-        for i in range(option_arr):
+        print(f"\nProfile options:")
+        for i in range(len(option_arr)):
             print(f"{i}. {option_arr[i]}")
-        user_input = input(f"Enter select [0-{arr_bound}]: ")
+        user_input = int(input(f"Enter select [0-{arr_bound}]: "))
     
+    #return the user selected name from the array
     return option_arr[user_input]
 
 def setup():
@@ -45,8 +46,9 @@ def setup():
 
         print(config.sections())
         if len(config.sections()) > 0:
-            #TO-DO: add prompts for user to choose configure block
-            print(prompt_options(config.sections()))
+            #Add prompts for user to choose configure block
+            selection = prompt_options(config.sections())
+            return config[selection]
         else:
            return None     
     else:
@@ -63,6 +65,17 @@ def heading():
 
 if __name__ == "__main__":
     heading()
-    setup()
+    aws_profile = setup()
+
+    #Dry run test the number of s3 buckets
+    s3_boto = boto3.client('s3')
+    response = s3_boto.list_buckets()
+
+    # Output the bucket names
+    print('Existing buckets:')
+    for bucket in response['Buckets']:
+        print(f'  {bucket["Name"]}')
+
+    print(aws_profile)
     #parser_object = SOAR_PARSER()
     #parser_object.execute_play()
