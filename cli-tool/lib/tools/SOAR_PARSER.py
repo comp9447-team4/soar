@@ -5,19 +5,29 @@ import boto3
 
 #Parses class which parses the user import and deploy AWS security stack. 
 class SOAR_PARSER():
-    def __init__(self, args):
-        self.template_folder = args.template_folder
-        self.inventory_folder = args.inv_folder
-        self.mapping_yml = args.mapping_cfg
+    def __init__(self, args, aws_session):
+        self.aws_session = aws_session
+        self.template_folder = args['template_folder']
+        self.inventory_folder = args['inv_folder']
+        self.mapping_yml = args['mapping_cfg']
     
+    def scan_serveless(self):
+        print(f"Scanning for serveless applicaiton in account ...")
+        s3_session = self.aws_session.client('s3')
+        #list of buckets
+        s3_buckets = [i['Name'] for i in s3_session.list_buckets()['Buckets']]
+
+        print(s3_buckets)
     #generate a play to be executed after parsing user input
     def execute_play(self):
         pass
 
+
+'''
 @click.command()
-@click.option('--inv','-i', help="Location of the inventory folder",  fg="blue", bold=True, required=True)
-@click.option('--tmp-folder','-t', help="Location of the inventory folder",  fg="red", bold=True, default=None)
-@click.option('--map','-m', help="Location of the inventory folder",  fg="green", bold=True, default=None)
+@click.option('--inv','-i', help="Location of the inventory folder", bold=True, required=True)
+@click.option('--tmp-folder','-t', help="Location of the inventory folder", bold=True, default=None)
+@click.option('--map','-m', help="Location of the inventory folder", bold=True, default=None)
 #Using click prompts to generate an interactive cli form for users to select the type of deployment
 def prompt_user(inv_folder, template_folder, mapping_cfg_loc):
     args = {}
@@ -34,7 +44,7 @@ def prompt_user(inv_folder, template_folder, mapping_cfg_loc):
             args['mapping_cfg'] = mapping_cfg_loc
 
     return args
-
+'''
 
 #checks if the directory exists
 def dir_check(targetDir):

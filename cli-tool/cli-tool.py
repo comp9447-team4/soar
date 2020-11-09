@@ -6,6 +6,7 @@ import subprocess
 import sys
 import configparser
 import os
+from lib.tools.SOAR_PARSER import SOAR_PARSER
 
 '''
 SOAR CLI tool 
@@ -35,6 +36,7 @@ def prompt_options(option_arr):
     #return the user selected name from the array
     return option_arr[user_input]
 
+#TODO: https://stackoverflow.com/questions/62311866/how-to-use-the-aws-python-sdk-while-connecting-via-sso-credentials
 def setup():
 #Do some checks to make sure that all the prerequsites are installed.
     aws_installed = subprocess.check_output(['which', 'aws']).decode()
@@ -44,10 +46,23 @@ def setup():
         config = configparser.ConfigParser()
         config.read(os.path.expanduser(config_path))
 
-        print(config.sections())
         if len(config.sections()) > 0:
             #Add prompts for user to choose configure block
             selection = prompt_options(config.sections())
+
+            #return a dictionary of creditentials based on user seleciton
+            '''
+            aws_access_key_id=ACCESS_KEY,
+            aws_secret_access_key=SECRET_KEY,
+            aws_session_token=SESSION_TOKEN
+            {
+                'key_id': '',
+                'secret': '',
+                'session':''
+            } 
+            '''
+            for i in config['profile Default']:
+                print(i)
             return config[selection]
         else:
            return None     
@@ -65,17 +80,29 @@ def heading():
 
 if __name__ == "__main__":
     heading()
-    aws_profile = setup()
-
-    #Dry run test the number of s3 buckets
-    s3_boto = boto3.client('s3')
-    response = s3_boto.list_buckets()
+    #aws_profile = setup()
+    
+    #creating session
+    session = boto3.session.Session()
+    '''
+    #s3 session
+    s3 = session.client('s3')
+    response = s3.list_buckets()
 
     # Output the bucket names
     print('Existing buckets:')
     for bucket in response['Buckets']:
         print(f'  {bucket["Name"]}')
+    '''
 
-    print(aws_profile)
-    #parser_object = SOAR_PARSER()
+    #TODO: need to invoke some shell script to create inventory or custom templates
+    conf = {
+        'template_folder': './templates',
+        'inv_folder': '',
+        'mapping_cfg': ''
+    }
+
+    #interactive part of the cli tool
+    parser_object = SOAR_PARSER(conf,session)
+    parser_object.scan_serveless()
     #parser_object.execute_play()
