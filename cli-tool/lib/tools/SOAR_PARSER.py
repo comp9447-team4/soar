@@ -5,7 +5,9 @@ from os import path
 from PyInquirer import style_from_dict, Token, prompt, Separator
 from pprint import pprint
 import boto3
-
+import configparser
+import io
+import re
 
 style = style_from_dict({
     Token.Separator: '#cc5454',
@@ -19,7 +21,7 @@ style = style_from_dict({
 
 def build_prompts(q_message, q_name, options):
     #create a prompt for the user to select something
-    convert_options = [{'name': i} for i in options]
+    convert_options = [Separator(f'=== {q_name} ===')] + [{'name': i} for i in options]
     q = [
         {
             'type': 'checkbox',
@@ -46,19 +48,118 @@ class SOAR_PARSER():
     def scan_serveless(self):
         print(f"Scanning for serveless applicaiton in account ...")
         s3_session = self.aws_session.client('s3')
-        #list of buckets
-        s3_buckets = [i['Name'] for i in s3_session.list_buckets()['Buckets']]
-        #print(s3_buckets)
-        s3_prompts = build_prompts("Deploy stack on the following s3 buckets:", "s3 buckets", s3_buckets)
-        user_input = prompt(s3_prompts, style=style)
+        try:
+            #list of buckets
+            s3_buckets = [i['Name'] for i in s3_session.list_buckets()['Buckets']]
+            #print(s3_buckets)
+            s3_prompts = build_prompts("Deploy stack on the following s3 buckets:", "s3 buckets", s3_buckets)
+            user_input =   prompt(s3_prompts, style=style)
 
-        pprint(user_input)
+            pprint(user_input)
+        except Exception as e:
+            print("Error occurried when trying find buckets!")
+
+    def deploy_services(self, service_type=''):
+        #prompt users on the tech stack available
+        #if it is requires dns, do some quick checks and prompt user on settings needed
+        #deploy stack using boto.client('cloudformation')
+        #might need to poll and check if the stack is ready
+        #pass
+
+        #hardcode the service type for now, export to individual waf script later
+        service_type = 'CLI-WAF'
+        waf_template = load_cloudform_template(path.expanduser('../services/WAF/templates/aws-waf-security-automations.template'))
+        
+        #waf deployment part 1
+        #waf_api_dict = toml.loads(path.expanduser('../services/WAF/templates/waf-cloudfront-deploy.toml'))
+        waf_api_dict = new_toml_read(path.expanduser('../services/WAF/templates/waf-cloudfront-deploy.toml'))
+        #waf deployment part 2
+        #waf_cloudfront_dict = load_toml_values(os.expand('../services/WAF/templates/waf-cloudfront-deploy.toml'))
+
+
+        #debugging 
+        print(waf_template)
+        print(waf_api_dict)
+
+        #invoke cloudformation to deploy waf here
+        c_form = self.aws_session.client('cloudformation')
+    
+        #deploy the api waf stack template
+        c_form.create_stack(
+             StackName=service_type,
+             TemplateBody=waf_template,
+             Parameters=waf_value_dict,
+
+        )
+        
 
     #generate a play to be executed after parsing user input
     def execute_play(self):
         pass
 
+#helper functions
+def load_cloudform_template(target_file):
+    res = None
 
+    try:
+        with open(target_file, 'r') as f:
+            f.read()
+    except Exceptiona as e:
+        print(f"Unable to load template, {e}")
+    
+    return res
+
+def load_toml_values(target_file):
+    values_arr = []
+    config = configparser.ConfigParser()
+
+    config.read(target_file)
+
+    if 'default.deploy.parameters' in config.sections():
+        for i in config['default.deploy.parameters']:
+            values_arr.push({'ParameterKey':i})
+            values_arr.push({'ParameterValue':config['default.deploy.parameters'][i]})
+    else:
+        print("Other toml formated templates, currently not supported...Please put parameters under default.deploy.paramters")
+
+    return values_dict
+
+def new_toml_read(target_file):
+    to_parse = ''
+    parsed_data = []
+    #reserved cli word list
+    reserve_list = ['capabilities', 'region', 'stack_name']
+    template_args = {}
+    try: 
+        with open(target_file, 'r') as f:
+            to_parse =  f.read()
+
+        #clean up the auto generated configurations
+        #get rid of the first line as it is not valid syntax
+        parsed = re.sub('^(version = .*)\n', '', to_parse)  
+        #convert "" to nothing
+        parsed = re.sub('\"', '', parsed) 
+        config = configparser.ConfigParser()
+        config.read_file(io.StringIO(parsed))
+        #print(f"sections {config.sections()}")
+        
+        
+        if 'default.deploy.parameters' in config.sections():
+            for i in config['default.deploy.parameters']:
+                if not(i in reserve_list):
+                    parsed_data.append({
+                        'ParameterKey':i,
+                        'ParameterValue':config['default.deploy.parameters'][i]
+                    })
+            
+        else:
+            print("Other toml formated templates, currently not supported...Please put parameters under default.deploy.paramters")
+
+        
+    except Exception as e:
+        print(f"Unable to load template, {e}")
+    
+    return template_args,parsed_data
 '''
 @click.command()
 @click.option('--inv','-i', help="Location of the inventory folder", bold=True, required=True)

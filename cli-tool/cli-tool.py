@@ -105,4 +105,5 @@ if __name__ == "__main__":
     #interactive part of the cli tool
     parser_object = SOAR_PARSER(conf,session)
     parser_object.scan_serveless()
+    parser_object.deploy_services()
     #parser_object.execute_play()
