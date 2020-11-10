@@ -15,36 +15,64 @@ phases:
   build:
     commands:
       - pwd
-      # Build Hello world
+      # HelloWorld
       - cd services/hello-world/
-      - "rm *.toml"
       - sam build
       - >-
         sam package
-        --template-file ./template.yaml
+        --template-file  ./.aws-sam/build/template.yaml
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
-      # Build Budget Alarms
+      # BudgetAlarms
       - cd services/budget-alarms/
-      - "rm *.toml"
       - sam build
       - >-
         sed -i "s/AWS_ENVIRONMENT: qa/AWS_ENVIRONMENT: ${AWS_ENVIRONMENT}/g" ./template.yaml
       - >-
         sam package
-        --template-file ./template.yaml
+        --template-file  ./.aws-sam/build/template.yaml
         --output-template-file ./transformed.yaml
         --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
       - cd -
-      # TODO: Build more artifacts here
+      # CodePipelineBotNotifier
+      - cd services/codepipeline-notifier
+      - sam build
+      - >-
+        sam package
+        --template-file  ./.aws-sam/build/template.yaml
+        --output-template-file ./transformed.yaml
+        --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
+      - cd -
+      # # S3ToESForwarder
+      - cd services/s3-to-es-forwarder
+      - sam build
+      - >-
+        sam package
+        --template-file  ./.aws-sam/build/template.yaml
+        --output-template-file ./transformed.yaml
+        --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
+      - cd -
+      # ES To Discord Notifier
+      - cd services/es-to-discord-notifier
+      - sam build
+      - >-
+        sam package
+        --template-file  ./.aws-sam/build/template.yaml
+        --output-template-file ./transformed.yaml
+        --s3-bucket "${LAMBDA_ARTIFACTS_BUCKET}"
+      - cd -
 
 
   post_build:
     commands:
       - echo "Completed SOAR service build on `date`"
 
+# Add your artifacts here
 artifacts:
   files:
     - ./services/hello-world/transformed.yaml
     - ./services/budget-alarms/transformed.yaml
+    - ./services/codepipeline-notifier/transformed.yaml
+    - ./services/s3-to-es-forwarder/transformed.yaml
+    - ./services/es-to-discord-notifier/transformed.yaml

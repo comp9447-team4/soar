@@ -1,0 +1,118 @@
+{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "range": {
+                        "Records.eventTime": {
+                            "from": "{{period_end}}||-15m",
+                            "to": "{{period_end}}",
+                            "include_lower": true,
+                            "include_upper": true,
+                            "format": "epoch_millis",
+                            "boost": 1
+                        }
+                    }
+                }
+            ],
+            "filter": [
+                {
+                    "bool": {
+                        "filter": [
+                            {
+                                "bool": {
+                                    "should": [
+                                        {
+                                            "match": {
+                                                "Records.eventSource": {
+                                                    "query": "cloudformation.amazonaws.com",
+                                                    "operator": "OR",
+                                                    "prefix_length": 0,
+                                                    "max_expansions": 50,
+                                                    "fuzzy_transpositions": true,
+                                                    "lenient": false,
+                                                    "zero_terms_query": "NONE",
+                                                    "auto_generate_synonyms_phrase_query": true,
+                                                    "boost": 1
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "adjust_pure_negative": true,
+                                    "minimum_should_match": "1",
+                                    "boost": 1
+                                }
+                            },
+                            {
+                                "bool": {
+                                    "should": [
+                                        {
+                                            "bool": {
+                                                "should": [
+                                                    {
+                                                        "match": {
+                                                            "Records.eventName": {
+                                                                "query": "UpdateTerminationProtection",
+                                                                "operator": "OR",
+                                                                "prefix_length": 0,
+                                                                "max_expansions": 50,
+                                                                "fuzzy_transpositions": true,
+                                                                "lenient": false,
+                                                                "zero_terms_query": "NONE",
+                                                                "auto_generate_synonyms_phrase_query": true,
+                                                                "boost": 1
+                                                            }
+                                                        }
+                                                    }
+                                                ],
+                                                "adjust_pure_negative": true,
+                                                "minimum_should_match": "1",
+                                                "boost": 1
+                                            }
+                                        },
+                                        {
+                                            "bool": {
+                                                "should": [
+                                                    {
+                                                        "query_string": {
+                                                            "query": "Delete*",
+                                                            "fields": [
+                                                                "Records.eventName^1.0"
+                                                            ],
+                                                            "type": "best_fields",
+                                                            "default_operator": "or",
+                                                            "max_determinized_states": 10000,
+                                                            "enable_position_increments": true,
+                                                            "fuzziness": "AUTO",
+                                                            "fuzzy_prefix_length": 0,
+                                                            "fuzzy_max_expansions": 50,
+                                                            "phrase_slop": 0,
+                                                            "escape": false,
+                                                            "auto_generate_synonyms_phrase_query": true,
+                                                            "fuzzy_transpositions": true,
+                                                            "boost": 1
+                                                        }
+                                                    }
+                                                ],
+                                                "adjust_pure_negative": true,
+                                                "minimum_should_match": "1",
+                                                "boost": 1
+                                            }
+                                        }
+                                    ],
+                                    "adjust_pure_negative": true,
+                                    "minimum_should_match": "1",
+                                    "boost": 1
+                                }
+                            }
+                        ],
+                        "adjust_pure_negative": true,
+                        "boost": 1
+                    }
+                }
+            ],
+            "adjust_pure_negative": true,
+            "boost": 1
+        }
+    }
+}

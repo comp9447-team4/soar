@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Notifies our Discord channel on codepipeline events
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  CodePipelineFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https//github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: codepipeline_notifier/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Environment:
+        Variables:
+          # TODO: move these to secrets manager
+          DISCORD_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762560716351733770/J6MCoWF8Krmx8izcCG7cD14FSFljJOgm-S5IZy3VbND9dZcGQm88mpWyLGQfcLr7J7ZQ
+          DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: https://discordapp.com/api/webhooks/762644386009317407/R1qXCsrycsrTx6QFa-dgpyFbMjzFDhK2WnxQiqmQP-N07mID7Hs-bGYU0-ENb61v1d6G
+          AWS_ENVIRONMENT: qa
+      Events:
+        # Subscribe to a SNS topics from other stacks
+        MythicalMysfitsServicePipelineSnsTopic:
+          Type: SNS
+          Properties:
+            Topic: !ImportValue MythicalMysfitsCICDStack:PipelineSnsTopic

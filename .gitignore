@@ -2,3 +2,4 @@
 tmp/
 .aws-sam
 .pytest_cache
+.idea

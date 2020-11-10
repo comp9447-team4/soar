@@ -197,16 +197,14 @@ create_cicd() {
     wait_build "${CICD_STACK_NAME}"
 }
 
-delete_cicd() {
-    echo "Deleting cicd stack..."
-    aws cloudformation \
-        update-termination-protection \
+update_cicd() {
+    aws cloudformation update-stack \
         --stack-name "${CICD_STACK_NAME}" \
-        --no-enable-termination-protection
+        --template-body file://"${CICD_STACK_YML}" \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameters ParameterKey=AwsProfile,ParameterValue="${AWS_PROFILE}"
 
-    aws cloudformation \
-        delete-stack \
-        --stack-name "${CICD_STACK_NAME}"
+    wait_update "${CICD_STACK_NAME}"
 }
 
 module_2_static_site_updates() {
@@ -667,6 +665,8 @@ main() {
         start_image_scan
     elif [[ "${args}" == "describe-images" ]]; then
         describe_images
+    elif [[ "${args}" == "update-cicd" ]]; then
+      update_cicd
     else
         echo "No command run :("
         usage
