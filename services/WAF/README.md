@@ -23,6 +23,7 @@ sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IA
 # deploy endpoint: Cloufront
 sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-cloudfront-deploy.toml
 
+
 ```
 
 # How to cleanup
@@ -36,6 +37,24 @@ aws cloudformation delete-stack --stack-name waf-cloudfront
 
 ```
 # stack template for deploying the WAF webACL
+
+```
 services/WAF/templates/aws-waf-security-automations.template
+
+```
 # stack template for migrating from WAF classic to AWS WAF2
+
+```
 services/WAF/templates/AWSWAFSecurityAutomationsAPIGateway1602565086135.json
+
+```
+
+# Lambda kinesis-log-processors.py
+
+```
+The lambda parse the kinesis log info for blocked records to Kibana elastic search
+And also update the Blacklist IPsets in WAF rule
+ 
+services/WAF/Lambda/kinesis-log-processors.py
+
+```
