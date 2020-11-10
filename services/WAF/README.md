@@ -39,3 +39,13 @@ aws cloudformation delete-stack --stack-name waf-cloudfront
 services/WAF/templates/aws-waf-security-automations.template
 # stack template for migrating from WAF classic to AWS WAF2
 services/WAF/templates/AWSWAFSecurityAutomationsAPIGateway1602565086135.json
+
+#Lambda kinesis-log-processors.py
+
+```
+The lambda parse the kinesis log info for blocked records to Kibana elastic search
+And also update the Blacklist IPsets in WAF rule
+ 
+services/WAF/Lambda/kinesis-log-processors.py
+
+```
