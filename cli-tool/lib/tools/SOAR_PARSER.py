@@ -72,12 +72,13 @@ class SOAR_PARSER():
         
         #waf deployment part 1
         #waf_api_dict = toml.loads(path.expanduser('../services/WAF/templates/waf-cloudfront-deploy.toml'))
-        waf_api_dict = new_toml_read(path.expanduser('../services/WAF/templates/waf-cloudfront-deploy.toml'))
+        waf_api_args, waf_api_dict = new_toml_read(path.expanduser('../services/WAF/templates/waf-cloudfront-deploy.toml'))
         #waf deployment part 2
         #waf_cloudfront_dict = load_toml_values(os.expand('../services/WAF/templates/waf-cloudfront-deploy.toml'))
 
 
         #debugging 
+        print("debugging")
         print(waf_template)
         print(waf_api_dict)
 
@@ -85,13 +86,14 @@ class SOAR_PARSER():
         c_form = self.aws_session.client('cloudformation')
     
         #deploy the api waf stack template
+        '''
         c_form.create_stack(
              StackName=service_type,
              TemplateBody=waf_template,
              Parameters=waf_value_dict,
 
         )
-        
+        '''
 
     #generate a play to be executed after parsing user input
     def execute_play(self):
@@ -151,6 +153,8 @@ def new_toml_read(target_file):
                         'ParameterKey':i,
                         'ParameterValue':config['default.deploy.parameters'][i]
                     })
+                else:
+                    template_args[i] = config['default.deploy.parameters'][i]
             
         else:
             print("Other toml formated templates, currently not supported...Please put parameters under default.deploy.paramters")
