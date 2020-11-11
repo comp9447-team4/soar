@@ -1,0 +1,60 @@
+{
+    "Parameters": [
+        {
+            "ParameterKey": "WafArnPrefix",
+            "ParameterValue": "arn:aws:waf-regional:us-east-1:"
+        },
+        {
+            "ParameterKey": "ActivateHttpFloodProtectionParam",
+            "ParameterValue": "yes - AWS WAF rate based rule"
+        },
+        {
+            "ParameterKey": "WafApiType",
+            "ParameterValue": "waf-regional"
+        },
+        {
+            "ParameterKey": "GlueWafAccessLogsTable",
+            "ParameterValue": ""
+        },
+        {
+            "ParameterKey": "ActivateScannersProbesProtectionParam",
+            "ParameterValue": "yes - AWS Lambda log parser"
+        },
+        {
+            "ParameterKey": "ParentStackName",
+            "ParameterValue": "waf-apigateway"
+        },
+        {
+            "ParameterKey": "WafLogBucket",
+            "ParameterValue": ""
+        },
+        {
+            "ParameterKey": "ActivateCrossSiteScriptingProtectionParam",
+            "ParameterValue": "yes"
+        },
+        {
+            "ParameterKey": "GlueAccessLogsDatabase",
+            "ParameterValue": ""
+        },
+        {
+            "ParameterKey": "ActivateReputationListsProtectionParam",
+            "ParameterValue": "yes"
+        },
+        {
+            "ParameterKey": "AppAccessLogBucket",
+            "ParameterValue": "api-accesslog-waf"
+        },
+        {
+            "ParameterKey": "GlueAppAccessLogsTable",
+            "ParameterValue": ""
+        },
+        {
+            "ParameterKey": "ActivateSqlInjectionProtectionParam",
+            "ParameterValue": "yes"
+        },
+        {
+            "ParameterKey": "ActivateBadBotProtectionParam",
+            "ParameterValue": "yes"
+        }
+    ]
+}

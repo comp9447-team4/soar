@@ -78,22 +78,26 @@ class SOAR_PARSER():
 
 
         #debugging 
-        print("debugging")
-        print(waf_template)
+        print("*"*50+"debugging"+"*"*50)
+        #print(waf_template)
         print(waf_api_dict)
+        print(waf_api_args)
 
         #invoke cloudformation to deploy waf here
         c_form = self.aws_session.client('cloudformation')
     
         #deploy the api waf stack template
-        '''
-        c_form.create_stack(
-             StackName=service_type,
-             TemplateBody=waf_template,
-             Parameters=waf_value_dict,
-
-        )
-        '''
+        
+        if waf_template and waf_api_dict:
+            c_form.create_stack(
+                StackName=service_type,
+                TemplateBody=waf_template,
+                Parameters=waf_api_dict,
+                Capabilities=['CAPABILITY_IAM','CAPABILITY_NAMED_IAM'],
+                OnFailure='DO_NOTHING',
+                EnableTerminationProtection=True
+            )
+        
 
     #generate a play to be executed after parsing user input
     def execute_play(self):
@@ -105,26 +109,12 @@ def load_cloudform_template(target_file):
 
     try:
         with open(target_file, 'r') as f:
-            f.read()
-    except Exceptiona as e:
+            res = f.read()
+    except Exception as e:
         print(f"Unable to load template, {e}")
     
     return res
 
-def load_toml_values(target_file):
-    values_arr = []
-    config = configparser.ConfigParser()
-
-    config.read(target_file)
-
-    if 'default.deploy.parameters' in config.sections():
-        for i in config['default.deploy.parameters']:
-            values_arr.push({'ParameterKey':i})
-            values_arr.push({'ParameterValue':config['default.deploy.parameters'][i]})
-    else:
-        print("Other toml formated templates, currently not supported...Please put parameters under default.deploy.paramters")
-
-    return values_dict
 
 def new_toml_read(target_file):
     to_parse = ''
