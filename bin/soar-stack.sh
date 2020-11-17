@@ -64,8 +64,16 @@ create_secrets() {
 
 # WAF stack deployment
 export WAF_TEMPLATE="${REPO_ROOT}/services/WAF/templates/aws-waf-security-automations.template"
-export WAF_ALB_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-api-deploy.toml"
-export WAF_CLOUDFRONT_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-cloudfront-deploy.toml"
+if [[ "${AWS_ENVIRONMENT}" == "qa" ]]; then
+    export WAF_ALB_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-api-deploy.toml"
+    export WAF_CLOUDFRONT_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-cloudfront-deploy.toml"
+elif [[ "${AWS_ENVIRONMENT}" == "prod" ]]; then
+    export WAF_ALB_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-api-deploy_prod.toml"
+    export WAF_CLOUDFRONT_CONFIG="${REPO_ROOT}/services/WAF/templates/waf-cloudfront-deploy_prod.toml"
+else
+    echo "Not a valid environment..."
+    exit 0
+fi
 
 create-waf-stack()  {
     echo "Do you wish to deploy to endpoint ALB?"

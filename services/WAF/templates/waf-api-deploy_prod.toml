@@ -3,7 +3,7 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "waf-apigateway"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ei1wdt2g2rw4"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1tbxmul61l44z"
 s3_prefix = "waf-apigateway"
 region = "us-east-1"
 confirm_changeset = true
