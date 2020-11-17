@@ -17,7 +17,7 @@ Elton Wong
 Evangeline Endacott
 William Yin
 Chirag Panikkasseril Unni
-Shiyuan Liang
+Shiyuan Liang (Steve)
 ```
 
 # Build Status

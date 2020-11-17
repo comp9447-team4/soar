@@ -16,4 +16,5 @@ def http_attack(url, pps=None):
 
 if __name__ == "__main__":
     # sample test on qa mysfits api
-    http_attack('https://6jztqidvd6.execute-api.us-east-1.amazonaws.com/qa/mysfits/c0684344-1eb7-40e7-b334-06d25ac9268c', 1000)
+    http_attack('https://6jztqidvd6.execute-api.us-east-1.amazonaws.com/qa/mysfits/b6d16e02-6aeb-413c-b457-321151bb403d', 200)
+
