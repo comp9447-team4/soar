@@ -12,7 +12,10 @@ def lambda_handler(event, context):
         webhook_url = os.environ["DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK"]
     else:
         webhook_url = os.environ["DISCORD_ALERTS_CHANNEL_WEBHOOK"]
-    content="""test"
+    content=""":robot: :wave: @here please send your daily standup updates!
+    * What did you do yesterday?
+    * What will you do today?
+    * Any blockers?"
     """
     response = requests.post(webhook_url, data={"content": content})
     return response
