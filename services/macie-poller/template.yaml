@@ -33,43 +33,45 @@ Resources:
   MaciePollerRole:
     Type: AWS::IAM::Role
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-policy.html
-    AssumeRolePolicyDocument: >-
-      {
-        "Version": "2012-10-17",
-        "Statement": [
-          {
-            "Effect": "Allow",
-            "Principal": {
-              "Service": "lambda.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-          }
-        ]
-      }
-    Policies:
-      PolicyName: AllowMacie
-      PolicyDocument: >-
+    Properties:
+      # RoleName: role-macie-poller
+      AssumeRolePolicyDocument: >-
         {
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Effect": "Allow",
-                    "Resource": "*",
-                    "Action": [
-                        "macie:*",
-                        "macie2:*"
-                    ]
-                },
-                {
-                    "Effect": "Allow",
-                    "Action": "iam:CreateServiceLinkedRole",
-                    "Resource": "*",
-                    "Condition": {
-                        "StringLike": {
-                            "iam:AWSServiceName": "macie.amazonaws.com"
-                        }
-                    }
-                }
-            ]
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
         }
+      Policies:
+      - PolicyName: AllowMacie
+        PolicyDocument: >-
+          {
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+                      "Effect": "Allow",
+                      "Resource": "*",
+                      "Action": [
+                          "macie:*",
+                          "macie2:*"
+                      ]
+                  },
+                  {
+                      "Effect": "Allow",
+                      "Action": "iam:CreateServiceLinkedRole",
+                      "Resource": "*",
+                      "Condition": {
+                          "StringLike": {
+                              "iam:AWSServiceName": "macie.amazonaws.com"
+                          }
+                      }
+                  }
+              ]
+          }
 

@@ -25,6 +25,7 @@ def lambda_handler(event, context):
     # Creating a list that will be sent to Discord
     macie_response = []
 
+    print("Hello")
     # Goes through the findings and classfies findings based on severity
     for finding in finding_ids.findingsIds:
         macie_finding = client.get_findings(finding)
@@ -54,7 +55,7 @@ def lambda_handler(event, context):
         webhook_url = os.environ["DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK"]
     else:
         webhook_url = os.environ["DISCORD_ALERTS_CHANNEL_WEBHOOK"]
-   
+    print("There")
     # Combine together the different types based on the findings
     macie_response.extend(high)
     macie_response.extend(medium)
@@ -62,7 +63,7 @@ def lambda_handler(event, context):
     macie_response.extend(other)
 
     # Below is the response that will be sent to Discord
-    content=macie_response
+    content=f"{macie_response}"
 
     response = requests.post(webhook_url, data={"content": content})
     return response
