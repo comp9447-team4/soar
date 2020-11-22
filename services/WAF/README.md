@@ -1,8 +1,9 @@
-# AWS WAF Servie
+# AWS WAF Setup
 
-default AWS template from aws docs
+AWS  solutions https://aws.amazon.com/solutions/implementations/aws-waf-security-automations/
 
-https://docs.aws.amazon.com/solutions/latest/aws-waf-security-automations/deployment.html
+For our soar solutions we will be setting up rules such as Rate based, SQLI, XSS and whitelisted and Blacklisted IPsets.
+Can be further extended to the full solution above if need be.
 
 # How to run local tests
 testing http rate-attacks 
@@ -12,18 +13,34 @@ services/WAF/test_script/rate-attacks.sh
 
 Note:
 default WAF rate limit is set to 100/5min window
-currently setup with access token after login
 
 # How to deploy
+This can be deployed manually using AWS SAM or as part of the CI/CD stack. 
+## soar-stack deployment
 
+```
+cd bin/
+AWS_PROFILE="qa"
+./soar-stack.sh create-waf-stack
+
+At the prompt enter 1 to continue or 2 to skip deploying to ALB endpoint
+It will use the sam deploy command to deploy the cloudformation template
+# deploy endpoint: ALB(APIGateway)
+sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-api-deploy.toml
+
+
+At the next prompt enter 1 to continue or 2 to skip deploying to CloudFront endpoint
+It will use the sam deploy command to deploy the cloudformation template
+# deploy endpoint: Cloufront
+sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-cloudfront-deploy.toml
+```
+## Sam Deployment
 ```
 # deploy endpoint: ALB(APIGateway)
 sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-api-deploy.toml
 
 # deploy endpoint: Cloufront
 sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-cloudfront-deploy.toml
-
-
 ```
 
 # How to cleanup
