@@ -43,12 +43,14 @@ phases:
       - echo Build completed on `date`
       - echo Pushing the Docker image..
       # Push the image to ECR.
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mythicalmysfits/service:latest
-      - echo Completed pushing Docker image. Deploying Docker image to AWS Fargate on `date`
-      - echo "Waiting for image scan results"
-      - aws ecr wait image-scan-complete --repository-name mythicalmysfits/service --image-id imageTag=latest
-      - scan_results=$(aws ecr describe-images --repository-name mythicalmysfits/service --image-id imageTag=latest | jq -r ".imageDetails[0].imageScanFindingsSummary")
-      - echo "${scan_results}"
+      # Disabling waiting for vulnerability scan because AWS CLI version is different on CodeBuild. WHY AWS!??? :(
+      # This would have been a cool feature but I'm killing it :(
+      # - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mythicalmysfits/service:latest
+      # - echo Completed pushing Docker image. Deploying Docker image to AWS Fargate on `date`
+      # - echo "Waiting for image scan results"
+      # - aws ecr wait image-scan-complete --repository-name mythicalmysfits/service --image-id imageTag=latest
+      # - scan_results=$(aws ecr describe-images --repository-name mythicalmysfits/service --image-id imageTag=latest | jq -r ".imageDetails[0].imageScanFindingsSummary")
+      # - echo "${scan_results}"
       # Create a artifacts file that contains the name and location of the image
       # pushed to ECR. This will be used by AWS CodePipeline to automate
       # deployment of this specific container to Amazon ECS.
