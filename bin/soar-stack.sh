@@ -169,16 +169,17 @@ update_es() {
 
 usage() {
     cat <<EOF
-Manages CFN stacks for the SOAR solution
-Reference: https://github.com/aws-samples/aws-modern-application-workshop/tree/python
+Manages CFN stacks for the SOAR solution.
 Usage: AWS_PROFILE=qa ./bin/soar.sh <arg>
+
 Where arg is:
+
 create-cicd
-update-cicd
-create-secrets
-create-waf-stack
-create-athena
+create-cloudtrail
 create-es
+create-waf-stack
+
+(There are more options if you checkout the shell script, eg: updating stacks etc)
 EOF
 }
 main() {
