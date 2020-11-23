@@ -72,6 +72,7 @@ Manages the SSO stack on the MASTER ACCOUNT.
 Only the admin can change this.
 
 Usage: ./bin/sso-stack.sh <arg>
+
 Where arg is:
 create
 delete

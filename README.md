@@ -20,6 +20,62 @@ Chirag Panikkasseril Unni
 Shiyuan Liang (Steve)
 ```
 
+
+# Directory Structure
+
+```
+bin/ - shell scripts (use this as an entry point)
+infra/ - cloudformation templates
+mythical-mysfits/ - code related to the sample app
+services/ - our custom use cases written with AWS SAM
+```
+
+# Quick start
+
+```
+➜  soar git:(master) ✗ AWS_PROFILE=qa ./bin/soar-stack.sh --help
+In environment: qa
+Not a valid argument...
+Manages CFN stacks for the SOAR solution.
+Usage: AWS_PROFILE=qa ./bin/soar.sh <arg>
+
+Where arg is:
+
+create-cicd
+create-cloudtrail
+create-es
+create-waf-stack
+
+(There are more options if you checkout the shell script, eg: updating stacks etc)
+
+```
+
+# Deploying ElasticSearch
+
+```
+
+# Deploy the S3 To ES Lambda Forwarder
+cd services/s3-to-es-forwarder
+sam deploy --guided
+
+# Go back to main root
+cd ../..
+./bin/soar-stack.sh create-cloudtrail
+./bin/soar-stack.sh create-es
+```
+
+# Deploying Custom Lambdas
+
+These can be deployed manually using AWS SAM: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html
+
+```
+# Go to the service
+cd services/budget-alarms
+sam deploy --guided
+```
+
+Or use the ci/cd with CodePipeline. `./services/buildspec.yml` is setup with our Github repo and AWS accounts.
+
 # Build Status
 
 Service | Master | Release
@@ -200,50 +256,9 @@ These contain infrastructure-as-code for comp9447-team4.
 
 This folder contains the setup for AWS users that follows the well architected labs. This uses AWS SSO.
 
-**THIS WILL ONLY BE NEEDED TO BE DONE ONCE** on the master root account. (Already provisioned for you).
-
-# Drupal
-
-This will only need to be done **once**. Do not destroy the existing stack.
-
-https://aws.amazon.com/quickstart/architecture/drupal/
-
-Create a key pair with:
-
-```
-AWS_PROFILE=qa ./bin/key-pair.sh create
-AWS_PROFILE=qa ./bin/key-pair.sh describe
-```
-
-Make sure you save it.
-
-
-Deploy the stack with:
-
-```
-AWS_PROFILE=qa ./bin/drupal-stack.sh create
-```
-
-## Clean up Drupal stack
-DO NOT DESTROY AN EXISTING STACK UNLESS ABSOLUTELY NECESSARY! It has termination protection on.
-
-```
-AWS_PROFILE=qa ./bin/key-pair.sh delete
-AWS_PROFILE=qa ./bin/drupal-stack.sh delete
-```
-
-# Panther
-
-I'm experimenting with Panther to do threat hunting on top of guard duty. 
-
-There is an open source version with Cloudformation templates to deploy.
-
-See:
-* https://runpanther.io/
-* https://docs.runpanther.io/
-
-Note: The quick start templates are in `us-east-1`.
 
 # AWS Region choice
 
 `us-east-1` was chosen as the main AWS REGION to make it easier to deploy resources. This region is expected to get the latest features.
+
+With the exception of SSO. Our initial stack for SSO ONLY is deployed on `ap-southeast-2`.
