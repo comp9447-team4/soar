@@ -20,6 +20,16 @@ Chirag Panikkasseril Unni
 Shiyuan Liang (Steve)
 ```
 
+# Build Status
+
+Service | Status
+---| ---
+Soar | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiVWR4K1AwWCtLMS8zaVhOdVU3ckNDaGlvMmpvVk5Gb0dLVjBvRjRVRFJjTS9RVkZrSEhRSERIcXdPZnVCQWlaeWswSHlteHM1SDJKMG91MEJENnhtVUxJPSIsIml2UGFyYW1ldGVyU3BlYyI6Ing2d0krcmtvSXJQd3ZzdXkiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+MythicalMysfitsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoidENmREJOQlJOWXljOHFyeDkweEp3dFdEWStCaWx1UXNiaFBES2R0V2xPOElWbk04SW9XY3l1NXdod3J4a0svSnVFbFZGcDBlK3NuZFBLNUpXV3llYmJvPSIsIml2UGFyYW1ldGVyU3BlYyI6InkrWktsZzFvSEtXOGZsZk4iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
+MythicalMysfitsStreamingService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibHdhRXc5dzgwalRGa3FlNVU1cVhFMGpTdE50ZlJUUlh3OFpZa294aWdKcW8xdDZ4cHNIUU1RemtSMENWandXM2RFTjBzZnphajJlM1Z0anZPdkYyOUU0PSIsIml2UGFyYW1ldGVyU3BlYyI6IlN5d0cyallzbmpRUnVIOXMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
+MythicalMysfitsQuestionsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiaWNxZ0NDMC91RlhoaU00SDB3L2dnMWpaZ29UeE5OTDl3YUhqY1h6L0kzL2xpZEwxd1JGR240L2pWRjVwVG5BcXVYNm1vTGhPTnZKc0JOaUl3bTNSY0s0PSIsIml2UGFyYW1ldGVyU3BlYyI6ImxDM3JkU3JsOTh6eWJyTjYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
+
+
 
 # Directory Structure
 
@@ -97,15 +107,6 @@ create-module-4
 create-module-5
 
 ```
-
-# Build Status
-
-Service | Status
----| ---
-Soar | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiVWR4K1AwWCtLMS8zaVhOdVU3ckNDaGlvMmpvVk5Gb0dLVjBvRjRVRFJjTS9RVkZrSEhRSERIcXdPZnVCQWlaeWswSHlteHM1SDJKMG91MEJENnhtVUxJPSIsIml2UGFyYW1ldGVyU3BlYyI6Ing2d0krcmtvSXJQd3ZzdXkiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
-MythicalMysfitsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoidENmREJOQlJOWXljOHFyeDkweEp3dFdEWStCaWx1UXNiaFBES2R0V2xPOElWbk04SW9XY3l1NXdod3J4a0svSnVFbFZGcDBlK3NuZFBLNUpXV3llYmJvPSIsIml2UGFyYW1ldGVyU3BlYyI6InkrWktsZzFvSEtXOGZsZk4iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
-MythicalMysfitsStreamingService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibHdhRXc5dzgwalRGa3FlNVU1cVhFMGpTdE50ZlJUUlh3OFpZa294aWdKcW8xdDZ4cHNIUU1RemtSMENWandXM2RFTjBzZnphajJlM1Z0anZPdkYyOUU0PSIsIml2UGFyYW1ldGVyU3BlYyI6IlN5d0cyallzbmpRUnVIOXMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
-MythicalMysfitsQuestionsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiaWNxZ0NDMC91RlhoaU00SDB3L2dnMWpaZ29UeE5OTDl3YUhqY1h6L0kzL2xpZEwxd1JGR240L2pWRjVwVG5BcXVYNm1vTGhPTnZKc0JOaUl3bTNSY0s0PSIsIml2UGFyYW1ldGVyU3BlYyI6ImxDM3JkU3JsOTh6eWJyTjYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
 
 # User Setup
 
