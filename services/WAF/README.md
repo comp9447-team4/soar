@@ -1,16 +1,15 @@
 # AWS WAF Setup
 
-## Setting up of WAF WebACL and Rules
+* ## Setting up of WAF WebACL and Rules
 The first part of the WAF setup is to deploy the cloudformation template which will create WebACL and IP sets for CloudFront or ALB endpoints for our application. The setup follows the AWS  solutions https://aws.amazon.com/solutions/implementations/aws-waf-security-automations/
 Considering the scope and time, for our soar solution we will be setting up rules such as Rate based, SQLI, XSS and whitelisted and Blacklisted IPsets.
 
 Can be further extended to the full solution above if need be.
 
-
-
-## How to deploy
+![](https://d1.awsstatic.com/Solutions/Solutions%20Category%20Template%20Draft/Solution%20Architecture%20Diagrams/waf-security-automations-architecture.520fa104475cd846b62df3b2027a64094dfad31a.png)
+### How to deploy
 This can be deployed manually using AWS SAM or as part of the CI/CD stack. 
-### soar-stack deployment
+##### soar-stack deployment
 
 ```
 cd bin/
@@ -28,7 +27,7 @@ It will use the sam deploy command to deploy the cloudformation template
 # deploy endpoint: Cloufront
 sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-cloudfront-deploy.toml
 ```
-### Sam Deployment
+##### Sam Deployment
 ```
 # deploy endpoint: ALB(APIGateway)
 sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-api-deploy.toml
@@ -36,17 +35,49 @@ sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IA
 # deploy endpoint: Cloufront
 sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-cloudfront-deploy.toml
 ```
-## Lambda kinesis-log-processors.py
 
-```
-The lambda parse the kinesis log info for blocked records to Kibana elastic search
-And also update the Blacklist IPsets in WAF rule
+
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_rules.png)
+
+* ## Add Association
+Once you have deployed the WebACL and corresponding rules and IP sets, we should associate the API’s or CloudFront resources to them. Under Rules we can see an option to add associations. For CloudFront the region must be global and for ALB’s it must be the deployed regions e.g.: “us-east-1”. 
+
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_association_api.png)
  
-services/WAF/Lambda/kinesis-log-processors.py
+Once this is done WAF will start to take actions on the incoming traffic, by default it is set to allowed but incase if a rule blocks an IP it will be temporarily blocked for a period of 240 mins.
 
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_sample_request.png)
+
+* ## Enabling logging
+WAF has the option to enable  continuous logging and monitoring using a kinesis firehose data stream. Make sure the Kinesis log stream starts with “aws-waf-logs-“, e.g.: aws-waf-logs-firehose We will need to enable logging for each of the WebACL we setup. By default, the kinesis logs are sent to an S3 bucket. 
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_logging.jpg)
+
+We can setup Lambda functions if we need to process these logs and can send those logs to other destinations. 
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kinesis_streams.jpg)
+In addition to this the lambda function also pass on any stdout to cloudwatch logs. You can see the log stream here /aws/lambda/kinesis-log-processors.
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_lambda_cloudwatch_logs.jpg)
+
+* ## Parse logs to elastic search using lambda
+As discussed above a lambda function e.g.: kinesis-log-processors is setup to send processed logs to specified destinations. We have already setup Elastic search with Kibana frontend on our AWS console. We are using the same setup to send our logs for monitoring needs. The lambda function filters out and sends the blocked traffic logs to our ES. The index for the same is setup in Elastic search as “waf-kinesis-logs” where below information for blocked IP is passed.
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_es_index.jpg)
+
+* ## Threat analysis and automated updation of WAF rules and IP sets using Lambda
+An integral part of the WAF is to minimize the human workload when external threat occurs. WAF to an extent handles this. But at the same time, we need to ensure a proper threat analysis can be done and block such malicious sources from further attempting to break into the system. This is where we use Blacklisted IP sets, where the rule blocks any IP’s listed in it.
+
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_threat_analysis.jpg)
+
+Whenever an IP is blocked by any rule, the WAF puts a temporary block, we want the IP to be moved into a permanent Blacklist if multiple attempts happen. We ensure this by a Lambda Function update_ipset(clientIp). The function which is part of : kinesis-log-processors update the Blacklisted IP set whenever the client IP is blocked by WAF, although current setup takes action on the first attempt itself.
 ```
+services/WAF/Lambda/kinesis-log-processors.py
+```
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_lambda_update_ipset.jpg)
 
-## How to cleanup
+Apart from setting up the Lambda we must change the permissions in IAM so that the Lambda can read and update the WAF rules and IP sets. This is done by attaching AWSWAFFullAccess policy to the function in IAM.
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_lambda_IAM.jpg)
+
+* ##  Monitoring for threats and alerting stakeholders
+
+* ## How to cleanup
 Detach associations and run cloudformation delete from console or from CLI
 
 CLI commands
@@ -58,6 +89,11 @@ aws cloudformation delete-stack --stack-name waf-apigateway
 aws cloudformation delete-stack --stack-name waf-cloudfront
 
 ```
+
+
+* ## How to run local tests
+Please refer to https://github.com/comp9447-team4/soar/blob/master/services/WAF/test_script/README.MD
+
 ## Miscellaneous
 ### stack template for deploying the WAF webACL
 
@@ -71,7 +107,3 @@ services/WAF/templates/aws-waf-security-automations.template
 services/WAF/templates/AWSWAFSecurityAutomationsAPIGateway1602565086135.json
 
 ```
-
-
-## How to run local tests
-Please refer to https://github.com/comp9447-team4/soar/blob/master/services/WAF/test_script/README.MD
