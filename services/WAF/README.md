@@ -36,6 +36,7 @@ sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IA
 sam deploy -t aws-waf-security-automations.template --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --config-file waf-cloudfront-deploy.toml
 ```
 
+Once deployed you can see the following rules setup under the WebACL.
 
 ![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_rules.png)
 
@@ -54,6 +55,7 @@ WAF has the option to enable  continuous logging and monitoring using a kinesis 
 
 We can setup Lambda functions if we need to process these logs and can send those logs to other destinations. 
 ![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kinesis_streams.jpg)
+
 In addition to this the lambda function also pass on any stdout to cloudwatch logs. You can see the log stream here /aws/lambda/kinesis-log-processors.
 ![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_lambda_cloudwatch_logs.jpg)
 
@@ -79,7 +81,7 @@ Apart from setting up the Lambda we must change the permissions in IAM so that t
 Whenever a security threat arises, WAF blocks the threat but at the same time it is important to have the incident alerted to security engineers or other concerned stakeholders. The Kibana ES offers this solution by setting up monitors on the index of our logs from WAF. As you can see, we have setup monitors which will capture information if there are any such events.
 ![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kibana_monitors.jpg)
 
-Each of these monitors are set up to alert the concerned person, in our case our team discord channel. This is done by  AWS SNS and target notification towards Discord channel
+Each of these monitors are set up to alert the concerned person, in our case our team discord channel. This is done by  AWS SNS and target the notification towards Discord channel
 ![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kibana_alerts.jpg)
 
 Below is a sample alert sent to the discord channel when a source attempted a rate based attack. We can see the clientIP, the rule based on which IP is blocked , source country as well as the timestamp of the event in the alert.
@@ -98,7 +100,7 @@ aws cloudformation delete-stack --stack-name waf-apigateway
 aws cloudformation delete-stack --stack-name waf-cloudfront
 
 ```
-
+Once aboe is complete we can delete the kinesis streams and the Lambda functions setup for logging and threat analysis.
 
 * ## How to run local tests
 Please refer to https://github.com/comp9447-team4/soar/blob/master/services/WAF/test_script/README.MD
