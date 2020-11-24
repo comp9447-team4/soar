@@ -79,12 +79,16 @@ Apart from setting up the Lambda we must change the permissions in IAM so that t
 
 * ##  Monitoring for threats and alerting stakeholders
 Whenever a security threat arises, WAF blocks the threat but at the same time it is important to have the incident alerted to security engineers or other concerned stakeholders. The Kibana ES offers this solution by setting up monitors on the index of our logs from WAF. As you can see, we have setup monitors which will capture information if there are any such events.
+
 ![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kibana_monitors.jpg)
 
 Each of these monitors are set up to alert the concerned person, in our case our team discord channel. This is done by  AWS SNS and target the notification towards Discord channel
+
 ![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kibana_alerts.jpg)
 
-Below is a sample alert sent to the discord channel when a source attempted a rate based attack. We can see the clientIP, the rule based on which IP is blocked , source country as well as the timestamp of the event in the alert.
+
+Below image is a sample alert sent to the discord channel when a source attempted a rate based attack. We can see the clientIP, the rule based on which IP is blocked , source country as well as the timestamp of the event in the alert.
+
 ![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_discord_alert.jpg)
 
 
@@ -100,7 +104,7 @@ aws cloudformation delete-stack --stack-name waf-apigateway
 aws cloudformation delete-stack --stack-name waf-cloudfront
 
 ```
-Once aboe is complete we can delete the kinesis streams and the Lambda functions setup for logging and threat analysis.
+Once above step is complete we can delete the kinesis streams and the Lambda functions setup for logging and threat analysis.
 
 * ## How to run local tests
 Please refer to https://github.com/comp9447-team4/soar/blob/master/services/WAF/test_script/README.MD
