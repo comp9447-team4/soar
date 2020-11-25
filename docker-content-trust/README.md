@@ -1,7 +1,7 @@
 # Docker Content Trust with Amazon ECR
 
 ## Prerequisite
-Install Docker and Docker Compose on your local machine. 
+Install Docker and Docker Compose on your local machine. Ensure git is also installed.
 
 ## Instructions
 1. Run the script:\
