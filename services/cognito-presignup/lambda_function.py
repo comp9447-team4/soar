@@ -8,6 +8,7 @@ logger.setLevel(logging.INFO)
 
 import httpbl
 
+# Sends data regarding the denied ip to a discord alert channel
 def sendAlertToDiscord(response, ip_address):
     content = 'COGNITO SIGN UP DENIED\n'
     content = content + "IP Address: {}".format(ip_address) + "\n"
@@ -22,14 +23,14 @@ def sendAlertToDiscord(response, ip_address):
     requests.post(webhook_url, data={"content": "```" + content + "```"})
 
 def lambda_handler(event, context):
-    # logger.info('## ENVIRONMENT VARIABLES')
-    # logger.info(os.environ)
-    # logger.info('## EVENT')
-    # logger.info(event)
-    # logger.info(event.request)
     print(event)
+
+    # Grab the client's ip from which the request came from
     ip_address = event['request']['clientMetadata']['client_ip']
 
+    # Query the httlbl for details regarding the incoming ip
+    # TODO: SET my-key to be your access key from ProjectHoneyPot
+    #       https://www.projecthoneypot.org/httpbl_configure.php
     bl = httpbl.HttpBL('my-key')
     response = bl.query(ip_address)
 
@@ -42,16 +43,20 @@ def lambda_handler(event, context):
         if ipset['Name'] == f"{waf_prefix} - Blacklist Set":
             BlacklistIPSetId = ipset['IPSetId']
 
+    # Place all blacklisted ips into an array
     blacklist_ipset = client.get_ip_set(IPSetId=BlacklistIPSetId)
     blacklist = [x['Value'] for x in blacklist_ipset['IPSet']['IPSetDescriptors']]
-    blacklist.append("27.32.194.700")
+
     print("BLACKLISTED IPS")
     print(blacklist)
 
+    # Log info about what triggered the lambda
     print("COGNITO PRESIGNUP TRIGGER")
     print('IP Address: {}'.format(ip_address))
     print('Threat Score: {}'.format(response['threat_score']))
     print('Days since last activity: {}'.format(response['days_since_last_activity']))
+
+    # if the ip in httpbl is listed as being threatening or is in the waf blacklist then deny it
     if response['threat_score'] > 0:
         print('Visitor type: {}'.format(', '.join([httpbl.DESCRIPTIONS[t] for t in response['type']])))
         print(event)
@@ -65,4 +70,6 @@ def lambda_handler(event, context):
         raise Exception("Denied signup")
     print("###################################################")
     print(event)
+
+    # If no exceptions were raised, proceed with the signup request
     return event
