@@ -177,7 +177,7 @@ You want to upload the zip file which we just created called 'cognito-presignup.
 
 Next you can set up the environment variable to have the lambda alert your desired discord channel.
 
-For example:
+For example (Team4's dev alerts channel: https://discordapp.com/api/webhooks/762644386009317407/R1qXCsrycsrTx6QFa-dgpyFbMjzFDhK2WnxQiqmQP-N07mID7Hs-bGYU0-ENb61v1d6G): 
 
 ![step6_1](https://user-images.githubusercontent.com/70885465/100230537-f3a29980-2f79-11eb-9777-78d2ea8addea.PNG)
 
