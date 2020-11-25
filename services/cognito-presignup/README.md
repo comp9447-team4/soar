@@ -161,11 +161,15 @@ inside of the current directory. This will produce a cognito-presignup.zip file.
 
 Next go into the management console and create a new lambda function named 'CognitoPreSignUp'
 
-
+![stepone](C:\Users\Sarah\Desktop\stepone.PNG)
 
 Under the Function code section, click on the 'actions' dropdown menu and select Upload a .zip file.
 
 You want to upload the zip file which we just created called 'cognito-presignup.zip'.
+
+![steptwo](C:\Users\Sarah\Desktop\steptwo.PNG)
+
+![stepthree](C:\Users\Sarah\Desktop\stepthree.PNG)
 
 
 
@@ -173,13 +177,15 @@ Next you can set up the environment variable to have the lambda alert your desir
 
 For example:
 
+![step6_1](C:\Users\Sarah\Desktop\step6_1.PNG)
+
 
 
 Next we need to ensure that the permissions are set correctly for the lambda so that it has access to the AWS WAF Blacklist. 
 
-Do this by clicking on the permissions tab inside of the lambda function on the management console. Clicking on the permission assigned to the lambda function and attaching the AWSWAFReadOnlyAccess policy. 
+Do this by clicking on the permissions tab inside of the lambda function on the management console. ![stepfour](C:\Users\Sarah\Desktop\stepfour.PNG)Clicking on the permission assigned to the lambda function and attaching the AWSWAFReadOnlyAccess policy. 
 
-
+![step5](C:\Users\Sarah\Desktop\step5.PNG)
 
 We can now test the lambda with the following event, remembering to replace userName with the username of a valid developer:
 
@@ -219,7 +225,7 @@ Navigate to cognito and the appropriate user pool inside of the management conso
 
 Click on the triggers section on the side left hand menu and assigned the lambda we just created to be triggered at presignup. 
 
-
+![step7](C:\Users\Sarah\Desktop\step7.PNG)
 
 # Lambda Deployment with aws sam
 
@@ -233,9 +239,9 @@ Go into the management console and navigate to the lambda that was just created.
 
 Next we need to ensure that the permissions are set correctly for the lambda so that it has access to the AWS WAF Blacklist. 
 
-Do this by clicking on the permissions tab inside of the lambda function on the management console. Clicking on the permission assigned to the lambda function and attaching the AWSWAFReadOnlyAccess policy. 
+Do this by clicking on the permissions tab inside of the lambda function on the management console. Clicking on the permission assigned to the lambda function and attaching the AWSWAFReadOnlyAccess policy. ![stepfour](C:\Users\Sarah\Desktop\stepfour.PNG)
 
-
+![step5](C:\Users\Sarah\Desktop\step5.PNG)
 
 We can now test the lambda with the following event, remembering to replace userName with the username of a valid developer:
 
@@ -275,6 +281,8 @@ Navigate to cognito and the appropriate user pool inside of the management conso
 
 Click on the triggers section on the side left hand menu and assigned the lambda we just created to be triggered at presignup. 
 
+![step7](C:\Users\Sarah\Desktop\step7.PNG)
+
 
 
 Note by deploying this way, all alerts will go to the Team 4's dev alerts channel, to change the discord channel that all alerts will be forwarded to, change the webhook provided in template.yaml to your desired location.  
@@ -302,12 +310,6 @@ Resources:
           DISCORD_DEV_ALERTS_CHANNEL_WEBHOOK: >-
             REPLACE WITH YOUR DISCORD CHANNEL WEBOOK
 ```
-
-
-
-
-
-
 
 
 
