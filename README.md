@@ -29,7 +29,7 @@ MythicalMysfitsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uu
 MythicalMysfitsStreamingService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibHdhRXc5dzgwalRGa3FlNVU1cVhFMGpTdE50ZlJUUlh3OFpZa294aWdKcW8xdDZ4cHNIUU1RemtSMENWandXM2RFTjBzZnphajJlM1Z0anZPdkYyOUU0PSIsIml2UGFyYW1ldGVyU3BlYyI6IlN5d0cyallzbmpRUnVIOXMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
 MythicalMysfitsQuestionsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiaWNxZ0NDMC91RlhoaU00SDB3L2dnMWpaZ29UeE5OTDl3YUhqY1h6L0kzL2xpZEwxd1JGR240L2pWRjVwVG5BcXVYNm1vTGhPTnZKc0JOaUl3bTNSY0s0PSIsIml2UGFyYW1ldGVyU3BlYyI6ImxDM3JkU3JsOTh6eWJyTjYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
 
-
+(Improvement feedback to AWS: Some of these build badges don't seem to update even though we have successful builds)
 
 # Directory Structure
 
