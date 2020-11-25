@@ -41,6 +41,8 @@ deactivate
 
 Here is an example of a static webpage for the sample app Mystical Mysfits that passes in the users ip as client metadata (register.html):
 
+https://github.com/comp9447-team4/soar/blob/master/mythical-mysfits/register.html
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -161,15 +163,15 @@ inside of the current directory. This will produce a cognito-presignup.zip file.
 
 Next go into the management console and create a new lambda function named 'CognitoPreSignUp'
 
-![stepone](C:\Users\Sarah\Desktop\stepone.PNG)
+![stepone](https://user-images.githubusercontent.com/70885465/100230546-f56c5d00-2f79-11eb-8bac-ae822df102da.PNG)
 
 Under the Function code section, click on the 'actions' dropdown menu and select Upload a .zip file.
 
 You want to upload the zip file which we just created called 'cognito-presignup.zip'.
 
-![steptwo](C:\Users\Sarah\Desktop\steptwo.PNG)
+![steptwo](https://user-images.githubusercontent.com/70885465/100230543-f4d3c680-2f79-11eb-944c-84c4a09119a2.PNG)
 
-![stepthree](C:\Users\Sarah\Desktop\stepthree.PNG)
+![stepthree](https://user-images.githubusercontent.com/70885465/100230542-f4d3c680-2f79-11eb-82ef-0868832725ae.PNG)
 
 
 
@@ -177,15 +179,15 @@ Next you can set up the environment variable to have the lambda alert your desir
 
 For example:
 
-![step6_1](C:\Users\Sarah\Desktop\step6_1.PNG)
+![step6_1](https://user-images.githubusercontent.com/70885465/100230537-f3a29980-2f79-11eb-9777-78d2ea8addea.PNG)
 
 
 
 Next we need to ensure that the permissions are set correctly for the lambda so that it has access to the AWS WAF Blacklist. 
 
-Do this by clicking on the permissions tab inside of the lambda function on the management console. ![stepfour](C:\Users\Sarah\Desktop\stepfour.PNG)Clicking on the permission assigned to the lambda function and attaching the AWSWAFReadOnlyAccess policy. 
+Do this by clicking on the permissions tab inside of the lambda function on the management console. ![stepfour](https://user-images.githubusercontent.com/70885465/100230541-f43b3000-2f79-11eb-9584-d5372c5efb92.PNG)Clicking on the permission assigned to the lambda function and attaching the AWSWAFReadOnlyAccess policy. 
 
-![step5](C:\Users\Sarah\Desktop\step5.PNG)
+![step5](https://user-images.githubusercontent.com/70885465/100230535-f2716c80-2f79-11eb-8579-9db7d8f9f6c3.PNG)
 
 We can now test the lambda with the following event, remembering to replace userName with the username of a valid developer:
 
@@ -225,7 +227,7 @@ Navigate to cognito and the appropriate user pool inside of the management conso
 
 Click on the triggers section on the side left hand menu and assigned the lambda we just created to be triggered at presignup. 
 
-![step7](C:\Users\Sarah\Desktop\step7.PNG)
+![step7](https://user-images.githubusercontent.com/70885465/100230549-f56c5d00-2f79-11eb-977d-c2aedeb91047.PNG)
 
 # Lambda Deployment with aws sam
 
@@ -239,9 +241,9 @@ Go into the management console and navigate to the lambda that was just created.
 
 Next we need to ensure that the permissions are set correctly for the lambda so that it has access to the AWS WAF Blacklist. 
 
-Do this by clicking on the permissions tab inside of the lambda function on the management console. Clicking on the permission assigned to the lambda function and attaching the AWSWAFReadOnlyAccess policy. ![stepfour](C:\Users\Sarah\Desktop\stepfour.PNG)
+Do this by clicking on the permissions tab inside of the lambda function on the management console. Clicking on the permission assigned to the lambda function and attaching the AWSWAFReadOnlyAccess policy. ![stepfour](https://user-images.githubusercontent.com/70885465/100230541-f43b3000-2f79-11eb-9584-d5372c5efb92.PNG)
 
-![step5](C:\Users\Sarah\Desktop\step5.PNG)
+![step5](https://user-images.githubusercontent.com/70885465/100230535-f2716c80-2f79-11eb-8579-9db7d8f9f6c3.PNG)
 
 We can now test the lambda with the following event, remembering to replace userName with the username of a valid developer:
 
@@ -281,7 +283,7 @@ Navigate to cognito and the appropriate user pool inside of the management conso
 
 Click on the triggers section on the side left hand menu and assigned the lambda we just created to be triggered at presignup. 
 
-![step7](C:\Users\Sarah\Desktop\step7.PNG)
+![step7](https://user-images.githubusercontent.com/70885465/100230549-f56c5d00-2f79-11eb-977d-c2aedeb91047.PNG)
 
 
 
