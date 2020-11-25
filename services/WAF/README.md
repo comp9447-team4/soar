@@ -40,7 +40,7 @@ Once deployed you can see the following rules setup under the WebACL.
 <img src="https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_rules.png" width="80%">
 
 * ## Add Association
-Once you have deployed the WebACL and corresponding rules and IP sets, we should associate the API’s or CloudFront resources to them. Under Rules we can see an option to add associations. For CloudFront the region must be global and for ALB’s it must be the deployed regions e.g.: “us-east-1”. 
+Once you have deployed the WebACL and corresponding rules and IP sets, we should associate the API’s or CloudFront resources to them. Under Rules we can see an option to add associations. For CloudFront the region must be global and for ALB’s it must be the deployed regions e.g.: “us-east-1”.
 <img src="https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_association_api.png" width="80%">
  
 Once this is done WAF will start to take actions on the incoming traffic, by default it is set to allowed but incase if a rule blocks an IP it will be temporarily blocked for a period of 240 mins.
@@ -48,10 +48,10 @@ Once this is done WAF will start to take actions on the incoming traffic, by def
 
 
 * ## Enabling logging
-WAF has the option to enable  continuous logging and monitoring using a kinesis firehose data stream. Make sure the Kinesis log stream starts with “aws-waf-logs-“, e.g.: aws-waf-logs-firehose We will need to enable logging for each of the WebACL we setup. By default, the kinesis logs are sent to an S3 bucket. 
+WAF has the option to enable  continuous logging and monitoring using a kinesis firehose data stream. Make sure the Kinesis log stream starts with “aws-waf-logs-“, e.g.: aws-waf-logs-firehose We will need to enable logging for each of the WebACL we setup. By default, the kinesis logs are sent to an S3 bucket.
 <img src="https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_logging.jpg" width="80%">
 
-We can setup Lambda functions if we need to process these logs and can send those logs to other destinations. 
+We can setup Lambda functions if we need to process these logs and can send those logs to other destinations.
 ![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kinesis_streams.jpg)
 
 In addition to this the lambda function also pass on any stdout to cloudwatch logs. You can see the log stream here /aws/lambda/kinesis-log-processors.
