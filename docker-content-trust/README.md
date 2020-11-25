@@ -23,4 +23,5 @@ In the first push it should prompt you for passphrases
 docker trust inspect --pretty MY_ACCOUNT.dkr.ecr.us-east-2.amazonaws.com/my/repo:latest
 ```
 
-
+## Troubleshoot
+* If experiencing issues at the `docker-compose up -d` stage, please ensure the device has more than 10GB of storage.
