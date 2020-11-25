@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "waf-cloudfront"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1tbxmul61l44z"
+s3_prefix = "waf-cloudfront"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+parameter_overrides = "ActivateSqlInjectionProtectionParam=\"yes\" ActivateCrossSiteScriptingProtectionParam=\"yes\" ActivateHttpFloodProtectionParam=\"yes - AWS WAF rate based rule\" ActivateScannersProbesProtectionParam=\"yes - AWS Lambda log parser\" ActivateReputationListsProtectionParam=\"yes\" ActivateBadBotProtectionParam=\"yes\" EndpointType=\"CloudFront\" AppAccessLogBucket=\"cloudfront-accesslog-waf\" RequestThreshold=\"100\" ErrorThreshold=\"50\" WAFBlockPeriod=\"240\" KeepDataInOriginalS3Location=\"No\""

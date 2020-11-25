@@ -17,17 +17,96 @@ Elton Wong
 Evangeline Endacott
 William Yin
 Chirag Panikkasseril Unni
-Shiyuan Liang
+Shiyuan Liang (Steve)
 ```
 
 # Build Status
 
-Service | Master | Release
---- | --- | ---
-Soar | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiVWR4K1AwWCtLMS8zaVhOdVU3ckNDaGlvMmpvVk5Gb0dLVjBvRjRVRFJjTS9RVkZrSEhRSERIcXdPZnVCQWlaeWswSHlteHM1SDJKMG91MEJENnhtVUxJPSIsIml2UGFyYW1ldGVyU3BlYyI6Ing2d0krcmtvSXJQd3ZzdXkiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiVWR4K1AwWCtLMS8zaVhOdVU3ckNDaGlvMmpvVk5Gb0dLVjBvRjRVRFJjTS9RVkZrSEhRSERIcXdPZnVCQWlaeWswSHlteHM1SDJKMG91MEJENnhtVUxJPSIsIml2UGFyYW1ldGVyU3BlYyI6Ing2d0krcmtvSXJQd3ZzdXkiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=release)
-MythicalMysfitsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoidENmREJOQlJOWXljOHFyeDkweEp3dFdEWStCaWx1UXNiaFBES2R0V2xPOElWbk04SW9XY3l1NXdod3J4a0svSnVFbFZGcDBlK3NuZFBLNUpXV3llYmJvPSIsIml2UGFyYW1ldGVyU3BlYyI6InkrWktsZzFvSEtXOGZsZk4iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoidENmREJOQlJOWXljOHFyeDkweEp3dFdEWStCaWx1UXNiaFBES2R0V2xPOElWbk04SW9XY3l1NXdod3J4a0svSnVFbFZGcDBlK3NuZFBLNUpXV3llYmJvPSIsIml2UGFyYW1ldGVyU3BlYyI6InkrWktsZzFvSEtXOGZsZk4iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=release)
-MythicalMysfitsStreamingService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibHdhRXc5dzgwalRGa3FlNVU1cVhFMGpTdE50ZlJUUlh3OFpZa294aWdKcW8xdDZ4cHNIUU1RemtSMENWandXM2RFTjBzZnphajJlM1Z0anZPdkYyOUU0PSIsIml2UGFyYW1ldGVyU3BlYyI6IlN5d0cyallzbmpRUnVIOXMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibHdhRXc5dzgwalRGa3FlNVU1cVhFMGpTdE50ZlJUUlh3OFpZa294aWdKcW8xdDZ4cHNIUU1RemtSMENWandXM2RFTjBzZnphajJlM1Z0anZPdkYyOUU0PSIsIml2UGFyYW1ldGVyU3BlYyI6IlN5d0cyallzbmpRUnVIOXMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=release)
-MythicalMysfitsQuestionsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiaWNxZ0NDMC91RlhoaU00SDB3L2dnMWpaZ29UeE5OTDl3YUhqY1h6L0kzL2xpZEwxd1JGR240L2pWRjVwVG5BcXVYNm1vTGhPTnZKc0JOaUl3bTNSY0s0PSIsIml2UGFyYW1ldGVyU3BlYyI6ImxDM3JkU3JsOTh6eWJyTjYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiaWNxZ0NDMC91RlhoaU00SDB3L2dnMWpaZ29UeE5OTDl3YUhqY1h6L0kzL2xpZEwxd1JGR240L2pWRjVwVG5BcXVYNm1vTGhPTnZKc0JOaUl3bTNSY0s0PSIsIml2UGFyYW1ldGVyU3BlYyI6ImxDM3JkU3JsOTh6eWJyTjYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=release)
+Service | Status
+---| ---
+Soar | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiVWR4K1AwWCtLMS8zaVhOdVU3ckNDaGlvMmpvVk5Gb0dLVjBvRjRVRFJjTS9RVkZrSEhRSERIcXdPZnVCQWlaeWswSHlteHM1SDJKMG91MEJENnhtVUxJPSIsIml2UGFyYW1ldGVyU3BlYyI6Ing2d0krcmtvSXJQd3ZzdXkiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+MythicalMysfitsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoidENmREJOQlJOWXljOHFyeDkweEp3dFdEWStCaWx1UXNiaFBES2R0V2xPOElWbk04SW9XY3l1NXdod3J4a0svSnVFbFZGcDBlK3NuZFBLNUpXV3llYmJvPSIsIml2UGFyYW1ldGVyU3BlYyI6InkrWktsZzFvSEtXOGZsZk4iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
+MythicalMysfitsStreamingService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibHdhRXc5dzgwalRGa3FlNVU1cVhFMGpTdE50ZlJUUlh3OFpZa294aWdKcW8xdDZ4cHNIUU1RemtSMENWandXM2RFTjBzZnphajJlM1Z0anZPdkYyOUU0PSIsIml2UGFyYW1ldGVyU3BlYyI6IlN5d0cyallzbmpRUnVIOXMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
+MythicalMysfitsQuestionsService | ![](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiaWNxZ0NDMC91RlhoaU00SDB3L2dnMWpaZ29UeE5OTDl3YUhqY1h6L0kzL2xpZEwxd1JGR240L2pWRjVwVG5BcXVYNm1vTGhPTnZKc0JOaUl3bTNSY0s0PSIsIml2UGFyYW1ldGVyU3BlYyI6ImxDM3JkU3JsOTh6eWJyTjYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master) 
+
+
+
+# Directory Structure
+
+```
+bin/ - shell scripts (use this as an entry point)
+infra/ - cloudformation templates
+mythical-mysfits/ - code related to the sample app
+services/ - our custom use cases written with Lambdas and AWS SAM
+```
+
+# Quick start
+
+```
+➜  soar git:(master) ✗ AWS_PROFILE=qa ./bin/soar-stack.sh --help
+In environment: qa
+Not a valid argument...
+Manages CFN stacks for the SOAR solution.
+Usage: AWS_PROFILE=qa ./bin/soar.sh <arg>
+
+Where arg is:
+
+create-cicd
+create-cloudtrail
+create-es
+create-waf-stack
+
+(There are more options if you checkout the shell script, eg: updating stacks etc)
+
+```
+
+# Deploying ElasticSearch
+
+```
+# Deploy the S3 To ES Lambda Forwarder
+cd services/s3-to-es-forwarder
+sam deploy --guided
+
+# Go back to repo root
+cd ../..
+
+# Use the soar-stack.sh script to deploy cloudtrail and es
+./bin/soar-stack.sh create-cloudtrail
+./bin/soar-stack.sh create-es
+```
+
+# Deploying Custom Lambdas
+
+These can be deployed manually using AWS SAM: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html
+
+```
+# Go to the service
+cd services/budget-alarms
+sam deploy --guided
+```
+
+Or use the ci/cd with CodePipeline. 
+
+`./services/buildspec.yml` is setup with our Github repo and AWS accounts.
+
+![](doc/img/cicd.png)
+
+
+# Deploying Mythical Mysfits
+
+```
+➜  soar git:(master) ✗ AWS_PROFILE=qa ./bin/mythical-mysfits.sh --help
+Reference: https://github.com/aws-samples/aws-modern-application-workshop/tree/python
+
+Where arg is:
+
+create-module-1
+create-module-2
+create-module-3
+create-module-4
+create-module-5
+
+```
 
 # User Setup
 
@@ -191,59 +270,8 @@ brew install aws-sam-cli
 sam --version
 ```
 
-
-# infra/ 
-
-These contain infrastructure-as-code for comp9447-team4.
-
-## infra/sso/ folder
-
-This folder contains the setup for AWS users that follows the well architected labs. This uses AWS SSO.
-
-**THIS WILL ONLY BE NEEDED TO BE DONE ONCE** on the master root account. (Already provisioned for you).
-
-# Drupal
-
-This will only need to be done **once**. Do not destroy the existing stack.
-
-https://aws.amazon.com/quickstart/architecture/drupal/
-
-Create a key pair with:
-
-```
-AWS_PROFILE=qa ./bin/key-pair.sh create
-AWS_PROFILE=qa ./bin/key-pair.sh describe
-```
-
-Make sure you save it.
-
-
-Deploy the stack with:
-
-```
-AWS_PROFILE=qa ./bin/drupal-stack.sh create
-```
-
-## Clean up Drupal stack
-DO NOT DESTROY AN EXISTING STACK UNLESS ABSOLUTELY NECESSARY! It has termination protection on.
-
-```
-AWS_PROFILE=qa ./bin/key-pair.sh delete
-AWS_PROFILE=qa ./bin/drupal-stack.sh delete
-```
-
-# Panther
-
-I'm experimenting with Panther to do threat hunting on top of guard duty. 
-
-There is an open source version with Cloudformation templates to deploy.
-
-See:
-* https://runpanther.io/
-* https://docs.runpanther.io/
-
-Note: The quick start templates are in `us-east-1`.
-
 # AWS Region choice
 
 `us-east-1` was chosen as the main AWS REGION to make it easier to deploy resources. This region is expected to get the latest features.
+
+With the exception of SSO. Our initial stack for SSO ONLY is deployed on `ap-southeast-2`.

@@ -47,3 +47,11 @@ Steps:
   ```
 5. Head over to the AWS management console > waf > waf classic, and under conditions > ip addresses > black list. Your public IP should be blocked.
 
+See the below responses when rate-based attack tested against one of the mysfits URL. The behaviour of the webpage depends on what resources the attack happens. If it is against API urls the WAF blocks access to the api alone but instead if we hit the cloudfront URL you will be blocked from accessing the website itself.
+
+
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_test_py.jpg)
+http_rate_attack.py which sends a short bust of over 100 HTTP requests
+
+![](https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_test_sh.jpg)
+rate-attacks.sh will send GET request on one of the mysfits API URL
