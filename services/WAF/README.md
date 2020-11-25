@@ -89,11 +89,11 @@ Apart from setting up the Lambda we must change the permissions in IAM so that t
 * ##  Monitoring for threats and alerting stakeholders
 Whenever a security threat arises, WAF blocks the threat but at the same time it is important to have the incident alerted to security engineers or other concerned stakeholders. The Kibana ES offers this solution by setting up monitors on the index of our logs from WAF. As you can see, we have setup monitors which will capture information if there are any such events.
 
-<img src="https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kibana_monitors.jpg" width="50%">
+<img src="https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kibana_monitors.jpg" width="60%">
 
 Each of these monitors are set up to alert the concerned person, in our case our team discord channel. This is done by  AWS SNS and target the notification towards Discord channel.
 
-<img src="https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kibana_alerts.jpg" width="50%">
+<img src="https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kibana_alerts.jpg" width="40%">
 
 
 Below image is a sample alert sent to the discord channel when a source attempted a rate based attack. We can see the clientIP, the rule based on which IP is blocked , source country as well as the timestamp of the event in the alert.
