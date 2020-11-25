@@ -6,7 +6,6 @@ This project contains source code and supporting files for a serverless applicat
 
 - macie - Code for the application's Lambda function.
 - events - Invocation events that you can use to invoke the function.
-- tests - Unit tests for the application code. 
 - template.yaml - A template that defines the application's AWS resources.
 
 The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
@@ -71,7 +70,7 @@ macie-poller$ sam local start-api
 macie-poller$ curl http://localhost:3000/
 ```
 
-The SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path.
+The SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path. The Macie Poller is scheduled to run only on working days to avoid altering outside of business hours.
 
 ```yaml
       Events:
@@ -95,15 +94,6 @@ macie-poller$ sam logs -n MaciePollerFunction --stack-name macie-poller --tail
 ```
 
 You can find more information and examples about filtering Lambda function logs in the [SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
-
-<!-- ## Unit tests
-
-Tests are defined in the `tests` folder in this project. Use PIP to install the [pytest](https://docs.pytest.org/en/latest/) and run unit tests.
-
-```bash
-macie-poller$ pip install pytest pytest-mock --user
-macie-poller$ python -m pytest tests/ -v
-``` -->
 
 ## Cleanup
 
