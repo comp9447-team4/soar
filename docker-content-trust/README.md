@@ -1,7 +1,12 @@
 # Docker Content Trust with Amazon ECR
 
-## Prerequisite
-Install Docker and Docker Compose on your local machine. Ensure git is also installed.
+## Requirements
+* Git
+* Docker
+* Docker Compose
+* At least 11 GB of free storage
+
+
 
 ## Instructions
 1. Run the script:\
@@ -22,6 +27,3 @@ In the first push it should prompt you for passphrases
 ```
 docker trust inspect --pretty MY_ACCOUNT.dkr.ecr.us-east-2.amazonaws.com/my/repo:latest
 ```
-
-## Troubleshoot
-* If experiencing issues at the `docker-compose up -d` stage, please ensure the device has more than 10GB of storage.
