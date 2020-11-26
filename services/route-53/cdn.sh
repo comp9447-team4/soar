@@ -1,17 +1,19 @@
-#hardcode the local dev account for test
+#Replacable variables
 export AWS_ENVIRONMENT="qa"
 export AWS_DEFAULT_REGION=us-east-1
 export CDN_NAME="${AWS_ENVIRONMENT}-CloudFront-Stack"
 export CDN_TEMPLATE_YML="./cdn.yml"
+export Cert_ARN="Insert your certificate ARN here"
+export My_domain="Insert your domain name here"
+export Bucket_name="Insert bucket name here"
 
-
-echo "Creating cdn..."
+echo "Creating CDN..."
 aws cloudformation create-stack \
     --stack-name "${CDN_NAME}" \
     --region us-east-1 \
     --template-body file://"${CDN_TEMPLATE_YML}" \
     --capabilities CAPABILITY_NAMED_IAM \
-    --parameters ParameterKey="DomainName",ParameterValue="9447.me"\
-     ParameterKey="CertificateArn",ParameterValue="arn:aws:acm:us-east-1:306967644367:certificate/80c8b98e-ce6f-49a7-908c-86131e18fb30"\
-     ParameterKey="BucketName",ParameterValue="qa-comp9447-team4-mythical-mysfits"\
-     ParameterKey="S3Region",ParameterValue="us-east-1"
+    --parameters ParameterKey="DomainName",ParameterValue="${My_domain}"\
+     ParameterKey="CertificateArn",ParameterValue="${Cert_ARN}"\
+     ParameterKey="BucketName",ParameterValue="${Bucket_name}"\
+     ParameterKey="S3Region",ParameterValue="${AWS_DEFAULT_REGION}"
