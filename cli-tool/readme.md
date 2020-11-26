@@ -1,6 +1,6 @@
 ### CLI Tool
 
-AWS CLI tool, uses utilise a number of packages to make security deployment easy
+AWS CLI tool, uses utilise a number of packages to make security deployment easy. (Currrently not working)
 
 
 ### Prequisites
