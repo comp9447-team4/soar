@@ -1,0 +1,85 @@
+Parameters:
+  CertificateArn:
+    Type: String
+  BucketName:
+    Type: String
+  DomainName:
+    Type: String
+  S3Region:
+    Type: String
+
+Description: CDN stack that ties domain name and acm together
+
+Resources:
+  #Create a CDN origin identity to be referenced later by the S3 bucket
+  CDNOriginIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub "Cloudfront Origin identity for ${DomainName}"
+
+  #Deploy a cdn for the s3 serveless bucket
+  CDN:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Sub "qa.${DomainName}"
+        DefaultCacheBehavior:
+          AllowedMethods:
+              - GET
+              - HEAD
+          CachedMethods:
+              - GET
+              - HEAD
+          ForwardedValues:
+            QueryString: True
+          TargetOriginId: !Sub "S3-${BucketName}"
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
+        Enabled: True
+        Origins:
+        #sub to get the correct region
+          - DomainName: !Sub "${BucketName}.s3.${S3Region}.amazonaws.com"
+            Id: !Sub "S3-${BucketName}"
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CDNOriginIdentity}"
+        PriceClass: PriceClass_100
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          MinimumProtocolVersion: TLSv1.2_2018
+          SslSupportMethod: sni-only
+      
+  #Create a origin policy to restrict the origin from only the cloudfront distribution
+  S3HostingBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketName
+      PolicyDocument:
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CDNOriginIdentity}
+            Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+    DependsOn: CDNOriginIdentity
+    Version: "2012-10-17"
+  
+  #Create new DNS entry for the newly deployed CDN, currently not working
+  CloudFrontDNSEntries:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: !Sub "${DomainName}."
+      RecordSets:
+        - AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName: !GetAtt CDN.DomainName
+          Name: !Sub "qa.${DomainName}"
+          Type: A
+    DependsOn: CDN
+  
+Outputs:
+  CloudFrontURL:
+    Value: !GetAtt CDN.DomainName
+    Description: CloudFront URL for updating DNS record

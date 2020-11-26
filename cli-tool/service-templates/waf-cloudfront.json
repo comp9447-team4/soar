@@ -1,0 +1,50 @@
+[
+    {
+        "ParameterKey": "ActivateCrossSiteScriptingProtectionParam",
+        "ParameterValue": "yes"
+    },
+    {
+        "ParameterKey": "RequestThreshold",
+        "ParameterValue": "100"
+    },
+    {
+        "ParameterKey": "ActivateHttpFloodProtectionParam",
+        "ParameterValue": "yes - AWS WAF rate based rule"
+    },
+    {
+        "ParameterKey": "ActivateScannersProbesProtectionParam",
+        "ParameterValue": "no"
+    },
+    {
+        "ParameterKey": "EndpointType",
+        "ParameterValue": "CloudFront"
+    },
+    {
+        "ParameterKey": "ActivateReputationListsProtectionParam",
+        "ParameterValue": "no"
+    },
+    {
+        "ParameterKey": "KeepDataInOriginalS3Location",
+        "ParameterValue": "No"
+    },
+    {
+        "ParameterKey": "ErrorThreshold",
+        "ParameterValue": "50"
+    },
+    {
+        "ParameterKey": "AppAccessLogBucket",
+        "ParameterValue": "cloudfront-accesslog-waf"
+    },
+    {
+        "ParameterKey": "WAFBlockPeriod",
+        "ParameterValue": "240"
+    },
+        "OutputValue": "296e6e32-7c72-4a30-81a8-523927daa30b",
+        "Description": "AWS WAF WebACL ID"
+    },
+    {
+        "OutputKey": "SolutionVersion",
+        "OutputValue": "v2.3.3",
+        "Description": "Solution Version Number"
+    }
+]

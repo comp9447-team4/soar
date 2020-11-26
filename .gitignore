@@ -2,4 +2,5 @@
 tmp/
 .aws-sam
 .pytest_cache
-.idea
+env/
+__pycache__/

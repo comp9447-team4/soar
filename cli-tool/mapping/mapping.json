@@ -1,0 +1,5 @@
+{
+    "name": "SOAR file mapping configuration",
+    "description": "mapping configuration file which is used to locate template files, incase they are no in the same directory or housed somewhere else",
+    "templates_folder": "/template"
+}

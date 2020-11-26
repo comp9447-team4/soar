@@ -1,0 +1,14 @@
+boto3==1.16.13
+botocore==1.19.13
+click==7.1.2
+jmespath==0.10.0
+prompt-toolkit==1.0.14
+pyfiglet==0.8.post1
+Pygments==2.7.2
+PyInquirer==1.0.3
+python-dateutil==2.8.1
+regex==2020.10.28
+s3transfer==0.3.3
+six==1.15.0
+urllib3==1.25.11
+wcwidth==0.2.5
