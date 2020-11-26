@@ -19,7 +19,3 @@ The stack secures the serveless s3 application by enabling ssl, cdn, and restric
 - CertificateArn: the newly generated ACM certificate ARN (aws resource idenfitier).
 - BucketName: The name of the bucket that is hosting the website.
 - S3Region: The region where the S3 bucket is located.
-
-
-### CLI-Tool options
-TBA
