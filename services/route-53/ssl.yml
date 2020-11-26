@@ -1,9 +1,6 @@
 Parameters:
   DomainName:
     Type: String
-  
-  S3Record:
-    Type: String
 
   HostedZoneId:
     Type: String
