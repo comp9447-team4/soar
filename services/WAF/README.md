@@ -92,9 +92,13 @@ Whenever a security threat arises, WAF blocks the threat but at the same time it
 <img src="https://github.com/comp9447-team4/soar/blob/master/doc/img/waf_kibana_monitors.jpg" width="60%">
 
 please find the monitors here:
+
 https://github.com/comp9447-team4/soar/blob/master/elasticsearch/queries/monitors/waf-BlockIP_RATE_BASED
+
 https://github.com/comp9447-team4/soar/blob/master/elasticsearch/queries/monitors/waf-blockIP-SqlInjectionMatch
+
 https://github.com/comp9447-team4/soar/blob/master/elasticsearch/queries/monitors/waf-blockIP-XSSMatch
+
 
 Each of these monitors are set up to alert the concerned person, in our case our team discord channel. This is done by  AWS SNS and target the notification towards Discord channel.
 
