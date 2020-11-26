@@ -1,7 +1,9 @@
 ### CLI Tool
 
-AWS CLI tool, uses utilise a number of packages to make security deployment easy. (Currrently not working)
+AWS CLI tool, uses utilise a number of packages to make security deployment easy. 
+(Currrently not working)
 
+Please use the shell tool found here: https://github.com/comp9447-team4/soar/blob/master/bin/sso-stack.sh
 
 ### Prequisites
 - Python3
